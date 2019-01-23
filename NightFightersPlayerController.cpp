@@ -6,10 +6,15 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "NightFightersCharacter.h"
 #include "Engine/World.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ANightFightersPlayerController::ANightFightersPlayerController()
 {
 	bShowMouseCursor = true;
+	bMoveToMouseCursor = true;
+	direction = FVector(0, 1, 0);
+	speed = 5000;
+	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = speed;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
@@ -77,14 +82,14 @@ void ANightFightersPlayerController::MoveToMouseCursor()
 	// We hit something, move there
 	FVector newDirection = Hit.ImpactPoint - GetPawn()->GetActorLocation();
 	newDirection = FVector(newDirection.X, newDirection.Y, 0);
+	float distToMouse = newDirection.Size();
 	newDirection.Normalize();
+	direction = newDirection;
 
-	GetCharacter()->SetActorRotation(FRotator(newDirection.CosineAngle2D(FVector(1, 0, 0)), PI / 2, PI / 2));
-	
-	if (Hit.bBlockingHit)
+	GetCharacter()->SetActorRotation(direction.ToOrientationRotator());
+	if (Hit.bBlockingHit && distToMouse > 120.0f)
 	{
-		
-		//SetNewMoveDestination(Hit.ImpactPoint);
+		GetCharacter()->GetCharacterMovement()->AddInputVector(direction * speed);
 
 	}
 }
@@ -133,5 +138,10 @@ void ANightFightersPlayerController::OnSetDestinationReleased()
 
 void ANightFightersPlayerController::OnPrimaryPressed()
 {
+	GetCharacter()->GetCharacterMovement()->StopMovementImmediately();
+	GetCharacter()->GetCharacterMovement()->AddImpulse(direction * 10000);
+}
 
+void ANightFightersPlayerController::OnPrimaryReleased()
+{
 }

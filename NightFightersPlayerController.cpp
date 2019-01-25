@@ -14,7 +14,6 @@ ANightFightersPlayerController::ANightFightersPlayerController()
 	bMoveToMouseCursor = true;
 	direction = FVector(0, 1, 0);
 	speed = 5000;
-	GetCharacter()->GetCharacterMovement()->MaxWalkSpeed = speed;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
@@ -138,8 +137,9 @@ void ANightFightersPlayerController::OnSetDestinationReleased()
 
 void ANightFightersPlayerController::OnPrimaryPressed()
 {
-	GetCharacter()->GetCharacterMovement()->StopMovementImmediately();
-	GetCharacter()->GetCharacterMovement()->AddImpulse(direction * 10000);
+	//std::cout << "OnPrimaryPressed" << std::endl;
+	//GetCharacter()->GetCharacterMovement()->StopMovementImmediately();
+	//GetCharacter()->GetCharacterMovement()->AddImpulse(direction * 10000);
 }
 
 void ANightFightersPlayerController::OnPrimaryReleased()

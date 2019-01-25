@@ -18,6 +18,7 @@ protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
 	FVector direction;
+	float speed;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;

@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour {
         aKey = KeyCode.Mouse0;
         bKey = KeyCode.Mouse1;
 
-        speed = 0.15f;
+        speed = 0.1f;
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
         useMouseMovement = true;
@@ -67,32 +67,30 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void Move(Vector2 direction)
+    private void Move(Vector2 direction, int layerMask=Physics2D.DefaultRaycastLayers)
     {
         Vector2 pos = transform.position;
-
-        int layMask = 1 << 8; // Layer mask for environment layer
+        Vector3 size = GetComponent<Renderer>().bounds.size;
+        //int layMask = 1 << 8; // Layer mask for environment layer
+        
+        GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
+        RaycastHit2D hitXTop = Physics2D.Raycast(pos + new Vector2(0, size.y/2), new Vector2(direction.x, 0), 0.5f, layerMask);
+        RaycastHit2D hitXBot = Physics2D.Raycast(pos - new Vector2(0, size.y/2), new Vector2(direction.x, 0), 0.5f, layerMask);
+        //RaycastHit2D hitDiag = Physics2D.Raycast(pos, new Vector2(direction.x / Mathf.Abs(direction.x), direction.x / Mathf.Abs(direction.x)), 0.707f);
+        GetComponent<BoxCollider2D>().enabled = true;
+        if (hitXTop.collider == null && hitXBot.collider == null)
+        {
+            transform.Translate(speed * new Vector2(direction.x, 0));
+        }
 
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
-
-        RaycastHit2D hitX = Physics2D.Raycast(pos, new Vector2(direction.x, 0), 0.5f);
-        RaycastHit2D hitY = Physics2D.Raycast(pos, new Vector2(0, direction.y), 0.5f);
-        //RaycastHit2D hitDiag = Physics2D.Raycast(pos, new Vector2(direction.x / Mathf.Abs(direction.x), direction.x / Mathf.Abs(direction.x)), 1f);
-
+        RaycastHit2D hitYLeft  = Physics2D.Raycast(pos - new Vector2(size.x/2, 0), new Vector2(0, direction.y), 0.5f, layerMask);
+        RaycastHit2D hitYRight = Physics2D.Raycast(pos + new Vector2(size.x/2, 0), new Vector2(0, direction.y), 0.5f, layerMask);
         GetComponent<BoxCollider2D>().enabled = true;
-        if (hitX.collider != null)
+        if (hitYLeft.collider == null && hitYRight.collider == null)
         {
-            Debug.Log("Collide x " + hitX.collider.gameObject);
-            direction = new Vector2(0, direction.y);
+            transform.Translate(speed * new Vector2(0, direction.y));
         }
-        if (hitY.collider != null)
-        {
-            Debug.Log("Collide y " + hitY.collider.gameObject);
-            direction = new Vector2(direction.x, 0);
-        }
-
-        Debug.Log("Translate: " + speed * direction);
-        transform.Translate(speed * direction);
     }
 
     private void Dash()

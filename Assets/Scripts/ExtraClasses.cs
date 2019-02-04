@@ -42,6 +42,6 @@ public class Timer
 
     public int GetPercentDone()
     {
-        return (int)(100 * time / presetTime);
+        return Mathf.CeilToInt(100 * time / presetTime);
     }
 }

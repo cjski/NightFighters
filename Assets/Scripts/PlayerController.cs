@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
 
@@ -15,6 +16,7 @@ public class PlayerController : MonoBehaviour {
     Timer dashTime;
 
     Timer primaryCooldown;
+    Text primaryCooldownText;
 
 	// Use this for initialization
 	void Start () {
@@ -33,6 +35,7 @@ public class PlayerController : MonoBehaviour {
         dashTime = new Timer(.5f);
 
         primaryCooldown = new Timer(3);
+        primaryCooldownText = GetComponentInChildren<Text>();
 	}
 
     // Update is called once per frame
@@ -49,6 +52,7 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
         if (!primaryCooldown.done) primaryCooldown.Update();
+        primaryCooldownText.text = "Primary Charge: " + primaryCooldown.GetPercentDone();
 	}
 
     private void MoveWithKeys()

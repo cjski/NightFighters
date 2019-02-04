@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour {
 
     Timer dashTime;
 
+    Timer primaryCooldown;
+
 	// Use this for initialization
 	void Start () {
         lKey = KeyCode.A;
@@ -29,10 +31,12 @@ public class PlayerController : MonoBehaviour {
         useMouseMovement = true;
 
         dashTime = new Timer(.5f);
+
+        primaryCooldown = new Timer(3);
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
         if (movementType == MovementType.Normal)
         {
             if (useMouseMovement) MoveWithMouse();
@@ -43,7 +47,8 @@ public class PlayerController : MonoBehaviour {
             Dash();
         }
 
-        if (Input.GetKeyDown(aKey)) OnPrimaryPressed();
+        if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
+        if (!primaryCooldown.done) primaryCooldown.Update();
 	}
 
     private void MoveWithKeys()
@@ -109,6 +114,7 @@ public class PlayerController : MonoBehaviour {
     protected virtual void OnPrimaryPressed()
     {
         movementType = MovementType.Dashing;
+        primaryCooldown.Reset();
         dashTime.Reset();
     }
 }

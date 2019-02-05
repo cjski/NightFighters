@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEditor;
 
 public class PlayerController : MonoBehaviour {
 
@@ -14,8 +16,13 @@ public class PlayerController : MonoBehaviour {
 
     Timer dashTime;
 
-	// Use this for initialization
-	void Start () {
+    Timer primaryCooldown;
+    Text primaryCooldownText;
+
+    GameObject projectilePrefab;
+
+    // Use this for initialization
+    void Start () {
         lKey = KeyCode.A;
         rKey = KeyCode.D;
         uKey = KeyCode.W;
@@ -29,10 +36,15 @@ public class PlayerController : MonoBehaviour {
         useMouseMovement = true;
 
         dashTime = new Timer(.5f);
-	}
-	
-	// Update is called once per frame
-	void Update () {
+
+        primaryCooldown = new Timer(3);
+        primaryCooldownText = GetComponentInChildren<Text>();
+
+        projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
+    }
+
+    // Update is called once per frame
+    void Update() {
         if (movementType == MovementType.Normal)
         {
             if (useMouseMovement) MoveWithMouse();
@@ -43,7 +55,11 @@ public class PlayerController : MonoBehaviour {
             Dash();
         }
 
-        if (Input.GetKeyDown(aKey)) OnPrimaryPressed();
+        if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
+        if (!primaryCooldown.done) primaryCooldown.Update();
+        primaryCooldownText.text = "Primary Charge: " + primaryCooldown.GetPercentDone();
+
+        if (Input.GetKeyDown(bKey)) OnSecondaryPressed();
 	}
 
     private void MoveWithKeys()
@@ -110,5 +126,11 @@ public class PlayerController : MonoBehaviour {
     {
         movementType = MovementType.Dashing;
         dashTime.Reset();
+    }
+
+    protected virtual void OnSecondaryPressed()
+    {
+        GameObject attack = Instantiate(projectilePrefab, transform.position, transform.rotation);
+        attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2);
     }
 }

@@ -39,9 +39,8 @@ public class PlayerController : MonoBehaviour {
 
         primaryCooldown = new Timer(3);
         primaryCooldownText = GetComponentInChildren<Text>();
-
         projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
-    }
+	}
 
     // Update is called once per frame
     void Update() {
@@ -125,6 +124,7 @@ public class PlayerController : MonoBehaviour {
     protected virtual void OnPrimaryPressed()
     {
         movementType = MovementType.Dashing;
+        primaryCooldown.Reset();
         dashTime.Reset();
     }
 

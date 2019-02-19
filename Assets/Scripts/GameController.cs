@@ -31,8 +31,8 @@ public class GameController : MonoBehaviour {
         }
 
         GameObject p1 = Instantiate(playerPrefab, new Vector3(-5, 3, 0), Quaternion.identity);
-        p1.GetComponent<PlayerController>().useMouseMovement = true;
+        p1.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
         GameObject p2 = Instantiate(playerPrefab, new Vector3(3, -3, 0), Quaternion.identity);
-        p2.GetComponent<PlayerController>().useMouseMovement = false;
+        p2.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
     }
 }

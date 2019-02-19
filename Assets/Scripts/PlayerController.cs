@@ -26,13 +26,6 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        lKey = KeyCode.A;
-        rKey = KeyCode.D;
-        uKey = KeyCode.W;
-        dKey = KeyCode.S;
-        aKey = KeyCode.Mouse0;
-        bKey = KeyCode.Mouse1;
-
         speed = 0.1f;
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
@@ -47,6 +40,30 @@ public class PlayerController : MonoBehaviour {
         text = GetComponentInChildren<Text>();
         projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
 	}
+
+    /* Map Controls using keys as movement in the following order:
+     * Left, Right, Up, Down, A, B
+     */
+    public void MapControls(KeyCode l, KeyCode r, KeyCode u, KeyCode d, KeyCode a, KeyCode b)
+    {
+        useMouseMovement = false;
+        lKey = l;
+        rKey = r;
+        uKey = u;
+        dKey = d;
+        aKey = a;
+        bKey = b;
+    }
+
+    /* Map controls using mouse for movement in the following order:
+     * A, B
+     */
+    public void MapControls(KeyCode a, KeyCode b)
+    {
+        useMouseMovement = true;
+        aKey = a;
+        bKey = b;
+    }
 
     // Update is called once per frame
     void Update() {
@@ -150,6 +167,7 @@ public class PlayerController : MonoBehaviour {
     {
         GameObject attack = Instantiate(projectilePrefab, transform.position, transform.rotation);
         attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2, gameObject);
+        secondaryCooldown.Reset();
     }
 
     public void Damage(int damage)

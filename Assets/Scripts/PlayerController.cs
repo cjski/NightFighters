@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour {
     Timer dashTime;
 
     Timer primaryCooldown;
+    Timer secondaryCooldown;
     Text text;
 
     GameObject projectilePrefab;
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour {
         dashTime = new Timer(.5f);
 
         primaryCooldown = new Timer(3);
+        secondaryCooldown = new Timer(1);
+
         text = GetComponentInChildren<Text>();
         projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
 	}
@@ -60,7 +63,8 @@ public class PlayerController : MonoBehaviour {
         if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
         if (!primaryCooldown.done) primaryCooldown.Update();
 
-        if (Input.GetKeyDown(bKey)) OnSecondaryPressed();
+        if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
+        if (!secondaryCooldown.done) secondaryCooldown.Update();
 
         text.text = "Health: " + health;
 	}
@@ -145,7 +149,7 @@ public class PlayerController : MonoBehaviour {
     protected virtual void OnSecondaryPressed()
     {
         GameObject attack = Instantiate(projectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2);
+        attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2, gameObject);
     }
 
     public void Damage(int damage)

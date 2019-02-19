@@ -7,14 +7,16 @@ public class ProjectileController : MonoBehaviour {
     public Vector2 direction;
     private float speed;
     private Timer lifetime;
+    private GameObject owner;
 	// Use this for initialization
 	void Start () {}
 
-    public void Init(Vector2 newDirection, float newSpeed, float duration)
+    public void Init(Vector2 newDirection, float newSpeed, float duration, GameObject newOwner)
     {
         direction = newDirection;
         speed = newSpeed;
         lifetime = new Timer(duration);
+        owner = newOwner;
     }
 	
 	// Update is called once per frame
@@ -26,10 +28,13 @@ public class ProjectileController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (!collision.gameObject.Equals(owner))
         {
-            PlayerController pc = collision.gameObject.GetComponent<PlayerController>();
-            pc.Damage(10);
+            if (collision.gameObject.tag == "Player")
+            {
+                PlayerController pc = collision.gameObject.GetComponent<PlayerController>();
+                pc.Damage(10);
+            }
             Destroy(gameObject);
         }
     }

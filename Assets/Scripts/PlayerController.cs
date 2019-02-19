@@ -8,16 +8,18 @@ public class PlayerController : MonoBehaviour {
 
     enum MovementType { Normal, Dashing };
 
-    KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
+    private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
     float speed;
-    bool useMouseMovement;
+    public bool useMouseMovement = true;
     Vector2 direction;
     MovementType movementType;
+
+    private int health;
 
     Timer dashTime;
 
     Timer primaryCooldown;
-    Text primaryCooldownText;
+    Text text;
 
     GameObject projectilePrefab;
 
@@ -33,12 +35,13 @@ public class PlayerController : MonoBehaviour {
         speed = 0.1f;
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
-        useMouseMovement = true;
+
+        health = 100;
 
         dashTime = new Timer(.5f);
 
         primaryCooldown = new Timer(3);
-        primaryCooldownText = GetComponentInChildren<Text>();
+        text = GetComponentInChildren<Text>();
         projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
 	}
 
@@ -56,14 +59,27 @@ public class PlayerController : MonoBehaviour {
 
         if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
         if (!primaryCooldown.done) primaryCooldown.Update();
-        primaryCooldownText.text = "Primary Charge: " + primaryCooldown.GetPercentDone();
 
         if (Input.GetKeyDown(bKey)) OnSecondaryPressed();
+
+        text.text = "Health: " + health;
 	}
 
     private void MoveWithKeys()
     {
-        Vector2 move = new Vector2(0, 0);
+        int moveX = 0, moveY = 0;
+        if (Input.GetKey(lKey)) moveX -= 1;
+        if (Input.GetKey(rKey)) moveX += 1;
+        if (Input.GetKey(uKey)) moveY += 1;
+        if (Input.GetKey(dKey)) moveY -= 1;
+
+        Vector2 move = new Vector2(moveX, moveY);
+
+        if (move.magnitude > 0)
+        {
+            direction = move.normalized;
+            Move(move.normalized);
+        }
     }
 
     private void MoveWithMouse()
@@ -75,8 +91,7 @@ public class PlayerController : MonoBehaviour {
         float distToMove = move.magnitude;
 
         direction = move.normalized;
-        Debug.Log("Try to move to "+move+" "+distToMove);
-        if(distToMove >= speed)
+        if(distToMove >= speed * 2)
         {
             Move(move.normalized);
         }
@@ -86,7 +101,6 @@ public class PlayerController : MonoBehaviour {
     {
         Vector2 pos = transform.position;
         Vector3 size = GetComponent<Renderer>().bounds.size;
-        Debug.Log("Size of player " + size + " at " + pos);
         //int layMask = 1 << 8; // Layer mask for environment layer
         
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
@@ -132,5 +146,11 @@ public class PlayerController : MonoBehaviour {
     {
         GameObject attack = Instantiate(projectilePrefab, transform.position, transform.rotation);
         attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2);
+    }
+
+    public void Damage(int damage)
+    {
+        health -= damage;
+        if (health <= 0) Destroy(gameObject);
     }
 }

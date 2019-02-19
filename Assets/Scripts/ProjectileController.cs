@@ -23,4 +23,14 @@ public class ProjectileController : MonoBehaviour {
         if (lifetime.done) Destroy(gameObject);
         GetComponent<Transform>().Translate(speed * direction);
 	}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            PlayerController pc = collision.gameObject.GetComponent<PlayerController>();
+            pc.Damage(10);
+            Destroy(gameObject);
+        }
+    }
 }

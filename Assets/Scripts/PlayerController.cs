@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour {
     public bool useMouseMovement = true;
     Vector2 direction;
     MovementType movementType;
+    public float slowFactor;
 
     private int health;
 
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour {
         speed = 0.1f;
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
+        slowFactor = 1;
 
         health = 100;
 
@@ -67,6 +69,12 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (!useMouseMovement)
+        {
+            if (InLight()) slowFactor = 2;
+            else slowFactor = 1;
+        }
+
         if (movementType == MovementType.Normal)
         {
             if (useMouseMovement) MoveWithMouse();
@@ -96,7 +104,7 @@ public class PlayerController : MonoBehaviour {
 
         Vector2 move = new Vector2(moveX, moveY);
 
-        if (move.magnitude > 0)
+        if (move.sqrMagnitude > 0)
         {
             direction = move.normalized;
             Move(move.normalized);
@@ -109,10 +117,10 @@ public class PlayerController : MonoBehaviour {
         mPos3d = Camera.main.ScreenToWorldPoint(mPos3d);
         Vector2 mPos2d = new Vector2(mPos3d.x, mPos3d.y);
         Vector2 move = mPos2d - GetComponent<Rigidbody2D>().position;
-        float distToMove = move.magnitude;
+        float distToMoveSqr = move.sqrMagnitude;
 
         direction = move.normalized;
-        if(distToMove >= speed * 2)
+        if(distToMoveSqr >= (speed * 2)*(speed * 2))
         {
             Move(move.normalized);
         }
@@ -132,7 +140,7 @@ public class PlayerController : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = true;
         if (hitXTop.collider == null && hitXBot.collider == null && hitXMid.collider == null)
         {
-            transform.Translate(speed * new Vector2(direction.x, 0));
+            transform.Translate((speed / slowFactor) * new Vector2(direction.x, 0));
         }
 
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
@@ -142,7 +150,7 @@ public class PlayerController : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = true;
         if (hitYLeft.collider == null && hitYRight.collider == null && hitYMid.collider == null)
         {
-            transform.Translate(speed * new Vector2(0, direction.y));
+            transform.Translate((speed / slowFactor) * new Vector2(0, direction.y));
         }
     }
 
@@ -154,6 +162,23 @@ public class PlayerController : MonoBehaviour {
         }
         dashTime.Update();
         if (dashTime.done) movementType = MovementType.Normal;
+    }
+
+    private bool InLight()
+    {
+        GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
+        float xDist, yDist;
+        for (int i=0; i < lights.Length; ++i)
+        {
+            if (lights[i].GetComponent<LightController>().On())
+            {
+                //Use squared distance for faster calculation
+                xDist = transform.position.x - lights[i].transform.position.x;
+                yDist = transform.position.y - lights[i].transform.position.y;
+                if ((xDist * xDist) + (yDist * yDist) < 4) return true;
+            }  
+        }
+        return false;
     }
 
     protected virtual void OnPrimaryPressed()

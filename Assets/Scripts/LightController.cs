@@ -24,8 +24,6 @@ public class LightController : MonoBehaviour {
 	void Update () {
         if (halo.enabled && monstersIn > 0) turnOffTimer.Update();
         else if (!halo.enabled && humansIn > 0) turnOnTimer.Update();
-        Debug.Log("Update: Halo: "+halo.enabled+", TurnOn: "+turnOnTimer.GetPercentDone()+ ", TurnOff: "+turnOffTimer.GetPercentDone());
-        Debug.Log("Monsters: " + monstersIn + ", Humans: " + humansIn);
         if (turnOnTimer.done)
         {
             halo.enabled = true;
@@ -40,26 +38,23 @@ public class LightController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.GetComponent<Collider2D>().GetType() == typeof(BoxCollider2D))
+        if (collision.gameObject.tag == "Player")
         {
-            if (collision.gameObject.tag == "Player")
-            {
-                Debug.Log("Enter");
-                if (collision.gameObject.GetComponent<PlayerController>().useMouseMovement) ++humansIn;
-                else ++monstersIn;
-            }
+            if (collision.gameObject.GetComponent<PlayerController>().useMouseMovement) ++humansIn;
+            else ++monstersIn;
         }
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.GetComponent<Collider2D>().GetType() == typeof(BoxCollider2D))
+        if (collision.gameObject.tag == "Player")
         {
-            if (collision.gameObject.tag == "Player")
-            {
-                Debug.Log("Exit");
-                if (collision.gameObject.GetComponent<PlayerController>().useMouseMovement) --humansIn;
-                else --monstersIn;
-            }
+            if (collision.gameObject.GetComponent<PlayerController>().useMouseMovement) --humansIn;
+            else --monstersIn;
         }
+    }
+
+    public bool On()
+    {
+        return halo.enabled;
     }
 }

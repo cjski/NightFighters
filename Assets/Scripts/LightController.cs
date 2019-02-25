@@ -40,7 +40,7 @@ public class LightController : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Player")
         {
-            if (collision.gameObject.GetComponent<PlayerController>().useMouseMovement) ++humansIn;
+            if (collision.gameObject.GetComponent<HumanController>()) ++humansIn;
             else ++monstersIn;
         }
     }
@@ -48,7 +48,7 @@ public class LightController : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Player")
         {
-            if (collision.gameObject.GetComponent<PlayerController>().useMouseMovement) --humansIn;
+            if (collision.gameObject.GetComponent<HumanController>()) --humansIn;
             else --monstersIn;
         }
     }

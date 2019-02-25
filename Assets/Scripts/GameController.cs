@@ -5,11 +5,13 @@ using UnityEditor;
 
 public class GameController : MonoBehaviour {
 
-    GameObject playerPrefab;
+    GameObject humanPrefab;
+    GameObject monsterPrefab;
 
     // Use this for initialization
     void Start () {
-        playerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/PlayerPrefab.prefab", typeof(GameObject));
+        humanPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanPrefab.prefab", typeof(GameObject));
+        monsterPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterPrefab.prefab", typeof(GameObject));
 
         Restart();
     }
@@ -30,9 +32,9 @@ public class GameController : MonoBehaviour {
             Destroy(players[i]);
         }
 
-        GameObject p1 = Instantiate(playerPrefab, new Vector3(-5, 3, 0), Quaternion.identity);
-        p1.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
-        GameObject p2 = Instantiate(playerPrefab, new Vector3(3, -3, 0), Quaternion.identity);
-        p2.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
+        GameObject p1 = Instantiate(humanPrefab, new Vector3(-5, 3, 0), Quaternion.identity);
+        p1.GetComponent<HumanController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
+        GameObject p2 = Instantiate(monsterPrefab, new Vector3(3, -3, 0), Quaternion.identity);
+        p2.GetComponent<MonsterController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
     }
 }

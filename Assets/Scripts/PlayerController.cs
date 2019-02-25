@@ -2,31 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 
-public class PlayerController : MonoBehaviour {
+public abstract class PlayerController : MonoBehaviour {
 
-    enum MovementType { Normal, Dashing };
+    protected enum MovementType { Normal, Dashing };
 
     private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
-    float speed;
+    protected float speed;
     public bool useMouseMovement = true;
-    Vector2 direction;
-    MovementType movementType;
+    protected Vector2 direction;
+    protected MovementType movementType;
     public float slowFactor;
 
-    private int health;
+    protected int health;
 
-    Timer dashTime;
+    protected Timer dashTime;
 
-    Timer primaryCooldown;
-    Timer secondaryCooldown;
-    Text text;
-
-    GameObject projectilePrefab;
+    protected Timer primaryCooldown;
+    protected Timer secondaryCooldown;
+    public Text text;
 
     // Use this for initialization
-    void Start () {
+    protected void Start () {
         speed = 0.1f;
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
@@ -34,14 +31,11 @@ public class PlayerController : MonoBehaviour {
 
         health = 100;
 
-        dashTime = new Timer(.5f);
-
         primaryCooldown = new Timer(3);
         secondaryCooldown = new Timer(1);
 
         text = GetComponentInChildren<Text>();
-        projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
-	}
+    }
 
     /* Map Controls using keys as movement in the following order:
      * Left, Right, Up, Down, A, B
@@ -68,13 +62,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update() {
-        if (!useMouseMovement)
-        {
-            if (InLight()) slowFactor = 2;
-            else slowFactor = 1;
-        }
-
+    protected void Update() {
         if (movementType == MovementType.Normal)
         {
             if (useMouseMovement) MoveWithMouse();
@@ -154,9 +142,9 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void Dash()
+    protected virtual void Dash()
     {
-        for(int i=0;i<2;++i)
+        for (int i = 0; i < 2; ++i)
         {
             Move(direction);
         }
@@ -164,36 +152,9 @@ public class PlayerController : MonoBehaviour {
         if (dashTime.done) movementType = MovementType.Normal;
     }
 
-    private bool InLight()
-    {
-        GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
-        float xDist, yDist;
-        for (int i=0; i < lights.Length; ++i)
-        {
-            if (lights[i].GetComponent<LightController>().On())
-            {
-                //Use squared distance for faster calculation
-                xDist = transform.position.x - lights[i].transform.position.x;
-                yDist = transform.position.y - lights[i].transform.position.y;
-                if ((xDist * xDist) + (yDist * yDist) < 4) return true;
-            }  
-        }
-        return false;
-    }
+    protected abstract void OnPrimaryPressed();
 
-    protected virtual void OnPrimaryPressed()
-    {
-        movementType = MovementType.Dashing;
-        primaryCooldown.Reset();
-        dashTime.Reset();
-    }
-
-    protected virtual void OnSecondaryPressed()
-    {
-        GameObject attack = Instantiate(projectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2, gameObject);
-        secondaryCooldown.Reset();
-    }
+    protected abstract void OnSecondaryPressed();
 
     public void Damage(int damage)
     {

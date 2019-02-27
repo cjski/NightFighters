@@ -4,16 +4,31 @@ using UnityEngine;
 
 public class MonsterController : PlayerController {
 
+    private bool prevInLight;
+
 	// Use this for initialization
 	new void Start () {
         base.Start();
+
+        prevInLight = false;
 	}
 	
 	// Update is called once per frame
 	new void Update () {
         base.Update();
-        if (InLight()) slowFactor = 2;
-        else slowFactor = 1;
+        if (InLight())
+        {
+            if (!prevInLight)
+            {
+                prevInLight = true;
+                ModifySpeed(-0.05f);
+            }
+        }
+        else if (prevInLight)
+        {
+            ModifySpeed(0.05f);
+            prevInLight = false;
+        }
     }
 
     private bool InLight()

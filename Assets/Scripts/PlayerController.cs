@@ -8,11 +8,14 @@ public abstract class PlayerController : MonoBehaviour {
     protected enum MovementType { Normal, Dashing };
 
     private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
+    protected float baseSpeed;
     protected float speed;
     public bool useMouseMovement = true;
     protected Vector2 direction;
     protected MovementType movementType;
-    public float slowFactor;
+    protected float speedModifier;
+    private float minSpeed;
+    private float maxSpeed;
 
     protected int health;
 
@@ -24,10 +27,14 @@ public abstract class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     protected void Start () {
-        speed = 0.1f;
+        baseSpeed = 0.1f;
+        speed = baseSpeed;
+        minSpeed = 0.025f;
+        maxSpeed = 1f;
+        speedModifier = 0;
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
-        slowFactor = 1;
+        speedModifier = 0;
 
         health = 100;
 
@@ -128,7 +135,7 @@ public abstract class PlayerController : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = true;
         if (hitXTop.collider == null && hitXBot.collider == null && hitXMid.collider == null)
         {
-            transform.Translate((speed / slowFactor) * new Vector2(direction.x, 0));
+            transform.Translate(speed * new Vector2(direction.x, 0));
         }
 
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
@@ -138,7 +145,7 @@ public abstract class PlayerController : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = true;
         if (hitYLeft.collider == null && hitYRight.collider == null && hitYMid.collider == null)
         {
-            transform.Translate((speed / slowFactor) * new Vector2(0, direction.y));
+            transform.Translate(speed * new Vector2(0, direction.y));
         }
     }
 
@@ -160,5 +167,13 @@ public abstract class PlayerController : MonoBehaviour {
     {
         health -= damage;
         if (health <= 0) Destroy(gameObject);
+    }
+
+    public void ModifySpeed(float speedModification)
+    {
+        speedModifier += speedModification;
+        speed = baseSpeed + speedModifier;
+        if (speed > maxSpeed) speed = maxSpeed;
+        else if (speed < minSpeed) speed = minSpeed;
     }
 }

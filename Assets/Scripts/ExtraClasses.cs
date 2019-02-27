@@ -45,3 +45,4 @@ public class Timer
         return Mathf.CeilToInt(100 * time / presetTime);
     }
 }
+

@@ -175,7 +175,7 @@ public abstract class PlayerController : MonoBehaviour {
     }
 
     // Used for any launching of the player(dash, knockback). Skips updating directions
-    protected virtual void Dash()
+    private void Dash()
     {
         Move(direction, dashSpeed);
         dashTime.Update();
@@ -183,7 +183,7 @@ public abstract class PlayerController : MonoBehaviour {
     }
 
     // Apply dashes through duration and speed to determine how long you'll fly back
-    protected void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed)
+    public void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed)
     {
         direction = dashDirection;
         dashSpeed = newDashSpeed;

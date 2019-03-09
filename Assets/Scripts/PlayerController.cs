@@ -27,6 +27,7 @@ public abstract class PlayerController : MonoBehaviour {
     protected int health;
 
     protected Timer dashTime;
+    private float dashSpeed;
 
     protected Timer primaryCooldown;
     protected Timer secondaryCooldown;
@@ -85,10 +86,7 @@ public abstract class PlayerController : MonoBehaviour {
             if (useMouseMovement) MoveWithMouse();
             else MoveWithKeys();
         }
-        else if (movementType == MovementType.Dashing)
-        {
-            Dash();
-        }
+        else if (movementType == MovementType.Dashing) Dash(); 
 
         if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
         if (!primaryCooldown.done) primaryCooldown.Update();
@@ -112,7 +110,7 @@ public abstract class PlayerController : MonoBehaviour {
         if (move.sqrMagnitude > 0)
         {
             direction = move.normalized;
-            Move(move.normalized);
+            Move(move.normalized, speed);
         }
     }
 
@@ -127,35 +125,35 @@ public abstract class PlayerController : MonoBehaviour {
         direction = move.normalized;
         if(distToMoveSqr >= (speed * 2)*(speed * 2))
         {
-            Move(move.normalized);
+            Move(move.normalized, speed);
         }
     }
 
-    private void Move(Vector2 direction, int layerMask=Physics2D.DefaultRaycastLayers)
+    private void Move(Vector2 direction, float moveSpeed, int layerMask=Physics2D.DefaultRaycastLayers)
     {
         Vector2 pos = transform.position;
         Vector3 size = GetComponent<Renderer>().bounds.size;
         //int layMask = 1 << 8; // Layer mask for environment layer
         
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
-        RaycastHit2D hitXTop = Physics2D.Raycast(pos + new Vector2(0, size.y/2), new Vector2(direction.x, 0), speed + size.x/2, layerMask);
-        RaycastHit2D hitXMid = Physics2D.Raycast(pos, new Vector2(direction.x, 0), speed + size.x/2, layerMask);
-        RaycastHit2D hitXBot = Physics2D.Raycast(pos - new Vector2(0, size.y/2), new Vector2(direction.x, 0), speed + size.x/2, layerMask);
+        RaycastHit2D hitXTop = Physics2D.Raycast(pos + new Vector2(0, size.y/2), new Vector2(direction.x, 0), moveSpeed + size.x/2, layerMask);
+        RaycastHit2D hitXMid = Physics2D.Raycast(pos, new Vector2(direction.x, 0), moveSpeed + size.x/2, layerMask);
+        RaycastHit2D hitXBot = Physics2D.Raycast(pos - new Vector2(0, size.y/2), new Vector2(direction.x, 0), moveSpeed + size.x/2, layerMask);
         //RaycastHit2D hitDiag = Physics2D.Raycast(pos, new Vector2(direction.x / Mathf.Abs(direction.x), direction.x / Mathf.Abs(direction.x)), 0.707f);
         GetComponent<BoxCollider2D>().enabled = true;
         if (hitXTop.collider == null && hitXBot.collider == null && hitXMid.collider == null)
         {
-            transform.Translate(speed * new Vector2(direction.x, 0));
+            transform.Translate(moveSpeed * new Vector2(direction.x, 0));
         }
 
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
-        RaycastHit2D hitYLeft = Physics2D.Raycast(pos - new Vector2(size.x / 2, 0), new Vector2(0, direction.y), speed + size.y / 2, layerMask);
-        RaycastHit2D hitYMid = Physics2D.Raycast(pos, new Vector2(0, direction.y), speed + size.y/2, layerMask);
-        RaycastHit2D hitYRight = Physics2D.Raycast(pos + new Vector2(size.x/2, 0), new Vector2(0, direction.y), speed + size.y/2, layerMask);
+        RaycastHit2D hitYLeft = Physics2D.Raycast(pos - new Vector2(size.x / 2, 0), new Vector2(0, direction.y), moveSpeed + size.y / 2, layerMask);
+        RaycastHit2D hitYMid = Physics2D.Raycast(pos, new Vector2(0, direction.y), moveSpeed + size.y/2, layerMask);
+        RaycastHit2D hitYRight = Physics2D.Raycast(pos + new Vector2(size.x/2, 0), new Vector2(0, direction.y), moveSpeed + size.y/2, layerMask);
         GetComponent<BoxCollider2D>().enabled = true;
         if (hitYLeft.collider == null && hitYRight.collider == null && hitYMid.collider == null)
         {
-            transform.Translate(speed * new Vector2(0, direction.y));
+            transform.Translate(moveSpeed * new Vector2(0, direction.y));
         }
     }
 
@@ -176,14 +174,21 @@ public abstract class PlayerController : MonoBehaviour {
         }
     }
 
+    // Used for any launching of the player(dash, knockback). Skips updating directions
     protected virtual void Dash()
     {
-        for (int i = 0; i < 2; ++i)
-        {
-            Move(direction);
-        }
+        Move(direction, dashSpeed);
         dashTime.Update();
         if (dashTime.done) movementType = MovementType.Normal;
+    }
+
+    // Apply dashes through duration and speed to determine how long you'll fly back
+    protected void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed)
+    {
+        direction = dashDirection;
+        dashSpeed = newDashSpeed;
+        dashTime.Set(duration);
+        movementType = MovementType.Dashing;
     }
 
     protected abstract void OnPrimaryPressed();

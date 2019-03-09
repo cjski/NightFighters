@@ -53,6 +53,7 @@ public class MonsterController : PlayerController {
 
     protected override void OnPrimaryPressed()
     {
+        
     }
 
     protected override void OnSecondaryPressed()

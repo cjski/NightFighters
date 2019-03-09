@@ -23,9 +23,9 @@ public class HumanController : PlayerController {
 
     protected override void OnPrimaryPressed()
     {
-        movementType = MovementType.Dashing;
         primaryCooldown.Reset();
-        dashTime.Reset();
+        //Apply the current speed instead of baseSpeed so the player will dash slower if they're slowed down
+        ApplyDash(direction, 0.5f, speed * 2);
     }
 
     protected override void OnSecondaryPressed()

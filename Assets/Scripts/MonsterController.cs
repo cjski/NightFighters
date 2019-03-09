@@ -7,12 +7,16 @@ public class MonsterController : PlayerController {
 
     private static GameObject slowProjectilePrefab;
     private bool prevInLight;
+    private float knockbackCosAngle;
+    private float knockbackRange;
 
 	// Use this for initialization
 	new void Start () {
         base.Start();
 
         prevInLight = false;
+        knockbackCosAngle = Mathf.Cos(3.14159265f * 45 / 180);
+        knockbackRange = 2;
         slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/SlowProjectilePrefab.prefab", typeof(GameObject));
     }
 
@@ -53,13 +57,45 @@ public class MonsterController : PlayerController {
 
     protected override void OnPrimaryPressed()
     {
-        
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
+
+        for (int i = 0; i < players.Length; ++i)
+        {
+            if(!(players[i].GetComponent<MonsterController>()))
+            {
+                Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
+                if (toPlayer.sqrMagnitude < knockbackRange)
+                {
+                    toPlayer.Normalize();
+                    if(Vector2.Dot(toPlayer, direction) > knockbackCosAngle)
+                    {
+                        players[i].GetComponent<PlayerController>().ApplyDash(toPlayer, 1f, 0.15f);
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < projectiles.Length; ++i)
+        {
+            Vector2 toProjectile = projectiles[i].transform.position - gameObject.transform.position;
+            if (toProjectile.sqrMagnitude < knockbackRange)
+            {
+                toProjectile.Normalize();
+                if (Vector2.Dot(toProjectile, direction) > knockbackCosAngle)
+                {
+                    projectiles[i].GetComponent<ProjectileController>().direction = toProjectile;
+                }
+            }
+        }
+
+        primaryCooldown.Reset();
     }
 
     protected override void OnSecondaryPressed()
     {
         GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<SlowProjectileController>().Init(direction, 0.2f, 2.5f, gameObject, 0.05f, 10);
+        attack.GetComponent<SlowProjectileController>().Init(direction, 0.12f, 2.5f, gameObject, 0.05f, 10);
         secondaryCooldown.Reset();
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProjectileController : MonoBehaviour {
 
-    protected Vector2 direction;
+    public Vector2 direction;
     protected float speed;
     protected Timer lifetime;
     protected GameObject owner;

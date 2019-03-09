@@ -31,7 +31,7 @@ public class HumanController : PlayerController {
     protected override void OnSecondaryPressed()
     {
         GameObject attack = Instantiate(damageProjectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<DamageProjectileController>().Init(direction, 0.3f, 2, gameObject, 10);
+        attack.GetComponent<DamageProjectileController>().Init(direction, 0.2f, 2, gameObject, 10);
         secondaryCooldown.Reset();
     }
 }

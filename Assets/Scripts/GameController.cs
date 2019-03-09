@@ -36,5 +36,7 @@ public class GameController : MonoBehaviour {
         p1.GetComponent<HumanController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
         GameObject p2 = Instantiate(monsterPrefab, new Vector3(3, -3, 0), Quaternion.identity);
         p2.GetComponent<MonsterController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
+        GameObject p3 = Instantiate(monsterPrefab, new Vector3(5, 0, 0), Quaternion.identity);
+        p3.GetComponent<MonsterController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
     }
 }

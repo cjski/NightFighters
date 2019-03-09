@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class HumanController : PlayerController {
 
-    public static GameObject projectilePrefab;
+    private static GameObject damageProjectilePrefab;
 
     // Use this for initialization
     new void Start () {
@@ -13,7 +13,7 @@ public class HumanController : PlayerController {
 
         dashTime = new Timer(.5f);
 
-        projectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ProjectilePrefab.prefab", typeof(GameObject));
+        damageProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/DamageProjectilePrefab.prefab", typeof(GameObject));
     }
 
     // Update is called once per frame
@@ -30,8 +30,8 @@ public class HumanController : PlayerController {
 
     protected override void OnSecondaryPressed()
     {
-        GameObject attack = Instantiate(projectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<ProjectileController>().Init(direction, 0.3f, 2, gameObject);
+        GameObject attack = Instantiate(damageProjectilePrefab, transform.position, transform.rotation);
+        attack.GetComponent<DamageProjectileController>().Init(direction, 0.3f, 2, gameObject, 10);
         secondaryCooldown.Reset();
     }
 }

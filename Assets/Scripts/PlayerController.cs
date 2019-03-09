@@ -5,6 +5,12 @@ using UnityEngine.UI;
 
 public abstract class PlayerController : MonoBehaviour {
 
+    private struct TimedSpeedModifier
+    {
+        public Timer timer;
+        public float speedModifier;
+    }
+
     protected enum MovementType { Normal, Dashing };
 
     private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
@@ -16,6 +22,7 @@ public abstract class PlayerController : MonoBehaviour {
     protected float speedModifier;
     private float minSpeed;
     private float maxSpeed;
+    private List<TimedSpeedModifier> timedSpeedModifiers;
 
     protected int health;
 
@@ -35,6 +42,7 @@ public abstract class PlayerController : MonoBehaviour {
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
         speedModifier = 0;
+        timedSpeedModifiers = new List<TimedSpeedModifier>();
 
         health = 100;
 
@@ -70,6 +78,8 @@ public abstract class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     protected void Update() {
+        UpdateTimedSpeedModifiers();
+
         if (movementType == MovementType.Normal)
         {
             if (useMouseMovement) MoveWithMouse();
@@ -149,6 +159,23 @@ public abstract class PlayerController : MonoBehaviour {
         }
     }
 
+    private void UpdateTimedSpeedModifiers()
+    {
+        List<TimedSpeedModifier> finishedModifiers = new List<TimedSpeedModifier>();
+
+        foreach(TimedSpeedModifier t in timedSpeedModifiers)
+        {
+            t.timer.Update();
+            if (t.timer.done) finishedModifiers.Add(t);
+        }
+
+        foreach (TimedSpeedModifier t in finishedModifiers)
+        {
+            timedSpeedModifiers.Remove(t);
+            ModifySpeed(t.speedModifier);
+        }
+    }
+
     protected virtual void Dash()
     {
         for (int i = 0; i < 2; ++i)
@@ -175,5 +202,14 @@ public abstract class PlayerController : MonoBehaviour {
         speed = baseSpeed + speedModifier;
         if (speed > maxSpeed) speed = maxSpeed;
         else if (speed < minSpeed) speed = minSpeed;
+    }
+
+    public void ModifySpeed(float speedModification, float duration)
+    {
+        TimedSpeedModifier t = new TimedSpeedModifier();
+        t.timer = new Timer(duration);
+        t.speedModifier = -speedModification; //Negative so we can reverse it
+        timedSpeedModifiers.Add(t);
+        ModifySpeed(speedModification);
     }
 }

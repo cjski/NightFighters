@@ -18,6 +18,14 @@ public class Node
         l = Connection.Empty,
         u = Connection.Empty,
         d = Connection.Empty;
+
+    public int x, y;
+
+    public Node(int xPos, int yPos)
+    {
+        x = xPos;
+        y = yPos;
+    }
 }
 public class Map
 {
@@ -44,43 +52,68 @@ public class Map
         {
             for (int j = 0; j < y; ++j)
             {
-                map[i, j] = new Node();
+                map[i, j] = new Node(i, j);
             }
         }
 
+        GenerateWalls();
+        while (!EntirelyConnected())
+        {
+            // Reset the Node Map so nothing is connected
+            for (int i = 0; i < x; ++i)
+            {
+                for (int j = 0; j < y; ++j)
+                {
+                    map[i, j] = new Node(i, j);
+                }
+            }
+            GenerateWalls();
+        }
+
+        GenerateLights();  
+    }
+
+    private void GenerateWalls()
+    {
+        GameObject[] gameWalls = GameObject.FindGameObjectsWithTag("Wall");
+        for (int i = 0; i < gameWalls.Length; ++i)
+        {
+            Object.Destroy(gameWalls[i]);
+        }
+
         //Generate lower border walls
-        for(int i=0;i < x; ++i)
+        for (int i = 0; i < x; ++i)
         {
             map[i, 0].d = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2(i+0.5f,0)*unitSize, Quaternion.identity);
+            Object.Instantiate(wallPrefab, new Vector2(i + 0.5f, 0) * unitSize, Quaternion.identity);
         }
 
         //Generate upper border walls
         for (int i = 0; i < x; ++i)
         {
-            map[i, y-1].u = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2((i + 0.5f), y)*unitSize, Quaternion.identity);
+            map[i, y - 1].u = Node.Connection.Wall;
+            Object.Instantiate(wallPrefab, new Vector2((i + 0.5f), y) * unitSize, Quaternion.identity);
         }
 
         //Generate left border walls
         for (int i = 0; i < y; ++i)
         {
             map[0, i].l = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2(0, i + 0.5f)*unitSize, Quaternion.Euler(0, 0, 90));
+            Object.Instantiate(wallPrefab, new Vector2(0, i + 0.5f) * unitSize, Quaternion.Euler(0, 0, 90));
         }
 
         //Generate right border walls
         for (int i = 0; i < y; ++i)
         {
-            map[x-1, i].r = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2(x, i + 0.5f)*unitSize, Quaternion.Euler(0, 0, 90));
+            map[x - 1, i].r = Node.Connection.Wall;
+            Object.Instantiate(wallPrefab, new Vector2(x, i + 0.5f) * unitSize, Quaternion.Euler(0, 0, 90));
         }
 
         // Generate random walls in the map
         int walls = 8;
         int wallX, wallY, wallR;
         int iterations = 0;
-        while(walls > 0 && iterations < 10000)
+        while (walls > 0 && iterations < 10000)
         {
             ++iterations;
             wallX = Random.Range(0, x);
@@ -125,7 +158,7 @@ public class Map
                     --walls;
                 }
             }
-            else if(map[wallX, wallY].d == Node.Connection.Empty)
+            else if (map[wallX, wallY].d == Node.Connection.Empty)
             {
                 other = map[wallX, wallY - 1];
                 if (GetMaxConnections(node, other) < 2)
@@ -136,13 +169,21 @@ public class Map
                     --walls;
                 }
             }
-           
+        }
+    }
+
+    private void GenerateLights()
+    {
+        GameObject[] gameLights = GameObject.FindGameObjectsWithTag("Light");
+        for (int i = 0; i < gameLights.Length; ++i)
+        {
+            Object.Destroy(gameLights[i]);
         }
 
         // Generate random lights in the map
         int lights = 4;
         int lightX, lightY, lightR;
-        iterations = 0;
+        int iterations = 0;
         while (lights > 0 && iterations < 10000)
         {
             ++iterations;
@@ -205,5 +246,47 @@ public class Map
         if (b.r == Node.Connection.Wall) ++bConnections;
 
         return Mathf.Max(aConnections, bConnections);
+    }
+
+    // Check if every tile on the map can reach every other tile
+    private bool EntirelyConnected()
+    {
+        bool[,] visited = new bool[x, y];
+        int numVisited = 0;
+        Stack<Node> toVisit = new Stack<Node>();
+        Node node;
+        toVisit.Push(map[0, 0]);
+        visited[0, 0] = true;
+        
+        // Check each node and use the visited array to keep track of who's in the stack or has been in the stack
+        // Eventually we'll hit every possible node and then we can check if we visited all of them with numVisited
+        while(toVisit.Count > 0)
+        {
+            node = toVisit.Pop();
+            ++numVisited;
+            //Checking for a wall first means we won't ever check out of bounds - We'll run into a wall first
+            if (node.u != Node.Connection.Wall && !visited[node.x, node.y + 1])
+            {
+                toVisit.Push(map[node.x, node.y + 1]);
+                visited[node.x, node.y + 1] = true;
+            }
+            if (node.l != Node.Connection.Wall && !visited[node.x - 1, node.y])
+            {
+                toVisit.Push(map[node.x - 1, node.y]);
+                visited[node.x - 1, node.y] = true;
+            }
+            if (node.r != Node.Connection.Wall && !visited[node.x + 1, node.y])
+            {
+                toVisit.Push(map[node.x + 1, node.y]);
+                visited[node.x + 1, node.y] = true;
+            }
+            if (node.d != Node.Connection.Wall && !visited[node.x, node.y - 1])
+            {
+                toVisit.Push(map[node.x, node.y - 1]);
+                visited[node.x, node.y - 1] = true;
+            }
+        }
+        // If everything is connected, then we should have gotten x*y nodes visited
+        return numVisited == x * y;
     }
 }

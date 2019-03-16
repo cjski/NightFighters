@@ -52,16 +52,6 @@ public class GameController : MonoBehaviour {
 
     private void ReGen()
     {
-        GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
-        for (int i = 0; i < walls.Length; ++i)
-        {
-            Destroy(walls[i]);
-        }
-        GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
-        for (int i = 0; i < lights.Length; ++i)
-        {
-            Destroy(lights[i]);
-        }
         stageMap.Generate();
 
         Restart();

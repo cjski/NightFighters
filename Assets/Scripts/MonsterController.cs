@@ -6,6 +6,8 @@ using UnityEditor;
 public class MonsterController : PlayerController {
 
     private static GameObject slowProjectilePrefab;
+    private static float lightRadSqr = 1;
+
     private bool prevInLight;
     private float knockbackCosAngle;
     private float knockbackRange;
@@ -49,7 +51,7 @@ public class MonsterController : PlayerController {
                 //Use squared distance for faster calculation
                 xDist = transform.position.x - lights[i].transform.position.x;
                 yDist = transform.position.y - lights[i].transform.position.y;
-                if ((xDist * xDist) + (yDist * yDist) < 4) return true;
+                if ((xDist * xDist) + (yDist * yDist) < lightRadSqr) return true;
             }
         }
         return false;

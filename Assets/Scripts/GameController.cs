@@ -8,8 +8,8 @@ public class GameController : MonoBehaviour {
     GameObject humanPrefab;
     GameObject monsterPrefab;
     Map stageMap;
-    int rows = 5, cols = 9;
-    float unitSize = 2;
+    int rows = 4, cols = 6;
+    float unitSize = 3;
 
     // Use this for initialization
     void Start () {
@@ -56,6 +56,11 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < walls.Length; ++i)
         {
             Destroy(walls[i]);
+        }
+        GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
+        for (int i = 0; i < lights.Length; ++i)
+        {
+            Destroy(lights[i]);
         }
         stageMap.Generate();
 

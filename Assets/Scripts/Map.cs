@@ -77,10 +77,12 @@ public class Map
         }
 
         // Generate random walls in the map
-        int walls = 20;
+        int walls = 8;
         int wallX, wallY, wallR;
-        while(walls > 0)
+        int iterations = 0;
+        while(walls > 0 && iterations < 10000)
         {
+            ++iterations;
             wallX = Random.Range(0, x);
             wallY = Random.Range(0, y);
             wallR = Random.Range(0, 4);
@@ -135,6 +137,55 @@ public class Map
                 }
             }
            
+        }
+
+        // Generate random lights in the map
+        int lights = 4;
+        int lightX, lightY, lightR;
+        iterations = 0;
+        while (lights > 0 && iterations < 10000)
+        {
+            ++iterations;
+            lightX = Random.Range(0, x);
+            lightY = Random.Range(0, y);
+            lightR = Random.Range(0, 4);
+
+            Node node = map[lightX, lightY], other;
+            // We set which of the 4 sides of the node we want here
+            // In each check, the empty check is done for the same reason as the wall one - we'll catch cases
+            // of being on the border right away.
+            if (lightR == 0 && node.u == Node.Connection.Empty)
+            {
+                other = map[lightX, lightY + 1];
+                node.u = Node.Connection.Light;
+                other.d = Node.Connection.Light;
+                Object.Instantiate(lightPrefab, new Vector2(lightX + 0.5f, lightY + 1) * unitSize, Quaternion.Euler(0, 0, 0));
+                --lights;
+            }
+            else if (lightR == 1 && node.l == Node.Connection.Empty)
+            {
+                other = map[lightX - 1, lightY];
+                node.l = Node.Connection.Light;
+                other.r = Node.Connection.Light;
+                Object.Instantiate(lightPrefab, new Vector2(lightX, lightY + 0.5f) * unitSize, Quaternion.Euler(0, 0, 0));
+                --lights;
+            }
+            else if (lightR == 2 && node.r == Node.Connection.Empty)
+            {
+                other = map[lightX + 1, lightY];
+                node.r = Node.Connection.Light;
+                other.l = Node.Connection.Light;
+                Object.Instantiate(lightPrefab, new Vector2(lightX + 1, lightY + 0.5f) * unitSize, Quaternion.Euler(0, 0, 0));
+                --lights;
+            }
+            else if (node.d == Node.Connection.Empty)
+            {
+                other = map[lightX, lightY - 1];
+                node.d = Node.Connection.Light;
+                other.u = Node.Connection.Light;
+                Object.Instantiate(lightPrefab, new Vector2(lightX + 0.5f, lightY) * unitSize, Quaternion.Euler(0, 0, 0));
+                --lights;
+            }
         }
     }
 

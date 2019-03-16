@@ -56,7 +56,7 @@ public class Map
             }
         }
 
-        GenerateWalls();
+        GenerateWalls(8);
         while (!EntirelyConnected())
         {
             // Reset the Node Map so nothing is connected
@@ -67,13 +67,13 @@ public class Map
                     map[i, j] = new Node(i, j);
                 }
             }
-            GenerateWalls();
+            GenerateWalls(8);
         }
 
-        GenerateLights();  
+        GenerateLights(4);  
     }
 
-    private void GenerateWalls()
+    private void GenerateWalls(int walls)
     {
         GameObject[] gameWalls = GameObject.FindGameObjectsWithTag("Wall");
         for (int i = 0; i < gameWalls.Length; ++i)
@@ -110,7 +110,6 @@ public class Map
         }
 
         // Generate random walls in the map
-        int walls = 8;
         int wallX, wallY, wallR;
         int iterations = 0;
         while (walls > 0 && iterations < 10000)
@@ -172,7 +171,7 @@ public class Map
         }
     }
 
-    private void GenerateLights()
+    private void GenerateLights(int lights)
     {
         GameObject[] gameLights = GameObject.FindGameObjectsWithTag("Light");
         for (int i = 0; i < gameLights.Length; ++i)
@@ -181,7 +180,6 @@ public class Map
         }
 
         // Generate random lights in the map
-        int lights = 4;
         int lightX, lightY, lightR;
         int iterations = 0;
         while (lights > 0 && iterations < 10000)

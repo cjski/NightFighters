@@ -343,25 +343,25 @@ public class Map
         {
             node = toVisit.Dequeue();
             //Checking for a wall first means we won't ever check out of bounds - We'll run into a wall first
-            if (node.u != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x, node.y + 1])
+            if (node.u != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 <= origin.distances[node.x, node.y + 1])
             {
                 origin.distances[node.x, node.y + 1] = origin.distances[node.x, node.y] + 1;
                 map[node.x, node.y + 1].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
                 toVisit.Enqueue(map[node.x, node.y + 1]);
             }
-            if (node.l != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x - 1, node.y])
+            if (node.l != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 <= origin.distances[node.x - 1, node.y])
             {
                 origin.distances[node.x - 1, node.y] = origin.distances[node.x, node.y] + 1;
                 map[node.x - 1, node.y].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
                 toVisit.Enqueue(map[node.x - 1, node.y]);
             }
-            if (node.r != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x + 1, node.y])
+            if (node.r != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 <= origin.distances[node.x + 1, node.y])
             {
                 origin.distances[node.x + 1, node.y] = origin.distances[node.x, node.y] + 1;
                 map[node.x + 1, node.y].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
                 toVisit.Enqueue(map[node.x + 1, node.y]);
             }
-            if (node.d != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x, node.y - 1])
+            if (node.d != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 <= origin.distances[node.x, node.y - 1])
             {
                 origin.distances[node.x, node.y - 1] = origin.distances[node.x, node.y] + 1;
                 map[node.x, node.y - 1].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;

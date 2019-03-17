@@ -20,11 +20,24 @@ public class Node
         d = Connection.Empty;
 
     public int x, y;
+    public int[,] distances;
 
     public Node(int xPos, int yPos)
     {
         x = xPos;
         y = yPos;
+    }
+
+    public void InitDistanceMap(int xMax, int yMax)
+    {
+        distances = new int[xMax, yMax];
+        for(int i = 0; i< xMax; ++i)
+        {
+            for (int j = 0; j < yMax; ++j)
+            {
+                distances[i, j] = xMax * yMax;
+            }
+        }
     }
 }
 public class Map
@@ -70,7 +83,9 @@ public class Map
             GenerateWalls(8);
         }
 
-        GenerateLights(4);  
+        GenerateLights(4);
+
+        GenerateDistances();
     }
 
     private void GenerateWalls(int walls)
@@ -286,5 +301,62 @@ public class Map
         }
         // If everything is connected, then we should have gotten x*y nodes visited
         return numVisited == x * y;
+    }
+
+    private void GenerateDistances()
+    {
+        for (int i = 0; i < x; ++i)
+        {
+            for (int j = 0; j < y; ++j)
+            {
+                map[i, j].InitDistanceMap(x, y);
+            }
+        }
+
+        for (int i = 0; i < x; ++i)
+        {
+            for (int j = 0; j < y; ++j)
+            {
+                CalculateDistances(map[i, j]);
+            }
+        }
+    }
+
+    private void CalculateDistances(Node origin)
+    {
+        Queue<Node> toVisit = new Queue<Node>();
+        toVisit.Enqueue(origin);
+        origin.distances[origin.x, origin.y] = 0;
+        Node node;
+
+        while (toVisit.Count > 0)
+        {
+            node = toVisit.Dequeue();
+            //Checking for a wall first means we won't ever check out of bounds - We'll run into a wall first
+            if (node.u != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x, node.y + 1])
+            {
+                origin.distances[node.x, node.y + 1] = origin.distances[node.x, node.y] + 1;
+                map[node.x, node.y + 1].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
+                toVisit.Enqueue(map[node.x, node.y + 1]);
+            }
+            if (node.l != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x - 1, node.y])
+            {
+                origin.distances[node.x - 1, node.y] = origin.distances[node.x, node.y] + 1;
+                map[node.x - 1, node.y].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
+                toVisit.Enqueue(map[node.x - 1, node.y]);
+            }
+            if (node.r != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x + 1, node.y])
+            {
+                origin.distances[node.x + 1, node.y] = origin.distances[node.x, node.y] + 1;
+                map[node.x + 1, node.y].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
+                toVisit.Enqueue(map[node.x + 1, node.y]);
+            }
+            if (node.d != Node.Connection.Wall && origin.distances[node.x, node.y] + 1 < origin.distances[node.x, node.y - 1])
+            {
+                origin.distances[node.x, node.y - 1] = origin.distances[node.x, node.y] + 1;
+                map[node.x, node.y - 1].distances[origin.x, origin.y] = origin.distances[node.x, node.y] + 1;
+                toVisit.Enqueue(map[node.x, node.y - 1]);
+            }
+        }
     }
 }

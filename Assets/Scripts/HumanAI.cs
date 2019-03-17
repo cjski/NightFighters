@@ -6,6 +6,7 @@ public class HumanAI : MonoBehaviour
 {
     static Map map;
     HumanController self;
+    private Vector2 prevDirection = new Vector2(0, 0);
 
     void Start()
     {
@@ -21,7 +22,14 @@ public class HumanAI : MonoBehaviour
 
     void Update()
     {
-        self.AIMove(FindDestinationNode());
+        if (!Input.GetKey(KeyCode.P))
+        {
+
+            Vector2 direction = FindDestinationNode();
+            direction += prevDirection;
+            self.AIMove(direction);
+            prevDirection = direction * 0.25f;
+        }
     }
 
     private Vector2 FindDestinationNode()
@@ -49,7 +57,7 @@ public class HumanAI : MonoBehaviour
                 }
             }
         }
-        if (target == null) return new Vector2(0,0);
+        if (target == null || target == selfNode) return new Vector2(0,0);
         Node destination = selfNode;
 
         // Pick the next best node beside you to go to
@@ -69,8 +77,8 @@ public class HumanAI : MonoBehaviour
         {
             destination = map.GetNode(selfNode.x + 1, selfNode.y);
         }
-
-        Debug.Log(destination.x + "," + destination.y);
-        return map.GetRealNodePosition(destination.x, destination.y) - (Vector2)(self.gameObject.transform.position);
+        
+        Vector2 direction = map.GetRealNodePosition(destination.x, destination.y) - (Vector2)(self.gameObject.transform.position);
+        return direction.normalized;
     }
 }

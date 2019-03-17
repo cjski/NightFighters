@@ -33,6 +33,8 @@ public abstract class PlayerController : MonoBehaviour {
     protected Timer secondaryCooldown;
     public Text text;
 
+    private bool IsAI = false;
+
     // Use this for initialization
     protected void Start () {
         baseSpeed = 0.1f;
@@ -81,19 +83,21 @@ public abstract class PlayerController : MonoBehaviour {
     protected void Update() {
         UpdateTimedSpeedModifiers();
 
-        if (movementType == MovementType.Normal)
+        if (!IsAI)
         {
-            if (useMouseMovement) MoveWithMouse();
-            else MoveWithKeys();
+            if (movementType == MovementType.Normal)
+            {
+                if (useMouseMovement) MoveWithMouse();
+                else MoveWithKeys();
+            }
+            else if (movementType == MovementType.Dashing) Dash();
+
+            if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
+            if (!primaryCooldown.done) primaryCooldown.Update();
+
+            if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
+            if (!secondaryCooldown.done) secondaryCooldown.Update();
         }
-        else if (movementType == MovementType.Dashing) Dash(); 
-
-        if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
-        if (!primaryCooldown.done) primaryCooldown.Update();
-
-        if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
-        if (!secondaryCooldown.done) secondaryCooldown.Update();
-
         text.text = "Health: " + health;
 	}
 
@@ -216,5 +220,15 @@ public abstract class PlayerController : MonoBehaviour {
         t.speedModifier = -speedModification; //Negative so we can reverse it
         timedSpeedModifiers.Add(t);
         ModifySpeed(speedModification);
+    }
+
+    public void ActivateAI()
+    {
+        IsAI = true;
+    }
+
+    public void AIMove(Vector2 direction)
+    {
+        Move(direction.normalized, speed);
     }
 }

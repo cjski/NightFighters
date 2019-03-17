@@ -8,8 +8,9 @@ public class GameController : MonoBehaviour {
     GameObject humanPrefab;
     GameObject monsterPrefab;
     Map stageMap;
-    int rows = 4, cols = 6;
+    int rows = 4, cols = 6;// 4, 6, 3
     float unitSize = 3;
+    GameObject ai1;
 
     // Use this for initialization
     void Start () {
@@ -17,6 +18,8 @@ public class GameController : MonoBehaviour {
         monsterPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterPrefab.prefab", typeof(GameObject));
 
         stageMap = new Map(cols, rows, unitSize);
+
+        ai1 = GameObject.Find("AIController");
 
         Restart();
     }
@@ -48,6 +51,9 @@ public class GameController : MonoBehaviour {
         p2.GetComponent<MonsterController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
         GameObject p3 = Instantiate(monsterPrefab, new Vector3(0.5f, rows*unitSize -0.5f, 0), Quaternion.identity);
         p3.GetComponent<MonsterController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
+        GameObject p4 = Instantiate(humanPrefab, new Vector3(2, 2, 0), Quaternion.identity);
+
+        ai1.GetComponent<HumanAI>().Init(stageMap, p4);
     }
 
     private void ReGen()

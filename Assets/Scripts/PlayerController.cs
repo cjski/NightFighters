@@ -225,6 +225,7 @@ public abstract class PlayerController : MonoBehaviour {
     public void ActivateAI()
     {
         IsAI = true;
+        ModifySpeed(-0.05f); // For testing purposes so the monsters can run away
     }
 
     public void AIMove(Vector2 direction)

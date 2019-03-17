@@ -45,8 +45,8 @@ public class Map
     private static GameObject wallPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallPrefab.prefab", typeof(GameObject));
     private static GameObject lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LightPrefab.prefab", typeof(GameObject));
 
-    private int y, x;
-    private float unitSize;
+    public int y, x;
+    public float unitSize;
     private Node[,] map;
 
     public Map(int cols, int rows, float sizeOfUnit)
@@ -56,6 +56,16 @@ public class Map
         unitSize = sizeOfUnit;
         map = new Node[cols, rows];
         Generate();
+    }
+
+    public Node GetNode(int xPos, int yPos)
+    {
+        return map[xPos, yPos];
+    }
+
+    public Vector2 GetRealNodePosition(int xPos, int yPos)
+    {
+        return new Vector2(xPos + 0.5f, yPos + 0.5f)*unitSize;
     }
 
     public void Generate()

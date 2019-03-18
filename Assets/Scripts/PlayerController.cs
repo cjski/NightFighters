@@ -29,8 +29,8 @@ public abstract class PlayerController : MonoBehaviour {
     protected Timer dashTime;
     private float dashSpeed;
 
-    protected Timer primaryCooldown;
-    protected Timer secondaryCooldown;
+    public Timer primaryCooldown { get; private set; }
+    public Timer secondaryCooldown { get; private set; }
     public Text text;
 
     private bool IsAI = false;
@@ -228,8 +228,19 @@ public abstract class PlayerController : MonoBehaviour {
         ModifySpeed(-0.05f); // For testing purposes so the monsters can run away
     }
 
-    public void AIMove(Vector2 direction)
+    public void AIMove(Vector2 newDirection)
     {
-        Move(direction.normalized, speed);
+        direction = newDirection.normalized;
+        Move(direction, speed);
+    }
+
+    public void AIUsePrimary()
+    {
+        OnPrimaryPressed();
+    }
+
+    public void AIUseSecondary()
+    {
+        OnSecondaryPressed();
     }
 }

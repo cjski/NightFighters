@@ -94,11 +94,10 @@ public abstract class PlayerController : MonoBehaviour {
         if (!IsAI)
         {
             if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
-            if (!primaryCooldown.done) primaryCooldown.Update();
-
             if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
-            if (!secondaryCooldown.done) secondaryCooldown.Update();
         }
+        if (!primaryCooldown.done) primaryCooldown.Update();
+        if (!secondaryCooldown.done) secondaryCooldown.Update();
         text.text = "Health: " + health;
 	}
 

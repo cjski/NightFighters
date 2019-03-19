@@ -23,7 +23,7 @@ public class HumanAI : MonoBehaviour
 
     void Update()
     {
-        if (!Input.GetKey(KeyCode.P))
+        if (!Input.GetKey(KeyCode.P) && self != null)
         {
             Move();
 

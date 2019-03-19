@@ -53,7 +53,7 @@ public class GameController : MonoBehaviour {
         p3.GetComponent<MonsterController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
         GameObject p4 = Instantiate(humanPrefab, new Vector3(2, 2, 0), Quaternion.identity);
 
-        ai1.GetComponent<HumanAI>().Init(stageMap, p4);
+        ai1.GetComponent<HumanAI>().Init(stageMap, p4);     
     }
 
     private void ReGen()

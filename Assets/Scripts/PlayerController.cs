@@ -29,8 +29,8 @@ public abstract class PlayerController : MonoBehaviour {
     protected Timer dashTime;
     private float dashSpeed;
 
-    public Timer primaryCooldown { get; private set; }
-    public Timer secondaryCooldown { get; private set; }
+    public Timer primaryCooldown { get; private set; } = new Timer(3);
+    public Timer secondaryCooldown { get; private set; } = new Timer(1);
     public Text text;
 
     private bool IsAI = false;
@@ -48,9 +48,6 @@ public abstract class PlayerController : MonoBehaviour {
         timedSpeedModifiers = new List<TimedSpeedModifier>();
 
         health = 100;
-
-        primaryCooldown = new Timer(3);
-        secondaryCooldown = new Timer(1);
 
         text = GetComponentInChildren<Text>();
     }

@@ -83,15 +83,16 @@ public abstract class PlayerController : MonoBehaviour {
     protected void Update() {
         UpdateTimedSpeedModifiers();
 
+        if (movementType == MovementType.Normal)
+        {
+            if (IsAI) Move(direction, speed);
+            else if (useMouseMovement) MoveWithMouse();
+            else MoveWithKeys();
+        }
+        else if (movementType == MovementType.Dashing) Dash();
+
         if (!IsAI)
         {
-            if (movementType == MovementType.Normal)
-            {
-                if (useMouseMovement) MoveWithMouse();
-                else MoveWithKeys();
-            }
-            else if (movementType == MovementType.Dashing) Dash();
-
             if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
             if (!primaryCooldown.done) primaryCooldown.Update();
 
@@ -230,8 +231,8 @@ public abstract class PlayerController : MonoBehaviour {
 
     public void AIMove(Vector2 newDirection)
     {
-        direction = newDirection.normalized;
-        Move(direction, speed);
+        if(movementType != MovementType.Dashing) direction = newDirection.normalized;
+        //Move(direction, speed);
     }
 
     public void AIUsePrimary()

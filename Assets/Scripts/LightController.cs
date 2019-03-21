@@ -38,6 +38,7 @@ public class LightController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("Enter");
         if (collision.gameObject.tag == "Player")
         {
             if (collision.gameObject.GetComponent<HumanController>()) ++humansIn;
@@ -46,6 +47,7 @@ public class LightController : MonoBehaviour {
     }
     private void OnTriggerExit2D(Collider2D collision)
     {
+        Debug.Log("Exit");
         if (collision.gameObject.tag == "Player")
         {
             if (collision.gameObject.GetComponent<HumanController>()) --humansIn;
@@ -55,6 +57,7 @@ public class LightController : MonoBehaviour {
 
     public bool On()
     {
-        return halo.enabled;
+        if(halo != null) return halo.enabled;
+        return false;
     }
 }

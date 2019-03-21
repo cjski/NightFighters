@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public abstract class PlayerController : MonoBehaviour {
 
@@ -34,6 +35,7 @@ public abstract class PlayerController : MonoBehaviour {
     public Text text;
 
     private bool IsAI = false;
+    private bool moveAINext = false;
 
     // Use this for initialization
     protected void Start () {
@@ -82,7 +84,14 @@ public abstract class PlayerController : MonoBehaviour {
 
         if (movementType == MovementType.Normal)
         {
-            if (IsAI) Move(direction, speed);
+            if (IsAI)
+            {
+                if(moveAINext)
+                {
+                    Move(direction, speed);
+                    moveAINext = false;
+                }
+            }
             else if (useMouseMovement) MoveWithMouse();
             else MoveWithKeys();
         }
@@ -126,11 +135,11 @@ public abstract class PlayerController : MonoBehaviour {
         direction = move.normalized;
         if(distToMoveSqr >= (speed * 2)*(speed * 2))
         {
-            Move(move.normalized, speed);
+            Move(direction, speed);
         }
     }
 
-    private void Move(Vector2 direction, float moveSpeed, int layerMask=Physics2D.DefaultRaycastLayers)
+    private void Move(Vector2 direction, float moveSpeed, int layerMask=-261)
     {
         Vector2 pos = transform.position;
         Vector3 size = GetComponent<Renderer>().bounds.size;
@@ -227,7 +236,11 @@ public abstract class PlayerController : MonoBehaviour {
 
     public void AIMove(Vector2 newDirection)
     {
-        if(movementType != MovementType.Dashing) direction = newDirection.normalized;
+        if (movementType != MovementType.Dashing)
+        {
+            direction = newDirection.normalized;
+            moveAINext = true;
+        }
         //Move(direction, speed);
     }
 

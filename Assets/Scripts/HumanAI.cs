@@ -33,9 +33,13 @@ public class HumanAI : MonoBehaviour
             Node selfNode = map.GetNode(selfX, selfY);
 
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            int monsterNodeX, monsterNodeY;
-            Vector2 monsterPosition = Vector2.zero;
+            int targetNodeX, targetNodeY;
+            Vector2 targetPosition = Vector2.zero;
+
+            GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
+
             Node target = null;
+            bool isMonster = false;
 
             // Pick a monster to target
             for (int i = 0; i < players.Length; ++i)
@@ -43,29 +47,58 @@ public class HumanAI : MonoBehaviour
                 MonsterController mc = players[i].GetComponent<MonsterController>();
                 if (mc != null)
                 {
-                    monsterNodeX = (int)(mc.gameObject.transform.position.x / map.unitSize);
-                    monsterNodeY = (int)(mc.gameObject.transform.position.y / map.unitSize);
+                    targetNodeX = (int)(mc.gameObject.transform.position.x / map.unitSize);
+                    targetNodeY = (int)(mc.gameObject.transform.position.y / map.unitSize);
                     if (target == null)
                     {
-                        target = map.GetNode(monsterNodeX, monsterNodeY);
-                        monsterPosition = mc.gameObject.transform.position;
+                        target = map.GetNode(targetNodeX, targetNodeY);
+                        targetPosition = mc.gameObject.transform.position;
+                        isMonster = true;
                     }
-                    else if (selfNode.distances[monsterNodeX, monsterNodeY] < selfNode.distances[target.x, target.y])
+                    else if (selfNode.distances[targetNodeX, targetNodeY] < selfNode.distances[target.x, target.y])
                     {
-                        target = map.GetNode(monsterNodeX, monsterNodeY);
-                        monsterPosition = mc.gameObject.transform.position;
+                        target = map.GetNode(targetNodeX, targetNodeY);
+                        targetPosition = mc.gameObject.transform.position;
+                        isMonster = true;
+                    }
+                }
+            }
+            // Pick a light to target with a lower weighting than the monsters
+            for (int i = 0; i < lights.Length; ++i)
+            {
+                LightController lc = lights[i].GetComponent<LightController>();
+                if (lc != null && !lc.On())
+                {
+                    targetNodeX = (int)(lc.gameObject.transform.position.x / map.unitSize);
+                    targetNodeY = (int)(lc.gameObject.transform.position.y / map.unitSize);
+
+                    // If a monster has been found it has a greater weighting than a light
+                    int distance = selfNode.distances[targetNodeX, targetNodeY];
+                    if (isMonster) distance += 1;
+
+                    if (target == null)
+                    {
+                        target = map.GetNode(targetNodeX, targetNodeY);
+                        targetPosition = lc.gameObject.transform.position;
+                        isMonster = false;
+                    }
+                    else if (distance < selfNode.distances[target.x, target.y])
+                    {
+                        target = map.GetNode(targetNodeX, targetNodeY);
+                        targetPosition = lc.gameObject.transform.position;
+                        isMonster = false;
                     }
                 }
             }
             if (target != null)
             {
-                toTarget = monsterPosition - (Vector2)(self.gameObject.transform.position);
+                toTarget = targetPosition - (Vector2)(self.gameObject.transform.position);
                 self.GetComponent<BoxCollider2D>().enabled = false;
                 RaycastHit2D hitTarget = Physics2D.Raycast(self.transform.position, toTarget);
                 self.GetComponent<BoxCollider2D>().enabled = true;
-                if (hitTarget.collider.transform != null && hitTarget.collider.transform.position.Equals(monsterPosition))
+                if (hitTarget.collider.transform != null && hitTarget.collider.transform.position.Equals(targetPosition))
                 {
-                    direction = toTarget.normalized;
+                    direction = toTarget;
                     seeTarget = true;
                 }
             }
@@ -90,16 +123,14 @@ public class HumanAI : MonoBehaviour
                 {
                     destination = map.GetNode(selfNode.x + 1, selfNode.y);
                 }
-
                 direction = map.GetRealNodePosition(destination.x, destination.y) - (Vector2)(self.gameObject.transform.position);
-                direction.Normalize();
             }
-            if (seeTarget && self.secondaryCooldown.done)
+            if (seeTarget && isMonster && self.secondaryCooldown.done)
             {
                 self.AIUseSecondary();
             }
             //direction += prevDirection;
-            self.AIMove(direction);
+            if (direction.sqrMagnitude > 0.01f) self.AIMove(direction);
             prevDirection = direction * 0.25f;
         }
     }

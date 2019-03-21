@@ -7,7 +7,7 @@ public class MonsterController : PlayerController {
 
     private static GameObject slowProjectilePrefab;
     private static float lightRadSqr = 1;
-
+    
     private bool prevInLight;
     private float knockbackCosAngle;
     private float knockbackRange;

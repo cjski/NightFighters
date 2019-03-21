@@ -6,7 +6,8 @@ public class LightController : MonoBehaviour {
 
     private Behaviour halo;
     Timer turnOnTimer, turnOffTimer;
-    private int humansIn, monstersIn;
+    bool humansIn = false, monstersIn = false;
+    private float activateRadSqr = 0.25f;
 
 	// Use this for initialization
 	void Start () {
@@ -15,15 +16,13 @@ public class LightController : MonoBehaviour {
 
         turnOnTimer = new Timer(2);
         turnOffTimer = new Timer(3);
-
-        humansIn = 0;
-        monstersIn = 0;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        if (halo.enabled && monstersIn > 0) turnOffTimer.Update();
-        else if (!halo.enabled && humansIn > 0) turnOnTimer.Update();
+        FindPlayersIn();
+        if (halo.enabled && monstersIn) turnOffTimer.Update();
+        else if (!halo.enabled && humansIn) turnOnTimer.Update();
         if (turnOnTimer.done)
         {
             halo.enabled = true;
@@ -36,22 +35,21 @@ public class LightController : MonoBehaviour {
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void FindPlayersIn()
     {
-        Debug.Log("Enter");
-        if (collision.gameObject.tag == "Player")
+        humansIn = false;
+        monstersIn = false;
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        float xDist, yDist;
+        for (int i = 0; i < players.Length; ++i)
         {
-            if (collision.gameObject.GetComponent<HumanController>()) ++humansIn;
-            else ++monstersIn;
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        Debug.Log("Exit");
-        if (collision.gameObject.tag == "Player")
-        {
-            if (collision.gameObject.GetComponent<HumanController>()) --humansIn;
-            else --monstersIn;
+            xDist = players[i].transform.position.x - gameObject.transform.position.x;
+            yDist = players[i].transform.position.y - gameObject.transform.position.y;
+            if ((xDist * xDist) + (yDist * yDist) < activateRadSqr)
+            {
+                if (players[i].GetComponent<HumanController>() != null) humansIn = true;
+                else monstersIn = true;
+            }
         }
     }
 

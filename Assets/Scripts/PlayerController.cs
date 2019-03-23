@@ -104,7 +104,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         if (!primaryCooldown.done) primaryCooldown.Update();
         if (!secondaryCooldown.done) secondaryCooldown.Update();
-        text.text = "Health: " + health;
+        text.text = "Health: " + health +"\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
 	}
 
     private void MoveWithKeys()

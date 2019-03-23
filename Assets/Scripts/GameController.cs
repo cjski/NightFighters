@@ -45,13 +45,13 @@ public class GameController : MonoBehaviour {
             Destroy(players[i]);
         }
 
-        GameObject p1 = Instantiate(humanPrefab, new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
-        p1.GetComponent<HumanController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
+        GameObject p1 = Instantiate(monsterPrefab, new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+        p1.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
         GameObject p2 = Instantiate(monsterPrefab, new Vector3(cols*unitSize - 0.5f, 0.5f, 0), Quaternion.identity);
-        p2.GetComponent<MonsterController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
+        p2.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
         //GameObject p3 = Instantiate(monsterPrefab, new Vector3(0.5f, rows*unitSize -0.5f, 0), Quaternion.identity);
-        //p3.GetComponent<MonsterController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        GameObject p4 = Instantiate(humanPrefab, new Vector3(2, 2, 0), Quaternion.identity);
+        //p3.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
+        GameObject p4 = Instantiate(humanPrefab, new Vector3((cols-0.5f)*unitSize, (rows-0.5f)*unitSize, 0), Quaternion.identity);
 
         ai1.GetComponent<HumanAI>().Init(stageMap, p4);     
     }

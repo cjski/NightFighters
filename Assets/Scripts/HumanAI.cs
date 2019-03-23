@@ -93,13 +93,29 @@ public class HumanAI : MonoBehaviour
             if (target != null)
             {
                 toTarget = targetPosition - (Vector2)(self.gameObject.transform.position);
+
                 self.GetComponent<BoxCollider2D>().enabled = false;
                 RaycastHit2D hitTarget = Physics2D.Raycast(self.transform.position, toTarget);
                 self.GetComponent<BoxCollider2D>().enabled = true;
                 if (hitTarget.collider.transform != null && hitTarget.collider.transform.position.Equals(targetPosition))
                 {
-                    direction = toTarget;
-                    seeTarget = true;
+                    // Catches any walls that the single ray would miss so that the AI can clip around walls
+                    Vector3 size = self.GetComponent<Renderer>().bounds.size;
+                    int xDir = 1;
+                    if (toTarget.x * toTarget.y > 0) xDir = -1;
+                    Vector2 pos1 = (Vector2)self.transform.position + new Vector2(size.y / 2, xDir * size.x / 2);
+                    Vector2 pos2 = (Vector2)self.transform.position + new Vector2(-size.y / 2, -xDir * size.x / 2);
+                    self.GetComponent<BoxCollider2D>().enabled = false;
+                    RaycastHit2D hitTargetCorner1 = Physics2D.Raycast(pos1, targetPosition - pos1, size.y * 2);
+                    RaycastHit2D hitTargetCorner2 = Physics2D.Raycast(pos2, targetPosition - pos2, size.y * 2);
+                    self.GetComponent<BoxCollider2D>().enabled = true;
+
+                    if ((hitTargetCorner1.collider == null || hitTargetCorner1.collider.gameObject.tag != "Wall") &&
+                        (hitTargetCorner2.collider == null || hitTargetCorner2.collider.gameObject.tag != "Wall"))
+                    {
+                        direction = toTarget;
+                        seeTarget = true;
+                    }
                 }
             }
             if (!(target == null || seeTarget))

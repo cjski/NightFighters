@@ -48,6 +48,20 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7597992937419923048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3585407471792058614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61bce7dc05a578d4c86f880fa6723d63, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useMouseMovement: 1
+  text: {fileID: 0}
 --- !u!1001 &6433359458369513360
 PrefabInstance:
   m_ObjectHideFlags: 0

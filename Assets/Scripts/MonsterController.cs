@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 
 public class MonsterController : PlayerController {
 
-    private static GameObject slowProjectilePrefab;
     private static float lightRadSqr = 1;
 
     private bool prevInLight = false;
@@ -13,8 +11,6 @@ public class MonsterController : PlayerController {
 	// Use this for initialization
 	new protected void Start () {
         base.Start();
-
-        slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/SlowProjectilePrefab.prefab", typeof(GameObject));
     }
 
     // Update is called once per frame
@@ -58,8 +54,5 @@ public class MonsterController : PlayerController {
 
     protected override void OnSecondaryPressed()
     {
-        GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<SlowProjectileController>().Init(direction, 0.12f, 2.5f, gameObject, 0.05f, 10);
-        secondaryCooldown.Reset();
     }
 }

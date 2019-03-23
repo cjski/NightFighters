@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class WerewolfController : MonsterController
 {
-    private float knockbackCosAngle = Mathf.Cos(3.14159265f * 45 / 180);
+    private float knockbackCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
     private float knockbackRange = 2;
 
     // Start is called before the first frame update
@@ -29,14 +29,7 @@ public class WerewolfController : MonsterController
             if (!(players[i].GetComponent<MonsterController>()))
             {
                 Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
-                if (toPlayer.sqrMagnitude < knockbackRange)
-                {
-                    toPlayer.Normalize();
-                    if (Vector2.Dot(toPlayer, direction) > knockbackCosAngle)
-                    {
-                        players[i].GetComponent<PlayerController>().ApplyDash(toPlayer, 1f, 0.15f);
-                    }
-                }
+                if(InRange(toPlayer, knockbackRange, knockbackCosAngle)) players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, 1f, 0.15f);
             }
         }
 

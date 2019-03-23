@@ -12,7 +12,7 @@ public abstract class PlayerController : MonoBehaviour {
         public float speedModifier;
     }
 
-    protected enum MovementType { Normal, Dashing };
+    protected enum MovementType { Normal, Dashing, Stun };
 
     private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
     protected float baseSpeed;
@@ -24,6 +24,7 @@ public abstract class PlayerController : MonoBehaviour {
     private float minSpeed;
     private float maxSpeed;
     private List<TimedSpeedModifier> timedSpeedModifiers;
+    private Timer stunTimer = new Timer(1);
 
     protected int health;
     protected int maxHealth = 100;
@@ -97,11 +98,23 @@ public abstract class PlayerController : MonoBehaviour {
             else MoveWithKeys();
         }
         else if (movementType == MovementType.Dashing) Dash();
+        else if (movementType == MovementType.Stun)
+        {
+            stunTimer.Update();
+            if(stunTimer.done)
+            {
+                stunTimer.Reset();
+                movementType = MovementType.Normal;
+            }
+        }
 
         if (!IsAI)
         {
-            if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
-            if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
+            if(movementType != MovementType.Stun)
+            {
+                if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
+                if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
+            }
         }
         if (!primaryCooldown.done) primaryCooldown.Update();
         if (!secondaryCooldown.done) secondaryCooldown.Update();
@@ -202,6 +215,12 @@ public abstract class PlayerController : MonoBehaviour {
         movementType = MovementType.Dashing;
     }
 
+    public void ApplyStun(float duration)
+    {
+        stunTimer.Set(duration);
+        movementType = MovementType.Stun;
+    }
+
     protected abstract void OnPrimaryPressed();
 
     protected abstract void OnSecondaryPressed();
@@ -233,6 +252,19 @@ public abstract class PlayerController : MonoBehaviour {
         t.speedModifier = -speedModification; //Negative so we can reverse it
         timedSpeedModifiers.Add(t);
         ModifySpeed(speedModification);
+    }
+
+    protected bool InRange(Vector2 toSelf, float range, float cosAngle)
+    {
+        if (toSelf.sqrMagnitude < range)
+        {
+            toSelf.Normalize();
+            if (Vector2.Dot(toSelf, direction) > cosAngle)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void ActivateAI()

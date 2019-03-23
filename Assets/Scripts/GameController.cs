@@ -7,6 +7,7 @@ public class GameController : MonoBehaviour {
 
     GameObject humanPrefab;
     GameObject werewolfPrefab;
+    GameObject vampirePrefab;
     Map stageMap;
     int rows = 4, cols = 6;// 4, 6, 3
     float unitSize = 3;
@@ -16,6 +17,7 @@ public class GameController : MonoBehaviour {
     void Start () {
         humanPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanPrefab.prefab", typeof(GameObject));
         werewolfPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfPrefab.prefab", typeof(GameObject));
+        vampirePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject));
 
         stageMap = new Map(cols, rows, unitSize);
 
@@ -47,13 +49,13 @@ public class GameController : MonoBehaviour {
 
         GameObject p1 = Instantiate(humanPrefab, new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
         p1.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
-        GameObject p2 = Instantiate(werewolfPrefab, new Vector3(cols*unitSize - 0.5f, 0.5f, 0), Quaternion.identity);
+        GameObject p2 = Instantiate(vampirePrefab, new Vector3(cols*unitSize - 0.5f, 0.5f, 0), Quaternion.identity);
         p2.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
         //GameObject p3 = Instantiate(monsterPrefab, new Vector3(0.5f, rows*unitSize -0.5f, 0), Quaternion.identity);
         //p3.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        //GameObject p4 = Instantiate(humanPrefab, new Vector3((cols-0.5f)*unitSize, (rows-0.5f)*unitSize, 0), Quaternion.identity);
+        GameObject p4 = Instantiate(humanPrefab, new Vector3((cols-0.5f)*unitSize, (rows-0.5f)*unitSize, 0), Quaternion.identity);
 
-        //ai1.GetComponent<HumanAI>().Init(stageMap, p4);     
+        ai1.GetComponent<HumanAI>().Init(stageMap, p4);     
     }
 
     private void ReGen()

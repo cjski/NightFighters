@@ -8,16 +8,14 @@ public class HumanController : PlayerController {
     private static GameObject damageProjectilePrefab;
 
     // Use this for initialization
-    new void Start () {
+    new protected void Start () {
         base.Start();
-
-        dashTime = new Timer(.5f);
 
         damageProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/DamageProjectilePrefab.prefab", typeof(GameObject));
     }
 
     // Update is called once per frame
-    new void Update () {
+    new protected void Update () {
         base.Update();
 	}
 

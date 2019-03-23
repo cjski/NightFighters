@@ -5,24 +5,28 @@ using UnityEngine;
 public class LightController : MonoBehaviour {
 
     private Behaviour halo;
-    Timer turnOnTimer, turnOffTimer;
-    bool humansIn = false, monstersIn = false;
+    private float turnOnFixedTime = 2;
+    private float turnOnBrokenTime = 4;
+    Timer turnOnTimer = new Timer(2);
+    Timer turnOffTimer = new Timer(2);
+    Timer brokenTimer = new Timer(2);
+    bool humansIn = false, monstersIn = false, broken = false;
     private float activateRadSqr = 0.25f;
 
 	// Use this for initialization
 	void Start () {
         halo = (Behaviour)GetComponent("Halo");
         halo.enabled = false;
-
-        turnOnTimer = new Timer(2);
-        turnOffTimer = new Timer(3);
 	}
 	
 	// Update is called once per frame
 	void Update () {
         FindPlayersIn();
         if (halo.enabled && monstersIn) turnOffTimer.Update();
-        else if (!halo.enabled && humansIn) turnOnTimer.Update();
+        else if (!halo.enabled && humansIn)
+        {
+            turnOnTimer.Update();
+        }
         if (turnOnTimer.done)
         {
             halo.enabled = true;
@@ -30,6 +34,8 @@ public class LightController : MonoBehaviour {
         }
         else if (turnOffTimer.done)
         {
+            if (broken) turnOnTimer.Set(turnOnBrokenTime);
+            else turnOnTimer.Set(turnOnFixedTime);
             halo.enabled = false;
             turnOffTimer.Reset();
         }
@@ -39,6 +45,7 @@ public class LightController : MonoBehaviour {
     {
         humansIn = false;
         monstersIn = false;
+        broken = false;
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         float xDist, yDist;
         for (int i = 0; i < players.Length; ++i)
@@ -48,7 +55,11 @@ public class LightController : MonoBehaviour {
             if ((xDist * xDist) + (yDist * yDist) < activateRadSqr)
             {
                 if (players[i].GetComponent<HumanController>() != null) humansIn = true;
-                else monstersIn = true;
+                else
+                {
+                    monstersIn = true;
+                    if (players[i].GetComponent<WerewolfController>() != null) broken = true;
+                }
             }
         }
     }

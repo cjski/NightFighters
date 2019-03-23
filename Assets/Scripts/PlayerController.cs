@@ -26,9 +26,10 @@ public abstract class PlayerController : MonoBehaviour {
     private List<TimedSpeedModifier> timedSpeedModifiers;
 
     protected int health;
+    protected int maxHealth = 100;
 
-    protected Timer dashTime;
-    private float dashSpeed;
+    protected Timer dashTime = new Timer(.5f);
+    private float dashSpeed = 0;
 
     public Timer primaryCooldown { get; private set; } = new Timer(3);
     public Timer secondaryCooldown { get; private set; } = new Timer(1);
@@ -209,6 +210,12 @@ public abstract class PlayerController : MonoBehaviour {
     {
         health -= damage;
         if (health <= 0) Destroy(gameObject);
+    }
+
+    public void Heal(int heal)
+    {
+        health += heal;
+        if (health > maxHealth) health = maxHealth;
     }
 
     public void ModifySpeed(float speedModification)

@@ -34,7 +34,7 @@ public class VampireController : MonsterController
                 if (InRange(toPlayer, biteRange, biteCosAngle))
                 {
                     players[i].GetComponent<PlayerController>().ApplyStun(1);
-                    Heal(10);
+                    Heal(5);
                 }
             }
         }

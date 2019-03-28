@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LightController : MonoBehaviour {
 
-    private Behaviour halo;
+    protected Behaviour halo;
     private float turnOnFixedTime = 2;
     private float turnOnBrokenTime = 4;
     Timer turnOnTimer = new Timer(2);
@@ -14,13 +14,13 @@ public class LightController : MonoBehaviour {
     private float activateRadSqr = 0.25f;
 
 	// Use this for initialization
-	void Start () {
+	protected void Start () {
         halo = (Behaviour)GetComponent("Halo");
         halo.enabled = false;
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	protected void Update () {
         FindPlayersIn();
         if (halo.enabled && monstersIn) turnOffTimer.Update();
         else if (!halo.enabled && humansIn)

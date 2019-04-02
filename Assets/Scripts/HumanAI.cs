@@ -141,9 +141,9 @@ public class HumanAI : MonoBehaviour
                 }
                 direction = map.GetRealNodePosition(destination.x, destination.y) - (Vector2)(self.gameObject.transform.position);
             }
-            if (seeTarget && isMonster && self.secondaryCooldown.done)
+            if (seeTarget && isMonster && self.primaryCooldown.done)
             {
-                self.AIUseSecondary();
+                self.AIUsePrimary();
             }
             //direction += prevDirection;
             if (direction.sqrMagnitude > 0.01f) self.AIMove(direction);

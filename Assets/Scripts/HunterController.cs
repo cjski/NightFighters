@@ -10,7 +10,7 @@ public class HunterController : HumanController
     // Start is called before the first frame update
     protected new void Start()
     {
-        arrowPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/DamageProjectilePrefab.prefab", typeof(GameObject));
+        arrowPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ArrowPrefab.prefab", typeof(GameObject));
         base.Start();
     }
 

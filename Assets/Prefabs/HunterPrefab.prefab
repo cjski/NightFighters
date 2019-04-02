@@ -1,26 +1,12 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &3466292261963217155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085421419405698976}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28ed57e7eb153de41be65b736561b9a1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useMouseMovement: 1
-  text: {fileID: 0}
---- !u!212 &4949927224468216957
+--- !u!212 &1138835237538805051
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2085421419405698976}
+  m_GameObject: {fileID: 1245616128416307147}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -52,7 +38,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.5261805, g: 1, b: 0.4292453, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -62,7 +48,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1001 &5401675720211945921
+--- !u!114 &7204697031485443850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1245616128416307147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb8593c76d050db4199607dcf2dad1c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useMouseMovement: 1
+  text: {fileID: 0}
+--- !u!1001 &5138375783693117866
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -72,7 +72,7 @@ PrefabInstance:
     - target: {fileID: 6198779143639744097, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
         type: 3}
       propertyPath: m_Name
-      value: WatchmanPrefab
+      value: HunterPrefab
       objectReference: {fileID: 0}
     - target: {fileID: 6202055947010966119, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
         type: 3}
@@ -129,27 +129,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
-        type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 0.03096056
-      objectReference: {fileID: 0}
-    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4961073647727660407, guid: 28dff1ea0cf88724bbd79801c2a34a2f, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 28dff1ea0cf88724bbd79801c2a34a2f, type: 3}
---- !u!1 &2085421419405698976 stripped
+--- !u!1 &1245616128416307147 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6198779143639744097, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
     type: 3}
-  m_PrefabInstance: {fileID: 5401675720211945921}
+  m_PrefabInstance: {fileID: 5138375783693117866}
   m_PrefabAsset: {fileID: 0}

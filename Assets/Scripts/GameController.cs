@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class GameController : MonoBehaviour {
 
-    GameObject humanPrefab;
+    GameObject hunterPrefab;
     GameObject werewolfPrefab;
     GameObject vampirePrefab;
     GameObject watchmanPrefab;
@@ -16,7 +16,7 @@ public class GameController : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        humanPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanPrefab.prefab", typeof(GameObject));
+        hunterPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterPrefab.prefab", typeof(GameObject));
         werewolfPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfPrefab.prefab", typeof(GameObject));
         vampirePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject));
         watchmanPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanPrefab.prefab", typeof(GameObject));
@@ -55,9 +55,9 @@ public class GameController : MonoBehaviour {
         p2.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
         GameObject p3 = Instantiate(werewolfPrefab, new Vector3(0.5f, rows*unitSize -0.5f, 0), Quaternion.identity);
         p3.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        //GameObject p4 = Instantiate(humanPrefab, new Vector3((cols-0.5f)*unitSize, (rows-0.5f)*unitSize, 0), Quaternion.identity);
+        GameObject p4 = Instantiate(hunterPrefab, new Vector3((cols-0.5f)*unitSize, (rows-0.5f)*unitSize, 0), Quaternion.identity);
 
-        //ai1.GetComponent<HumanAI>().Init(stageMap, p4);     
+        ai1.GetComponent<HumanAI>().Init(stageMap, p4);     
     }
 
     private void ReGen()

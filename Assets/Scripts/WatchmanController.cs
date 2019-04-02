@@ -5,14 +5,14 @@ using UnityEditor;
 
 public class WatchmanController : HumanController
 {
-    GameObject lightPrefab;
+    static GameObject lightPrefab;
     GameObject lantern;
     bool holdingLantern;
-    Timer catchTimer = new Timer(1);
+    Timer catchTimer = new Timer(.5f);
     float hitRange = 1;
     float hitCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
     float stunTime = 0.5f;
-    int damage = 5;
+    int damage = 10;
 
     // Start is called before the first frame update
     new protected void Start()
@@ -64,7 +64,7 @@ public class WatchmanController : HumanController
         if (holdingLantern)
         {
             holdingLantern = false;
-            lantern.GetComponent<LanternController>().Throw(direction, 0.4f);
+            lantern.GetComponent<LanternController>().Throw(direction, 0.325f);
             secondaryCooldown.Reset();
         }
     }

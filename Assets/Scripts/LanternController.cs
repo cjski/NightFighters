@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class LanternController : LightController
 {
-    float speed = 2;
-    Vector2 direction;
+    public float speed = 2;
+    public Vector2 direction;
 
     public void Throw(Vector2 newDirection, float newSpeed)
     {

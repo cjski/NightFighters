@@ -23,11 +23,16 @@ public class WerewolfController : MonsterController
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
+        List<GameObject> lanterns = new List<GameObject>();
 
         for (int i = 0; i < players.Length; ++i)
         {
             if (!(players[i].GetComponent<MonsterController>()))
             {
+                if(players[i].GetComponent<WatchmanController>())
+                {
+                    lanterns.Add(players[i].GetComponent<WatchmanController>().lantern);
+                }
                 Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
                 if(InRange(toPlayer, knockbackRange, knockbackCosAngle)) players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, 1f, 0.15f);
             }
@@ -42,6 +47,19 @@ public class WerewolfController : MonsterController
                 if (Vector2.Dot(toProjectile, direction) > knockbackCosAngle)
                 {
                     projectiles[i].GetComponent<ProjectileController>().direction = toProjectile;
+                }
+            }
+        }
+
+        for (int i = 0; i < lanterns.Count; ++i)
+        {
+            Vector2 toLantern = lanterns[i].transform.position - gameObject.transform.position;
+            if (toLantern.sqrMagnitude < knockbackRange)
+            {
+                toLantern.Normalize();
+                if (Vector2.Dot(toLantern, direction) > knockbackCosAngle)
+                {
+                    lanterns[i].GetComponent<LanternController>().direction = toLantern;
                 }
             }
         }

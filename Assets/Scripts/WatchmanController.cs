@@ -6,7 +6,7 @@ using UnityEditor;
 public class WatchmanController : HumanController
 {
     static GameObject lightPrefab;
-    GameObject lantern;
+    public GameObject lantern;
     bool holdingLantern;
     Timer catchTimer = new Timer(.5f);
     float hitRange = 1;

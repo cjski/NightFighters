@@ -40,6 +40,7 @@ public class Node
         }
     }
 }
+
 public class Map
 {
     private static GameObject wallPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallPrefab.prefab", typeof(GameObject));
@@ -55,7 +56,6 @@ public class Map
         x = cols;
         unitSize = sizeOfUnit;
         map = new Node[cols, rows];
-        Generate();
     }
 
     public Node GetNode(int xPos, int yPos)
@@ -96,6 +96,21 @@ public class Map
         GenerateLights(4);
 
         GenerateDistances();
+    }
+
+    public void ClearAll()
+    {
+        GameObject[] gameWalls = GameObject.FindGameObjectsWithTag("Wall");
+        for (int i = 0; i < gameWalls.Length; ++i)
+        {
+            Object.Destroy(gameWalls[i]);
+        }
+
+        GameObject[] gameLights = GameObject.FindGameObjectsWithTag("Light");
+        for (int i = 0; i < gameLights.Length; ++i)
+        {
+            Object.Destroy(gameLights[i]);
+        }
     }
 
     private void GenerateWalls(int walls)

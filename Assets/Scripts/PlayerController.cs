@@ -38,6 +38,8 @@ public abstract class PlayerController : MonoBehaviour {
     private bool IsAI = false;
     private bool moveAINext = false;
 
+    private Animator anim;
+
     // Use this for initialization
     protected void Start () {
         baseSpeed = 0.1f;
@@ -53,6 +55,8 @@ public abstract class PlayerController : MonoBehaviour {
         health = 100;
 
         text = GetComponentInChildren<Text>();
+
+        anim = GetComponent<Animator>();
     }
 
     /* Map Controls using keys as movement in the following order:
@@ -91,6 +95,10 @@ public abstract class PlayerController : MonoBehaviour {
                 {
                     Move(direction, speed);
                     moveAINext = false;
+                }
+                else
+                {
+                    if(anim) anim.Play("Idle");
                 }
             }
             else if (useMouseMovement) MoveWithMouse();
@@ -135,6 +143,10 @@ public abstract class PlayerController : MonoBehaviour {
             direction = move.normalized;
             Move(move.normalized, speed);
         }
+        else
+        {
+            if (anim) anim.Play("Idle");
+        }
     }
 
     private void MoveWithMouse()
@@ -149,6 +161,10 @@ public abstract class PlayerController : MonoBehaviour {
         if(distToMoveSqr >= (speed * 2)*(speed * 2))
         {
             Move(direction, speed);
+        }
+        else
+        {
+            if (anim) anim.Play("Idle");
         }
     }
 
@@ -178,6 +194,10 @@ public abstract class PlayerController : MonoBehaviour {
         {
             transform.Translate(moveSpeed * new Vector2(0, direction.y));
         }
+
+        if (anim) anim.Play("Walk");
+        if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
+        else GetComponent<SpriteRenderer>().flipX = true;
     }
 
     private void UpdateTimedSpeedModifiers()
@@ -255,7 +275,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected bool InRange(Vector2 toSelf, float range, float cosAngle)
     {
-        if (toSelf.sqrMagnitude < range)
+        if (toSelf.sqrMagnitude < range * range)
         {
             toSelf.Normalize();
             if (Vector2.Dot(toSelf, direction) > cosAngle)

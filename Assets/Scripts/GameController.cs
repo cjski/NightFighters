@@ -229,13 +229,13 @@ public class GameController : MonoBehaviour {
             Destroy(players[i]);
         }
 
-        playerInfo[0].character = Instantiate(playerInfo[0].selectedClass.prefab, new Vector3(0.5f, 0.5f, 0), Quaternion.identity);
+        playerInfo[0].character = Instantiate(playerInfo[0].selectedClass.prefab, new Vector3(1, 1, 0), Quaternion.identity);
         playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
-        playerInfo[1].character = Instantiate(playerInfo[1].selectedClass.prefab, new Vector3(cols*unitSize - 0.5f, 0.5f, 0), Quaternion.identity);
+        playerInfo[1].character = Instantiate(playerInfo[1].selectedClass.prefab, new Vector3(cols*unitSize - 1, 1, 0), Quaternion.identity);
         playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
-        playerInfo[2].character = Instantiate(playerInfo[2].selectedClass.prefab, new Vector3(0.5f, rows*unitSize -0.5f, 0), Quaternion.identity);
+        playerInfo[2].character = Instantiate(playerInfo[2].selectedClass.prefab, new Vector3(1, rows*unitSize -1, 0), Quaternion.identity);
         playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        playerInfo[3].character = Instantiate(playerInfo[3].selectedClass.prefab, new Vector3((cols-0.5f)*unitSize, (rows-0.5f)*unitSize, 0), Quaternion.identity);
+        playerInfo[3].character = Instantiate(playerInfo[3].selectedClass.prefab, new Vector3(cols*unitSize - 1, rows*unitSize - 1, 0), Quaternion.identity);
 
         ai1.GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);     
     }

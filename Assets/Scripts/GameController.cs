@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
-
+// 10, -1.7     and     1.9
 public class ClassInformation
 {
     public GameObject prefab { get; private set; }
@@ -25,7 +25,7 @@ public class ClassInformation
 public class PlayerInformation
 {
     public KeyCode l, r, u, d, a, b;
-    public ClassInformation selectedClass = null;
+    public ClassInformation[] classes = { null, null }; //0 Human, 1 Monster
     public GameObject character = null;
 
     public PlayerInformation(KeyCode pA, KeyCode pB, KeyCode pL=KeyCode.None, KeyCode pR=KeyCode.None, KeyCode pU=KeyCode.None, KeyCode pD=KeyCode.None)
@@ -54,10 +54,12 @@ public class GameController : MonoBehaviour {
     GameObject ai1;
 
     ClassInformation hunter, watchman, werewolf, vampire;
-    ClassInformation[] classes;
-    int[] classSelectionIndex = { 0, 0, 0, 0 };
+    List<List<ClassInformation>> classes = new List<List<ClassInformation>>();
+    int[,] classSelectionIndex = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
     bool[] ready = { false, false, false, true };
+    int[] typeOfClassIndex = { 0, 0, 0, 0 };
 
+    GameObject startButton;
     GameObject characterInfoPanelPrefab; 
     GameObject[] characterInfoPanels = new GameObject[4];
 
@@ -71,7 +73,8 @@ public class GameController : MonoBehaviour {
             "Werewolf", "Break Lights", "Knockback", "Dash");
         vampire = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject)),
             "Vampire", "None", "Bite(Heal)", "Slow Projectile");
-        classes = new ClassInformation[4]{ hunter, watchman, werewolf, vampire };
+        classes.Add(new List<ClassInformation> { hunter, watchman });
+        classes.Add(new List<ClassInformation> { werewolf, vampire });
         stageMap = new Map(cols, rows, unitSize);
         characterInfoPanelPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/CharacterInfoPanelPrefab.prefab", typeof(GameObject));
 
@@ -102,6 +105,9 @@ public class GameController : MonoBehaviour {
 
     private void StartCharacterSelect()
     {
+        startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), new Vector3(10, -1.7f, 0), Quaternion.identity);
+        startButton.SetActive(false);
+
         characterInfoPanels[0] = Instantiate(characterInfoPanelPrefab, new Vector3(0, 8.6f, 0), Quaternion.identity);
         characterInfoPanels[1] = Instantiate(characterInfoPanelPrefab, new Vector3(6.2f, 8.6f, 0), Quaternion.identity);
         characterInfoPanels[2] = Instantiate(characterInfoPanelPrefab, new Vector3(12.4f, 8.6f, 0), Quaternion.identity);
@@ -109,12 +115,15 @@ public class GameController : MonoBehaviour {
 
         for (int i = 0; i < characterInfoPanels.Length; ++i)
         {
-            playerInfo[i].selectedClass = classes[classSelectionIndex[i]];
-            characterInfoPanels[i].GetComponentInChildren<Text>().text =
-                "Name: " + playerInfo[i].selectedClass.name +
-                "\nPassive: " + playerInfo[i].selectedClass.passiveDescription +
-                "\nPrimary: " + playerInfo[i].selectedClass.primaryDescription +
-                "\nSecondary: " + playerInfo[i].selectedClass.secondaryDescription;
+            for (int j = 0; j < 2; ++j) 
+            {
+                playerInfo[i].classes[j] = classes[j][classSelectionIndex[j, i]];
+                characterInfoPanels[i].transform.Find("Canvas" + j).GetComponentInChildren<Text>().text =
+                    "Name: " + playerInfo[i].classes[j].name +
+                    "\nPassive: " + playerInfo[i].classes[j].passiveDescription +
+                    "\nPrimary: " + playerInfo[i].classes[j].primaryDescription +
+                    "\nSecondary: " + playerInfo[i].classes[j].secondaryDescription;
+            }
         }
 
     }
@@ -129,34 +138,37 @@ public class GameController : MonoBehaviour {
                 {
                     if(Input.GetKeyDown(KeyCode.Mouse0))
                     {
-                        BoxCollider2D leftArrow = characterInfoPanels[i].transform.Find("LeftArrow").GetComponent<BoxCollider2D>();
-                        BoxCollider2D rightArrow = characterInfoPanels[i].transform.Find("RightArrow").GetComponent<BoxCollider2D>();
                         BoxCollider2D readyBox = characterInfoPanels[i].transform.Find("Ready").GetComponent<BoxCollider2D>();
                         Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                        mPos = new Vector3(mPos.x, mPos.y, leftArrow.transform.position.z);
-                        if (leftArrow.bounds.Contains(mPos))
+                        mPos = new Vector3(mPos.x, mPos.y, readyBox.transform.position.z);
+                        for (int j = 0; j < 2; ++j)
                         {
-                            classSelectionIndex[i] = (classSelectionIndex[i] + classes.Length - 1) % classes.Length;
-                            playerInfo[i].selectedClass = classes[classSelectionIndex[i]];
-                            characterInfoPanels[i].GetComponentInChildren<Text>().text =
-                                "Name: " + playerInfo[i].selectedClass.name +
-                                "\nPassive: " + playerInfo[i].selectedClass.passiveDescription +
-                                "\nPrimary: " + playerInfo[i].selectedClass.primaryDescription +
-                                "\nSecondary: " + playerInfo[i].selectedClass.secondaryDescription;
+                            BoxCollider2D leftArrow = characterInfoPanels[i].transform.Find("LeftArrow"+j).GetComponent<BoxCollider2D>();
+                            BoxCollider2D rightArrow = characterInfoPanels[i].transform.Find("RightArrow"+j).GetComponent<BoxCollider2D>();
+                            if (leftArrow.bounds.Contains(mPos))
+                            {
+                                classSelectionIndex[j, i] = (classSelectionIndex[j, i] + classes[j].Count - 1) % classes[j].Count;
+                                playerInfo[i].classes[j] = classes[j][classSelectionIndex[j, i]];
+                                characterInfoPanels[i].transform.Find("Canvas" + j).GetComponentInChildren<Text>().text =
+                                    "Name: " + playerInfo[i].classes[j].name +
+                                    "\nPassive: " + playerInfo[i].classes[j].passiveDescription +
+                                    "\nPrimary: " + playerInfo[i].classes[j].primaryDescription +
+                                    "\nSecondary: " + playerInfo[i].classes[j].secondaryDescription;
+                            }
+                            else if (rightArrow.bounds.Contains(mPos))
+                            {
+                                classSelectionIndex[j, i] = (classSelectionIndex[j, i] + 1) % classes[j].Count;
+                                playerInfo[i].classes[j] = classes[j][classSelectionIndex[j, i]];
+                                characterInfoPanels[i].transform.Find("Canvas" + j).GetComponentInChildren<Text>().text =
+                                    "Name: " + playerInfo[i].classes[j].name +
+                                    "\nPassive: " + playerInfo[i].classes[j].passiveDescription +
+                                    "\nPrimary: " + playerInfo[i].classes[j].primaryDescription +
+                                    "\nSecondary: " + playerInfo[i].classes[j].secondaryDescription;
+                            }
                         }
-                        else if (rightArrow.bounds.Contains(mPos))
+                        if (readyBox.bounds.Contains(mPos))
                         {
-                            classSelectionIndex[i] = (classSelectionIndex[i] + 1) % classes.Length;
-                            playerInfo[i].selectedClass = classes[classSelectionIndex[i]];
-                            characterInfoPanels[i].GetComponentInChildren<Text>().text =
-                                "Name: " + playerInfo[i].selectedClass.name +
-                                "\nPassive: " + playerInfo[i].selectedClass.passiveDescription +
-                                "\nPrimary: " + playerInfo[i].selectedClass.primaryDescription +
-                                "\nSecondary: " + playerInfo[i].selectedClass.secondaryDescription;
-                        }
-                        else if (readyBox.bounds.Contains(mPos))
-                        {
-                            characterInfoPanels[i].GetComponentInChildren<Text>().text += "\nREADY";
+                            characterInfoPanels[i].transform.Find("Background").GetComponent<SpriteRenderer>().color = Color.gray;
                             ready[i] = true;
                         }
                     }
@@ -165,27 +177,35 @@ public class GameController : MonoBehaviour {
                 {
                     if (Input.GetKeyDown(playerInfo[i].l))
                     {
-                        classSelectionIndex[i] = (classSelectionIndex[i] + classes.Length - 1) % classes.Length;
-                        playerInfo[i].selectedClass = classes[classSelectionIndex[i]];
-                        characterInfoPanels[i].GetComponentInChildren<Text>().text =
-                            "Name: " + playerInfo[i].selectedClass.name +
-                            "\nPassive: " + playerInfo[i].selectedClass.passiveDescription +
-                            "\nPrimary: " + playerInfo[i].selectedClass.primaryDescription +
-                            "\nSecondary: " + playerInfo[i].selectedClass.secondaryDescription;
+                        classSelectionIndex[typeOfClassIndex[i], i] = (classSelectionIndex[typeOfClassIndex[i], i] + classes[typeOfClassIndex[i]].Count - 1) % classes[typeOfClassIndex[i]].Count;
+                        playerInfo[i].classes[typeOfClassIndex[i]] = classes[typeOfClassIndex[i]][classSelectionIndex[typeOfClassIndex[i], i]];
+                        characterInfoPanels[i].transform.Find("Canvas" + typeOfClassIndex[i]).GetComponentInChildren<Text>().text =
+                            "Name: " + playerInfo[i].classes[typeOfClassIndex[i]].name +
+                            "\nPassive: " + playerInfo[i].classes[typeOfClassIndex[i]].passiveDescription +
+                            "\nPrimary: " + playerInfo[i].classes[typeOfClassIndex[i]].primaryDescription +
+                            "\nSecondary: " + playerInfo[i].classes[typeOfClassIndex[i]].secondaryDescription;
                     }
                     else if (Input.GetKeyDown(playerInfo[i].r))
                     {
-                        classSelectionIndex[i] = (classSelectionIndex[i] + 1) % classes.Length;
-                        playerInfo[i].selectedClass = classes[classSelectionIndex[i]];
-                        characterInfoPanels[i].GetComponentInChildren<Text>().text =
-                            "Name: " + playerInfo[i].selectedClass.name +
-                            "\nPassive: " + playerInfo[i].selectedClass.passiveDescription +
-                            "\nPrimary: " + playerInfo[i].selectedClass.primaryDescription +
-                            "\nSecondary: " + playerInfo[i].selectedClass.secondaryDescription;
+                        classSelectionIndex[typeOfClassIndex[i], i] = (classSelectionIndex[typeOfClassIndex[i], i] + 1) % classes[typeOfClassIndex[i]].Count;
+                        playerInfo[i].classes[typeOfClassIndex[i]] = classes[typeOfClassIndex[i]][classSelectionIndex[typeOfClassIndex[i], i]];
+                        characterInfoPanels[i].transform.Find("Canvas" + typeOfClassIndex[i]).GetComponentInChildren<Text>().text =
+                            "Name: " + playerInfo[i].classes[typeOfClassIndex[i]].name +
+                            "\nPassive: " + playerInfo[i].classes[typeOfClassIndex[i]].passiveDescription +
+                            "\nPrimary: " + playerInfo[i].classes[typeOfClassIndex[i]].primaryDescription +
+                            "\nSecondary: " + playerInfo[i].classes[typeOfClassIndex[i]].secondaryDescription;
+                    }
+                    else if (Input.GetKeyDown(playerInfo[i].u))
+                    {
+                        typeOfClassIndex[i] = 0;
+                    }
+                    else if (Input.GetKeyDown(playerInfo[i].d))
+                    {
+                        typeOfClassIndex[i] = 1;
                     }
                     else if (Input.GetKeyDown(playerInfo[i].a))
                     {
-                        characterInfoPanels[i].GetComponentInChildren<Text>().text += "\nREADY";
+                        characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
                         ready[i] = true;
                     }
                 }
@@ -195,11 +215,7 @@ public class GameController : MonoBehaviour {
                 if (Input.GetKeyDown(playerInfo[i].b))
                 {
                     ready[i] = false;
-                    characterInfoPanels[i].GetComponentInChildren<Text>().text =
-                        "Name: " + playerInfo[i].selectedClass.name +
-                        "\nPassive: " + playerInfo[i].selectedClass.passiveDescription +
-                        "\nPrimary: " + playerInfo[i].selectedClass.primaryDescription +
-                        "\nSecondary: " + playerInfo[i].selectedClass.secondaryDescription;
+                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
                 }
             }
         }
@@ -212,12 +228,28 @@ public class GameController : MonoBehaviour {
 
         if (allReady)
         {
-            for (int i = 0; i < characterInfoPanels.Length; ++i)
+            startButton.SetActive(true);
+
+            if(Input.GetKeyDown(KeyCode.Mouse0))
             {
-                Destroy(characterInfoPanels[i]);
+                Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                mPos = new Vector3(mPos.x, mPos.y, startButton.transform.position.z);
+
+                if (startButton.GetComponent<BoxCollider2D>().bounds.Contains(mPos))
+                {
+                    for (int i = 0; i < characterInfoPanels.Length; ++i)
+                    {
+                        Destroy(characterInfoPanels[i]);
+                        Destroy(startButton);
+                    }
+                    ReGen();
+                    state = State.game;
+                }
             }
-            ReGen();
-            state = State.game;
+        }
+        else
+        {
+            startButton.SetActive(false);
         }
     }
 
@@ -229,13 +261,13 @@ public class GameController : MonoBehaviour {
             Destroy(players[i]);
         }
 
-        playerInfo[0].character = Instantiate(playerInfo[0].selectedClass.prefab, new Vector3(1, 1, 0), Quaternion.identity);
+        playerInfo[0].character = Instantiate(playerInfo[0].classes[1].prefab, new Vector3(1, 1, 0), Quaternion.identity);
         playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
-        playerInfo[1].character = Instantiate(playerInfo[1].selectedClass.prefab, new Vector3(cols*unitSize - 1, 1, 0), Quaternion.identity);
+        playerInfo[1].character = Instantiate(playerInfo[1].classes[1].prefab, new Vector3(cols*unitSize - 1, 1, 0), Quaternion.identity);
         playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
-        playerInfo[2].character = Instantiate(playerInfo[2].selectedClass.prefab, new Vector3(1, rows*unitSize -1, 0), Quaternion.identity);
+        playerInfo[2].character = Instantiate(playerInfo[2].classes[1].prefab, new Vector3(1, rows*unitSize -1, 0), Quaternion.identity);
         playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        playerInfo[3].character = Instantiate(playerInfo[3].selectedClass.prefab, new Vector3(cols*unitSize - 1, rows*unitSize - 1, 0), Quaternion.identity);
+        playerInfo[3].character = Instantiate(playerInfo[3].classes[0].prefab, new Vector3(cols*unitSize - 1, rows*unitSize - 1, 0), Quaternion.identity);
 
         ai1.GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);     
     }

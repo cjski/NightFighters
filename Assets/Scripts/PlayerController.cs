@@ -13,6 +13,8 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected enum MovementType { Normal, Dashing, Stun };
 
+    private PlayerInformation player;
+
     private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
     protected float baseSpeed;
     protected float speed;

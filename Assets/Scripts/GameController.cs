@@ -27,6 +27,7 @@ public class PlayerInformation
     public KeyCode l, r, u, d, a, b;
     public ClassInformation[] classes = { null, null }; //0 Human, 1 Monster
     public GameObject character = null;
+    public enum CharacterState { HumanAlive, HumanDead, MonsterAlive, MonsterDead }
 
     public PlayerInformation(KeyCode pA, KeyCode pB, KeyCode pL=KeyCode.None, KeyCode pR=KeyCode.None, KeyCode pU=KeyCode.None, KeyCode pD=KeyCode.None)
     {
@@ -269,13 +270,12 @@ public class GameController : MonoBehaviour {
         playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
         playerInfo[3].character = Instantiate(playerInfo[3].classes[0].prefab, new Vector3(cols*unitSize - 1, rows*unitSize - 1, 0), Quaternion.identity);
 
-        ai1.GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);     
+        ai1.GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);
     }
 
     private void ReGen()
     {
         stageMap.Generate();
-
         Restart();
     }
 }

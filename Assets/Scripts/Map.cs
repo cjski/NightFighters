@@ -48,6 +48,7 @@ public class Map
 
     public int y, x;
     public float unitSize;
+    public float unitSizeInverse;
     private Node[,] map;
 
     public Map(int cols, int rows, float sizeOfUnit)
@@ -55,6 +56,7 @@ public class Map
         y = rows;
         x = cols;
         unitSize = sizeOfUnit;
+        unitSizeInverse = 1 / unitSize;
         map = new Node[cols, rows];
     }
 

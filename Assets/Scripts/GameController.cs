@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
-// 10, -1.7     and     1.9
+
 public class ClassInformation
 {
     public GameObject prefab { get; private set; }
@@ -52,7 +52,9 @@ public class GameController : MonoBehaviour {
     Map stageMap;
     int rows = 4, cols = 6;// 4, 6, 3
     float unitSize = 3;
-    GameObject ai1;
+
+    GameObject[] AIControllers = new GameObject[4];
+    static GameObject monsterAIControllerPrefab, humanAIControllerPrefab;
 
     ClassInformation hunter, watchman, werewolf, vampire;
     List<List<ClassInformation>> classes = new List<List<ClassInformation>>();
@@ -76,10 +78,16 @@ public class GameController : MonoBehaviour {
             "Vampire", "None", "Bite(Heal)", "Slow Projectile");
         classes.Add(new List<ClassInformation> { hunter, watchman });
         classes.Add(new List<ClassInformation> { werewolf, vampire });
+
         stageMap = new Map(cols, rows, unitSize);
+
         characterInfoPanelPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/CharacterInfoPanelPrefab.prefab", typeof(GameObject));
 
-        ai1 = GameObject.Find("AIController");
+        monsterAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterAIController.prefab", typeof(GameObject));
+        humanAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanAIController.prefab", typeof(GameObject));
+
+        AIControllers[0] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
+        AIControllers[1] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
 
         StartCharacterSelect();
     }
@@ -266,11 +274,12 @@ public class GameController : MonoBehaviour {
         playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
         playerInfo[1].character = Instantiate(playerInfo[1].classes[1].prefab, new Vector3(cols*unitSize - 1, 1, 0), Quaternion.identity);
         playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
-        playerInfo[2].character = Instantiate(playerInfo[2].classes[1].prefab, new Vector3(1, rows*unitSize -1, 0), Quaternion.identity);
-        playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
+        playerInfo[2].character = Instantiate(playerInfo[2].classes[0].prefab, new Vector3(1, rows*unitSize -1, 0), Quaternion.identity);
+        //playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
         playerInfo[3].character = Instantiate(playerInfo[3].classes[0].prefab, new Vector3(cols*unitSize - 1, rows*unitSize - 1, 0), Quaternion.identity);
 
-        ai1.GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);
+        AIControllers[0].GetComponent<HumanAI>().Init(stageMap, playerInfo[2].character);
+        AIControllers[1].GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);
     }
 
     private void ReGen()

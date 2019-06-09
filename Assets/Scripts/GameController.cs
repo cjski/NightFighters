@@ -280,6 +280,12 @@ public class GameController : MonoBehaviour {
 
         AIControllers[0].GetComponent<HumanAI>().Init(stageMap, playerInfo[2].character);
         AIControllers[1].GetComponent<HumanAI>().Init(stageMap, playerInfo[3].character);
+
+        GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
+        for(int i=0;i<lights.Length;++i)
+        {
+            lights[i].GetComponent<LightController>().TurnOff();
+        }
     }
 
     private void ReGen()

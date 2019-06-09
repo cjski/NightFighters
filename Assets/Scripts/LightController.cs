@@ -101,4 +101,24 @@ public class LightController : MonoBehaviour {
     {
         return turnOffTimer.time > 0;
     }
+
+    public void TurnOff()
+    {
+        turnOffTimer.Reset();
+        turnOnTimer.Reset();
+        if (halo)
+        {
+            halo.enabled = false;
+        }
+    }
+
+    public void TurnOn()
+    {
+        turnOffTimer.Reset();
+        turnOnTimer.Reset();
+        if (halo)
+        {
+            halo.enabled = true;
+        }
+    }
 }

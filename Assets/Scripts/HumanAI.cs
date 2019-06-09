@@ -6,9 +6,11 @@ public class HumanAI : AI
 {
     static Map map;
     static float lightTargetDistanceOffset = 50; //Offsets the distance for the lights so the AI is more likely to target players
-    HumanController self;
+    HumanController humanController;
     private Vector2 finalDirection = new Vector2(0, 0);
     private float range = 3;
+
+    private GameObject lastTarget = null;
 
     void Start()
     {
@@ -18,8 +20,8 @@ public class HumanAI : AI
     public void Init(Map gameMap, GameObject human)
     {
         if (map == null) map = gameMap;
-        self = human.GetComponent<HumanController>();
-        self.ActivateAI();
+        humanController = human.GetComponent<HumanController>();
+        humanController.ActivateAI();
     }
 
     /*
@@ -157,17 +159,17 @@ public class HumanAI : AI
 
     void Update()
     {
-        if (self != null)
+        if (humanController != null)
         {
             bool canSeeTarget = false;
             bool isPlayer = false;
             GetDirectionToTargetForMovement(ref finalDirection, ref canSeeTarget, ref isPlayer);
-            if (canSeeTarget && isPlayer && self.primaryCooldown.done)
+            if (canSeeTarget && isPlayer && humanController.primaryCooldown.done)
             {
-                self.AIUsePrimary();
+                humanController.AIUsePrimary();
             }
 
-            if (finalDirection.sqrMagnitude > 0.01f) self.AIMove(finalDirection);
+            if (finalDirection.sqrMagnitude > 0.01f) humanController.AIMove(finalDirection);
         }
     }
 
@@ -177,14 +179,14 @@ public class HumanAI : AI
         
         canSeeTarget = false;
 
-        int selfX = (int)(self.gameObject.transform.position.x * map.unitSizeInverse);
-        int selfY = (int)(self.gameObject.transform.position.y * map.unitSizeInverse);
+        int selfX = (int)(humanController.gameObject.transform.position.x * map.unitSizeInverse);
+        int selfY = (int)(humanController.gameObject.transform.position.y * map.unitSizeInverse);
         Node selfNode = map.GetNode(selfX, selfY);
 
         float distanceToTargetSquared = 9999;
         Vector2 targetPosition = Vector2.zero;
         Vector2 toTarget = Vector2.zero;
-        Vector2 selfPosition = self.gameObject.transform.position;
+        Vector2 selfPosition = humanController.gameObject.transform.position;
 
         // Have to get these each time because some players may die and then they leave the array
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -249,7 +251,8 @@ public class HumanAI : AI
         for (int i = 0; i < lights.Length; ++i)
         {
             LightController lc = lights[i].GetComponent<LightController>();
-            if (lc != null && !lc.On())
+            // Don't go for any lights that another human is turning on already
+            if (lc != null && !lc.On() && (!lc.humansIn || lc.currentHumanInLight == humanController.gameObject))
             {
                 targetPosition = lc.gameObject.transform.position;
                 toTarget = targetPosition - selfPosition;
@@ -303,21 +306,21 @@ public class HumanAI : AI
 
     bool FindIfTargetIsVisible(Vector2 targetPosition, Vector2 toTarget, ref Vector2 direction)
     {
-        self.GetComponent<BoxCollider2D>().enabled = false;
-        RaycastHit2D hitTarget = Physics2D.Raycast(self.transform.position, toTarget);
-        self.GetComponent<BoxCollider2D>().enabled = true;
+        humanController.GetComponent<BoxCollider2D>().enabled = false;
+        RaycastHit2D hitTarget = Physics2D.Raycast(humanController.transform.position, toTarget);
+        humanController.GetComponent<BoxCollider2D>().enabled = true;
         if (hitTarget.collider.transform != null && hitTarget.collider.transform.position.Equals(targetPosition))
         {
             // Catches any walls that the single ray would miss so that the AI can clip around walls
-            Vector3 size = self.GetComponent<Renderer>().bounds.size;
+            Vector3 size = humanController.GetComponent<Renderer>().bounds.size;
             int xDir = 1;
             if (toTarget.x * toTarget.y > 0) xDir = -1;
-            Vector2 pos1 = (Vector2)self.transform.position + new Vector2(size.y * 0.5f, xDir * size.x * 0.5f);
-            Vector2 pos2 = (Vector2)self.transform.position + new Vector2(-size.y * 0.5f, -xDir * size.x * 0.5f);
-            self.GetComponent<BoxCollider2D>().enabled = false;
+            Vector2 pos1 = (Vector2)humanController.transform.position + new Vector2(size.y * 0.5f, xDir * size.x * 0.5f);
+            Vector2 pos2 = (Vector2)humanController.transform.position + new Vector2(-size.y * 0.5f, -xDir * size.x * 0.5f);
+            humanController.GetComponent<BoxCollider2D>().enabled = false;
             RaycastHit2D hitTargetCorner1 = Physics2D.Raycast(pos1, targetPosition - pos1, size.y * 2);
             RaycastHit2D hitTargetCorner2 = Physics2D.Raycast(pos2, targetPosition - pos2, size.y * 2);
-            self.GetComponent<BoxCollider2D>().enabled = true;
+            humanController.GetComponent<BoxCollider2D>().enabled = true;
 
             if ((hitTargetCorner1.collider == null || hitTargetCorner1.collider.gameObject.tag != "Wall") &&
                 (hitTargetCorner2.collider == null || hitTargetCorner2.collider.gameObject.tag != "Wall"))

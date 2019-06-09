@@ -10,7 +10,7 @@ public class HumanAI : AI
     private Vector2 finalDirection = new Vector2(0, 0);
     private float range = 3;
 
-    private GameObject lastTarget = null;
+    private GameObject[] players, lights;
 
     void Start()
     {
@@ -19,7 +19,13 @@ public class HumanAI : AI
 
     public void Init(Map gameMap, GameObject human)
     {
-        if (map == null) map = gameMap;
+        if (map == null)
+        {
+            map = gameMap;
+        }
+
+        players = GameObject.FindGameObjectsWithTag("Player");
+        lights = GameObject.FindGameObjectsWithTag("Light");
         humanController = human.GetComponent<HumanController>();
         humanController.ActivateAI();
     }
@@ -189,12 +195,16 @@ public class HumanAI : AI
         Vector2 selfPosition = humanController.gameObject.transform.position;
 
         // Have to get these each time because some players may die and then they leave the array
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
+        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
 
         // Pick a monster to target
         for (int i = 0; i < players.Length; ++i)
         {
+            if(!players[i])
+            {
+                break;
+            }
             MonsterController mc = players[i].GetComponent<MonsterController>();
             if (mc != null)
             {
@@ -250,6 +260,10 @@ public class HumanAI : AI
 
         for (int i = 0; i < lights.Length; ++i)
         {
+            if (!lights[i])
+            {
+                break;
+            }
             LightController lc = lights[i].GetComponent<LightController>();
             // Don't go for any lights that another human is turning on already
             if (lc != null && !lc.On() && (!lc.humansIn || lc.currentHumanInLight == humanController.gameObject))

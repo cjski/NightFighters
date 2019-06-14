@@ -179,10 +179,8 @@ public class HumanAI : AI
         direction = Vector2.zero;
         
         canSeeTarget = false;
-
-        int selfX = (int)(humanController.gameObject.transform.position.x * map.unitSizeInverse);
-        int selfY = (int)(humanController.gameObject.transform.position.y * map.unitSizeInverse);
-        Node selfNode = map.GetNode(selfX, selfY);
+        
+        Node selfNode = map.GetNode(humanController.gameObject.transform.position);
 
         float distanceToTargetSquared = 9999;
         Vector2 targetPosition = Vector2.zero;
@@ -208,7 +206,7 @@ public class HumanAI : AI
                     canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection);
                     if(!canSeeTarget)
                     {
-                        Node targetNode = map.GetNode((int)(targetPosition.x * map.unitSizeInverse), (int)(targetPosition.y * map.unitSizeInverse));
+                        Node targetNode = map.GetNode(targetPosition);
                         // Add one to the target distance calculation because if they are on the same node it will count as 0
                         float targetDistance = (selfNode.distances[targetNode.x, targetNode.y] + 1) * map.unitSize;
                         targetDistanceSquared = targetDistance * targetDistance;
@@ -264,7 +262,7 @@ public class HumanAI : AI
                     canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection);
                     if (!canSeeTarget)
                     {
-                        Node targetNode = map.GetNode((int)(targetPosition.x * map.unitSizeInverse), (int)(targetPosition.y * map.unitSizeInverse));
+                        Node targetNode = map.GetNode(targetPosition);
                         float targetDistance = (selfNode.distances[targetNode.x, targetNode.y] + 1) * map.unitSize;
                         targetDistanceSquared = targetDistance * targetDistance + lightTargetDistanceOffset;
                         if (targetDistanceSquared < distanceToTargetSquared)

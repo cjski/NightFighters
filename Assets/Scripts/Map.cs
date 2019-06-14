@@ -49,25 +49,33 @@ public class Map
     public int y, x;
     public float unitSize;
     public float unitSizeInverse;
+    public Vector2 offset;
     private Node[,] map;
 
-    public Map(int cols, int rows, float sizeOfUnit)
+    public Map(int cols, int rows, float sizeOfUnit, Vector2 newOffset)
     {
         y = rows;
         x = cols;
         unitSize = sizeOfUnit;
         unitSizeInverse = 1 / unitSize;
+        offset = newOffset;
         map = new Node[cols, rows];
     }
 
-    public Node GetNode(int xPos, int yPos)
+    public Node GetNode(int xIndex, int yIndex)
     {
-        return map[xPos, yPos];
+        return map[xIndex, yIndex];
+    }
+
+    public Node GetNode(Vector2 position)
+    {
+        position = (position - offset) * unitSizeInverse;
+        return map[(int)position.x, (int)position.y];
     }
 
     public Vector2 GetRealNodePosition(int xPos, int yPos)
     {
-        return new Vector2(xPos + 0.5f, yPos + 0.5f)*unitSize;
+        return new Vector2(xPos + 0.5f, yPos + 0.5f)*unitSize + offset;
     }
 
     public void Generate()
@@ -127,28 +135,28 @@ public class Map
         for (int i = 0; i < x; ++i)
         {
             map[i, 0].d = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2(i + 0.5f, 0) * unitSize, Quaternion.identity);
+            Object.Instantiate(wallPrefab, new Vector2(i + 0.5f, 0) * unitSize + offset, Quaternion.identity);
         }
 
         //Generate upper border walls
         for (int i = 0; i < x; ++i)
         {
             map[i, y - 1].u = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2((i + 0.5f), y) * unitSize, Quaternion.identity);
+            Object.Instantiate(wallPrefab, new Vector2((i + 0.5f), y) * unitSize + offset, Quaternion.identity);
         }
 
         //Generate left border walls
         for (int i = 0; i < y; ++i)
         {
             map[0, i].l = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2(0, i + 0.5f) * unitSize, Quaternion.Euler(0, 0, 90));
+            Object.Instantiate(wallPrefab, new Vector2(0, i + 0.5f) * unitSize + offset, Quaternion.Euler(0, 0, 90));
         }
 
         //Generate right border walls
         for (int i = 0; i < y; ++i)
         {
             map[x - 1, i].r = Node.Connection.Wall;
-            Object.Instantiate(wallPrefab, new Vector2(x, i + 0.5f) * unitSize, Quaternion.Euler(0, 0, 90));
+            Object.Instantiate(wallPrefab, new Vector2(x, i + 0.5f) * unitSize + offset, Quaternion.Euler(0, 0, 90));
         }
 
         // Generate random walls in the map
@@ -173,7 +181,7 @@ public class Map
                 {
                     node.u = Node.Connection.Wall;
                     other.d = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefab, new Vector2(wallX + 0.5f, wallY + 1) * unitSize, Quaternion.Euler(0, 0, 0));
+                    Object.Instantiate(wallPrefab, new Vector2(wallX + 0.5f, wallY + 1) * unitSize + offset, Quaternion.Euler(0, 0, 0));
                     --walls;
                 }
             }
@@ -184,7 +192,7 @@ public class Map
                 {
                     node.l = Node.Connection.Wall;
                     other.r = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefab, new Vector2(wallX, wallY + 0.5f) * unitSize, Quaternion.Euler(0, 0, 90));
+                    Object.Instantiate(wallPrefab, new Vector2(wallX, wallY + 0.5f) * unitSize + offset, Quaternion.Euler(0, 0, 90));
                     --walls;
                 }
             }
@@ -195,7 +203,7 @@ public class Map
                 {
                     node.r = Node.Connection.Wall;
                     other.l = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefab, new Vector2(wallX + 1, wallY + 0.5f) * unitSize, Quaternion.Euler(0, 0, 90));
+                    Object.Instantiate(wallPrefab, new Vector2(wallX + 1, wallY + 0.5f) * unitSize + offset, Quaternion.Euler(0, 0, 90));
                     --walls;
                 }
             }
@@ -206,7 +214,7 @@ public class Map
                 {
                     node.d = Node.Connection.Wall;
                     other.u = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefab, new Vector2(wallX + 0.5f, wallY) * unitSize, Quaternion.Euler(0, 0, 0));
+                    Object.Instantiate(wallPrefab, new Vector2(wallX + 0.5f, wallY) * unitSize + offset, Quaternion.Euler(0, 0, 0));
                     --walls;
                 }
             }
@@ -240,7 +248,7 @@ public class Map
                 other = map[lightX, lightY + 1];
                 node.u = Node.Connection.Light;
                 other.d = Node.Connection.Light;
-                Object.Instantiate(lightPrefab, new Vector2(lightX + 0.5f, lightY + 1) * unitSize, Quaternion.Euler(0, 0, 0));
+                Object.Instantiate(lightPrefab, new Vector2(lightX + 0.5f, lightY + 1) * unitSize + offset, Quaternion.Euler(0, 0, 0));
                 --lights;
             }
             else if (lightR == 1 && node.l == Node.Connection.Empty)
@@ -248,7 +256,7 @@ public class Map
                 other = map[lightX - 1, lightY];
                 node.l = Node.Connection.Light;
                 other.r = Node.Connection.Light;
-                Object.Instantiate(lightPrefab, new Vector2(lightX, lightY + 0.5f) * unitSize, Quaternion.Euler(0, 0, 0));
+                Object.Instantiate(lightPrefab, new Vector2(lightX, lightY + 0.5f) * unitSize + offset, Quaternion.Euler(0, 0, 0));
                 --lights;
             }
             else if (lightR == 2 && node.r == Node.Connection.Empty)
@@ -256,7 +264,7 @@ public class Map
                 other = map[lightX + 1, lightY];
                 node.r = Node.Connection.Light;
                 other.l = Node.Connection.Light;
-                Object.Instantiate(lightPrefab, new Vector2(lightX + 1, lightY + 0.5f) * unitSize, Quaternion.Euler(0, 0, 0));
+                Object.Instantiate(lightPrefab, new Vector2(lightX + 1, lightY + 0.5f) * unitSize + offset, Quaternion.Euler(0, 0, 0));
                 --lights;
             }
             else if (node.d == Node.Connection.Empty)
@@ -264,7 +272,7 @@ public class Map
                 other = map[lightX, lightY - 1];
                 node.d = Node.Connection.Light;
                 other.u = Node.Connection.Light;
-                Object.Instantiate(lightPrefab, new Vector2(lightX + 0.5f, lightY) * unitSize, Quaternion.Euler(0, 0, 0));
+                Object.Instantiate(lightPrefab, new Vector2(lightX + 0.5f, lightY) * unitSize + offset, Quaternion.Euler(0, 0, 0));
                 --lights;
             }
         }

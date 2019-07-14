@@ -5,6 +5,8 @@ using UnityEngine;
 public class MonsterAI : AI
 {
     static Map map;
+    static float directionToTargetWeight = 1.0f;
+    static float directionToBestTileWeight = 1.0f;
     MonsterController monsterController;
     private Vector2 finalDirection = new Vector2(0, 0);
     private float range = 3;
@@ -65,7 +67,7 @@ public class MonsterAI : AI
                 canSeeTarget = FindIfTargetIsVisible(targetPosition, fromTarget, ref newTargetDirection);
                 if(canSeeTarget)
                 {
-                    direction += newTargetDirection.normalized;
+                    direction += newTargetDirection.normalized * directionToTargetWeight;
                 }
                 Node targetNode = map.GetNode(targetPosition);
                 // Add one to the target distance calculation because if they are on the same node it will count as 0
@@ -73,24 +75,88 @@ public class MonsterAI : AI
                 Node destination = selfNode;
 
                 // Pick the next best node beside you to go to
-                if (selfNode.l != Node.Connection.Wall && map.GetNode(selfNode.x - 1, selfNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                if (selfNode.l != Node.Connection.Wall)
                 {
-                    destination = map.GetNode(selfNode.x - 1, selfNode.y);
+                    Node adjNode = map.GetNode(selfNode.x - 1, selfNode.y);
+                    if(adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.d != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.u != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.l != Node.Connection.Wall && map.GetNode(adjNode.x - 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
                 }
-                if (selfNode.d != Node.Connection.Wall && map.GetNode(selfNode.x, selfNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                if (selfNode.u != Node.Connection.Wall)
                 {
-                    destination = map.GetNode(selfNode.x, selfNode.y - 1);
+                    Node adjNode = map.GetNode(selfNode.x, selfNode.y + 1);
+                    if (adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.r != Node.Connection.Wall && map.GetNode(adjNode.x + 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.u != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.l != Node.Connection.Wall && map.GetNode(adjNode.x - 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
                 }
-                if (selfNode.u != Node.Connection.Wall && map.GetNode(selfNode.x, selfNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                if (selfNode.d != Node.Connection.Wall)
                 {
-                    destination = map.GetNode(selfNode.x, selfNode.y + 1);
+                    Node adjNode = map.GetNode(selfNode.x, selfNode.y - 1);
+                    if (adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.r != Node.Connection.Wall && map.GetNode(adjNode.x + 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.d != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.l != Node.Connection.Wall && map.GetNode(adjNode.x - 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
                 }
-                if (selfNode.r != Node.Connection.Wall && map.GetNode(selfNode.x + 1, selfNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                if (selfNode.r != Node.Connection.Wall)
                 {
-                    destination = map.GetNode(selfNode.x + 1, selfNode.y);
+                    Node adjNode = map.GetNode(selfNode.x + 1, selfNode.y);
+                    if (adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.d != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.u != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
+                    if (adjNode.r != Node.Connection.Wall && map.GetNode(adjNode.x + 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = adjNode;
+                    }
                 }
 
-                direction += (map.GetRealNodePosition(destination.x, destination.y) - selfPosition).normalized;
+                direction += ((map.GetRealNodePosition(destination.x, destination.y) - selfPosition).normalized) * directionToBestTileWeight;
             }
         }
 

@@ -49,7 +49,7 @@ public class MonsterAI : AI
 
         //float distanceToTargetSquared = 9999;
         Vector2 targetPosition = Vector2.zero;
-        Vector2 fromTarget = Vector2.zero;
+        Vector2 toTarget = Vector2.zero;
         Vector2 selfPosition = monsterController.gameObject.transform.position;
 
         // Have to get these each time because some players may die and then they leave the array
@@ -62,12 +62,13 @@ public class MonsterAI : AI
             if (hc != null)
             {
                 targetPosition = hc.gameObject.transform.position;
-                fromTarget =  selfPosition - targetPosition;
+                toTarget = targetPosition - selfPosition;
                 Vector2 newTargetDirection = Vector2.zero;
-                canSeeTarget = FindIfTargetIsVisible(targetPosition, fromTarget, ref newTargetDirection);
+                canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection);
                 if(canSeeTarget)
                 {
-                    direction += newTargetDirection.normalized * directionToTargetWeight;
+                    // Use - because we want to move away from the target
+                    direction -= newTargetDirection.normalized * directionToTargetWeight;
                 }
                 Node targetNode = map.GetNode(targetPosition);
                 // Add one to the target distance calculation because if they are on the same node it will count as 0

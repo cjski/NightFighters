@@ -7,6 +7,7 @@ public class MonsterAI : AI
     static Map map;
     static float directionToTargetWeight = 1.0f;
     static float directionToBestTileWeight = 1.0f;
+    static float directionAwayFromWallWeight = 0.5f;
     MonsterController monsterController;
     private Vector2 finalDirection = new Vector2(0, 0);
     private float range = 3;
@@ -161,7 +162,7 @@ public class MonsterAI : AI
             }
         }
 
-        
+        direction += GetDirectionAwayFromWall(direction.normalized);
     }
 
     bool FindIfTargetIsVisible(Vector2 targetPosition, Vector2 toTarget, ref Vector2 direction)
@@ -192,5 +193,28 @@ public class MonsterAI : AI
             }
         }
         return false;
+    }
+
+    Vector2 GetDirectionAwayFromWall(Vector2 direction)
+    {
+        Vector2 directionAwayFromWall = new Vector2();
+
+        Vector2 size = monsterController.GetSize();
+        monsterController.GetComponent<BoxCollider2D>().enabled = false;
+        RaycastHit2D hitTargetX = Physics2D.Raycast(monsterController.transform.position, new Vector2(direction.x, 0), size.x * 2);
+        RaycastHit2D hitTargetY = Physics2D.Raycast(monsterController.transform.position, new Vector2(0, direction.y), size.y * 2);
+        monsterController.GetComponent<BoxCollider2D>().enabled = true;
+
+        if(hitTargetX.collider != null && hitTargetX.collider.gameObject.tag == "Wall")
+        {
+            directionAwayFromWall.x = -direction.x;
+        }
+
+        if (hitTargetY.collider != null && hitTargetY.collider.gameObject.tag == "Wall")
+        {
+            directionAwayFromWall.y = -direction.y;
+        }
+
+        return directionAwayFromWall * directionAwayFromWallWeight;
     }
 }

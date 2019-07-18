@@ -160,7 +160,7 @@ public abstract class PlayerController : MonoBehaviour {
         float distToMoveSqr = move.sqrMagnitude;
 
         direction = move.normalized;
-        if(distToMoveSqr >= (speed * 2)*(speed * 2))
+        if(distToMoveSqr >= 4 *speed * speed)
         {
             Move(direction, speed);
         }
@@ -173,7 +173,7 @@ public abstract class PlayerController : MonoBehaviour {
     private void Move(Vector2 direction, float moveSpeed, int layerMask=-261)
     {
         Vector2 pos = transform.position;
-        Vector3 size = GetComponent<Renderer>().bounds.size;
+        Vector2 size = GetSize();
         //int layMask = 1 << 8; // Layer mask for environment layer
 
         Vector2[] originsForRaycastsX =
@@ -323,6 +323,11 @@ public abstract class PlayerController : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    public Vector2 GetSize()
+    {
+        return GetComponent<Renderer>().bounds.size;
     }
 
     public void ActivateAI()

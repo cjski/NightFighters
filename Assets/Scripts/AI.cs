@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class AI : MonoBehaviour
 {
-
+    protected static int ignoreLightLayerMask = -261;
 }

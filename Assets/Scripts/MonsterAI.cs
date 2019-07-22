@@ -6,11 +6,11 @@ public class MonsterAI : AI
 {
     static Map map;
     static float directionToTargetWeight = 1.0f;
-    static float directionToBestTileWeight = 1.0f;
-    static float directionAwayFromWallWeight = 0.5f;
+    static float directionToBestTileWeight = 0.75f;
+    static float directionAwayFromWallWeight = 1.0f;
     MonsterController monsterController;
     private Vector2 finalDirection = new Vector2(0, 0);
-    private float range = 3;
+    private Vector2 previousDirection = new Vector2(0, 0);
 
     void Start()
     {
@@ -31,12 +31,13 @@ public class MonsterAI : AI
             bool canSeeTarget = false;
             bool isPlayer = false;
             GetDirectionToTargetForMovement(ref finalDirection, ref canSeeTarget, ref isPlayer);
-            //if (canSeeTarget && isPlayer && monsterController.primaryCooldown.done)
-            //{
-            //    monsterController.AIUsePrimary();
-            //}
 
-            if (finalDirection.sqrMagnitude > 0.01f) monsterController.AIMove(finalDirection);
+            if (finalDirection.sqrMagnitude > 0.01f)
+            {
+                monsterController.AIMove(finalDirection);
+            }
+
+            previousDirection = finalDirection;
         }
     }
 
@@ -44,14 +45,19 @@ public class MonsterAI : AI
     {
         direction = Vector2.zero;
 
+        bool biasUpNode = true;
+        bool biasRightNode = true;
+
         canSeeTarget = false;
         
         Node selfNode = map.GetNode(monsterController.gameObject.transform.position);
-
-        //float distanceToTargetSquared = 9999;
+        
         Vector2 targetPosition = Vector2.zero;
         Vector2 toTarget = Vector2.zero;
         Vector2 selfPosition = monsterController.gameObject.transform.position;
+
+        Vector2 totalAwayFromHuman = new Vector2();
+        Vector2 totalToTiles = new Vector2();
 
         // Have to get these each time because some players may die and then they leave the array
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -64,111 +70,184 @@ public class MonsterAI : AI
             {
                 targetPosition = hc.gameObject.transform.position;
                 toTarget = targetPosition - selfPosition;
+
                 Vector2 newTargetDirection = Vector2.zero;
                 canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection);
+
                 if(canSeeTarget)
                 {
                     // Use - because we want to move away from the target
                     direction -= newTargetDirection.normalized * directionToTargetWeight;
+                    totalAwayFromHuman -= newTargetDirection.normalized * directionToTargetWeight;
+
+                    // Bias the node selection to be as away from the target as you can get
+                    // only do this if you can see the target or you'll get stuck in between nodes
+                    biasUpNode = toTarget.y < 0 ? true : false;
+                    biasRightNode = toTarget.x < 0 ? true : false;
                 }
                 Node targetNode = map.GetNode(targetPosition);
-                // Add one to the target distance calculation because if they are on the same node it will count as 0
-                //float targetDistance = (selfNode.distances[targetNode.x, targetNode.y] + 1) * map.unitSize;
                 Node destination = selfNode;
+                int bestDistance = -1;
+
+                Node leftNode = selfNode;
+                Node rightNode = selfNode;
+                Node upNode = selfNode;
+                Node downNode = selfNode;
+                int leftNodeBestDistance = -1;
+                int rightNodeBestDistance = -1;
+                int upNodeBestDistance = -1;
+                int downNodeBestDistance = -1;
 
                 // Pick the next best node beside you to go to
                 if (selfNode.l != Node.Connection.Wall)
                 {
-                    Node adjNode = map.GetNode(selfNode.x - 1, selfNode.y);
-                    if(adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    leftNode = map.GetNode(selfNode.x - 1, selfNode.y);
+                    leftNodeBestDistance = leftNode.distances[targetNode.x, targetNode.y];
+
+                    if (leftNode.d != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        leftNodeBestDistance = Mathf.Max(map.GetNode(leftNode.x, leftNode.y - 1).distances[targetNode.x, targetNode.y], leftNodeBestDistance);
                     }
-                    if (adjNode.d != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (leftNode.u != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        leftNodeBestDistance = Mathf.Max(map.GetNode(leftNode.x, leftNode.y + 1).distances[targetNode.x, targetNode.y], leftNodeBestDistance);
                     }
-                    if (adjNode.u != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (leftNode.l != Node.Connection.Wall)
                     {
-                        destination = adjNode;
-                    }
-                    if (adjNode.l != Node.Connection.Wall && map.GetNode(adjNode.x - 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
-                    {
-                        destination = adjNode;
+                        leftNodeBestDistance = Mathf.Max(map.GetNode(leftNode.x - 1, leftNode.y).distances[targetNode.x, targetNode.y], leftNodeBestDistance);
                     }
                 }
                 if (selfNode.u != Node.Connection.Wall)
                 {
-                    Node adjNode = map.GetNode(selfNode.x, selfNode.y + 1);
-                    if (adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    upNode = map.GetNode(selfNode.x, selfNode.y + 1);
+                    upNodeBestDistance = upNode.distances[targetNode.x, targetNode.y];
+
+                    if (upNode.r != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        upNodeBestDistance = Mathf.Max(map.GetNode(upNode.x + 1, upNode.y).distances[targetNode.x, targetNode.y], upNodeBestDistance);
                     }
-                    if (adjNode.r != Node.Connection.Wall && map.GetNode(adjNode.x + 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (upNode.u != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        upNodeBestDistance = Mathf.Max(map.GetNode(upNode.x, upNode.y + 1).distances[targetNode.x, targetNode.y], upNodeBestDistance);
                     }
-                    if (adjNode.u != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (upNode.l != Node.Connection.Wall)
                     {
-                        destination = adjNode;
-                    }
-                    if (adjNode.l != Node.Connection.Wall && map.GetNode(adjNode.x - 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
-                    {
-                        destination = adjNode;
+                        upNodeBestDistance = Mathf.Max(map.GetNode(upNode.x - 1, upNode.y).distances[targetNode.x, targetNode.y], upNodeBestDistance);
                     }
                 }
                 if (selfNode.d != Node.Connection.Wall)
                 {
-                    Node adjNode = map.GetNode(selfNode.x, selfNode.y - 1);
-                    if (adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    downNode = map.GetNode(selfNode.x, selfNode.y - 1);
+                    downNodeBestDistance = downNode.distances[targetNode.x, targetNode.y];
+
+                    if (downNode.r != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        downNodeBestDistance = Mathf.Max(map.GetNode(downNode.x + 1, downNode.y).distances[targetNode.x, targetNode.y], downNodeBestDistance);
                     }
-                    if (adjNode.r != Node.Connection.Wall && map.GetNode(adjNode.x + 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (downNode.d != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        downNodeBestDistance = Mathf.Max(map.GetNode(downNode.x, downNode.y - 1).distances[targetNode.x, targetNode.y], downNodeBestDistance);
                     }
-                    if (adjNode.d != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (downNode.l != Node.Connection.Wall)
                     {
-                        destination = adjNode;
-                    }
-                    if (adjNode.l != Node.Connection.Wall && map.GetNode(adjNode.x - 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
-                    {
-                        destination = adjNode;
+                        downNodeBestDistance = Mathf.Max(map.GetNode(downNode.x - 1, downNode.y).distances[targetNode.x, targetNode.y], downNodeBestDistance);
                     }
                 }
                 if (selfNode.r != Node.Connection.Wall)
                 {
-                    Node adjNode = map.GetNode(selfNode.x + 1, selfNode.y);
-                    if (adjNode.distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    rightNode = map.GetNode(selfNode.x + 1, selfNode.y);
+                    rightNodeBestDistance = rightNode.distances[targetNode.x, targetNode.y];
+
+                    if (rightNode.d != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        rightNodeBestDistance = Mathf.Max(map.GetNode(rightNode.x, rightNode.y - 1).distances[targetNode.x, targetNode.y], rightNodeBestDistance);
                     }
-                    if (adjNode.d != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y - 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (rightNode.u != Node.Connection.Wall)
                     {
-                        destination = adjNode;
+                        rightNodeBestDistance = Mathf.Max(map.GetNode(rightNode.x, rightNode.y + 1).distances[targetNode.x, targetNode.y], rightNodeBestDistance);
                     }
-                    if (adjNode.u != Node.Connection.Wall && map.GetNode(adjNode.x, adjNode.y + 1).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
+                    if (rightNode.r != Node.Connection.Wall)
                     {
-                        destination = adjNode;
-                    }
-                    if (adjNode.r != Node.Connection.Wall && map.GetNode(adjNode.x + 1, adjNode.y).distances[targetNode.x, targetNode.y] > destination.distances[targetNode.x, targetNode.y])
-                    {
-                        destination = adjNode;
+                        rightNodeBestDistance = Mathf.Max(map.GetNode(rightNode.x + 1, rightNode.y).distances[targetNode.x, targetNode.y], rightNodeBestDistance);
                     }
                 }
 
+                // If we have a bias up then check that one first so that the AI is more likely to keep going up (since equality will fail the check) 
+                if (biasUpNode)
+                {
+                    if (upNodeBestDistance > bestDistance)
+                    {
+                        destination = upNode;
+                        bestDistance = upNodeBestDistance;
+                    }
+                    if (downNodeBestDistance > bestDistance)
+                    {
+                        destination = downNode;
+                        bestDistance = downNodeBestDistance;
+                    }
+                }
+                else
+                {
+                    if (downNodeBestDistance > bestDistance)
+                    {
+                        destination = downNode;
+                        bestDistance = downNodeBestDistance;
+                    }
+                    if (upNodeBestDistance > bestDistance)
+                    {
+                        destination = upNode;
+                        bestDistance = upNodeBestDistance;
+                    }
+                }
+
+                // If we have a bias right then check that one first so that the AI is more likely to keep going right (since equality will fail the check) 
+                if (biasRightNode)
+                {
+                    if (rightNodeBestDistance > bestDistance)
+                    {
+                        destination = rightNode;
+                        bestDistance = rightNodeBestDistance;
+                    }
+                    if (leftNodeBestDistance > bestDistance)
+                    {
+                        destination = leftNode;
+                        bestDistance = leftNodeBestDistance;
+                    }
+                }
+                else
+                {
+                    if (leftNodeBestDistance > bestDistance)
+                    {
+                        destination = leftNode;
+                        bestDistance = leftNodeBestDistance;
+                    }
+                    if (rightNodeBestDistance > bestDistance)
+                    {
+                        destination = rightNode;
+                        bestDistance = rightNodeBestDistance;
+                    }
+                }
+
+                Debug.Log("RightDist:" + rightNodeBestDistance +
+                    ", UpDist:" + upNodeBestDistance +
+                    ", DownDist:" + downNodeBestDistance +
+                    ", LeftDist:" + leftNodeBestDistance);
                 direction += ((map.GetRealNodePosition(destination.x, destination.y) - selfPosition).normalized) * directionToBestTileWeight;
+                totalToTiles += ((map.GetRealNodePosition(destination.x, destination.y) - selfPosition).normalized) * directionToBestTileWeight;
             }
         }
 
+        // If the AI is moving into the wall then offset their direction
+        Vector2 directionAwayFromWall = GetDirectionAwayFromWall(direction.normalized);
+        Vector2 moveDirection = direction;
         direction += GetDirectionAwayFromWall(direction.normalized);
+        Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
     }
 
     bool FindIfTargetIsVisible(Vector2 targetPosition, Vector2 toTarget, ref Vector2 direction)
     {
         monsterController.GetComponent<BoxCollider2D>().enabled = false;
-        RaycastHit2D hitTarget = Physics2D.Raycast(monsterController.transform.position, toTarget);
+        RaycastHit2D hitTarget = Physics2D.Raycast(monsterController.transform.position, toTarget, 100.0f, ignoreLightLayerMask);
         monsterController.GetComponent<BoxCollider2D>().enabled = true;
         // Don't check against the collider, because we expect the whole area to be surrounded by walls and the ray 
         // Will eventually hit something

@@ -271,16 +271,16 @@ public class GameController : MonoBehaviour {
             Destroy(players[i]);
         }
 
-        playerInfo[0].character = Instantiate(playerInfo[0].classes[1].prefab, new Vector2(1, 1) + offset, Quaternion.identity);
-        playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
-        playerInfo[1].character = Instantiate(playerInfo[1].classes[0].prefab, new Vector2(cols*unitSize - 1, 1) + offset, Quaternion.identity);
-        playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
-        playerInfo[2].character = Instantiate(playerInfo[2].classes[1].prefab, new Vector2(1, rows*unitSize -1) + offset, Quaternion.identity);
-        playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        playerInfo[3].character = Instantiate(playerInfo[3].classes[1].prefab, new Vector2(cols*unitSize - 1, rows*unitSize - 1) + offset, Quaternion.identity);
+        playerInfo[0].character = Instantiate(playerInfo[0].classes[0].prefab, new Vector2(1, 1) + offset, Quaternion.identity);
+        //playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
+        playerInfo[1].character = Instantiate(playerInfo[1].classes[1].prefab, new Vector2(cols*unitSize - 1, 1) + offset, Quaternion.identity);
+        //playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
+        //playerInfo[2].character = Instantiate(playerInfo[2].classes[0].prefab, new Vector2(1, rows*unitSize -1) + offset, Quaternion.identity);
+        //playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
+        //playerInfo[3].character = Instantiate(playerInfo[3].classes[1].prefab, new Vector2(cols*unitSize - 1, rows*unitSize - 1) + offset, Quaternion.identity);
 
-        //AIControllers[0].GetComponent<HumanAI>().Init(stageMap, playerInfo[2].character);
-        AIControllers[1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[3].character);
+        AIControllers[0].GetComponent<HumanAI>().Init(stageMap, playerInfo[0].character);
+        AIControllers[1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[1].character);
 
         GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
         for(int i=0;i<lights.Length;++i)

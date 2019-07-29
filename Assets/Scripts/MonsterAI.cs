@@ -87,7 +87,7 @@ public class MonsterAI : AI
                 }
                 Node targetNode = map.GetNode(targetPosition);
                 Node destination = selfNode;
-                int bestDistance = -1;
+                int bestDistance = selfNode.distances[targetNode.x, targetNode.y];
 
                 Node leftNode = selfNode;
                 Node rightNode = selfNode;

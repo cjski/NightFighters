@@ -48,19 +48,19 @@ public class GameController : MonoBehaviour {
     PlayerInformation[] playerInfo = {new PlayerInformation(KeyCode.Mouse0, KeyCode.Mouse1),
         new PlayerInformation(KeyCode.Z, KeyCode.X, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow),
         new PlayerInformation(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S),
-        new PlayerInformation(KeyCode.O, KeyCode.P)};
+        new PlayerInformation(KeyCode.Mouse0, KeyCode.Mouse1)};
     Map stageMap;
     int rows = 4, cols = 6;// 4, 6, 3
     float unitSize = 3.5f;
     Vector2 offset = new Vector2(-4,-2);
 
-    GameObject[] AIControllers = new GameObject[4];
+    GameObject[,] AIControllers = new GameObject[4, 2];
     static GameObject monsterAIControllerPrefab, humanAIControllerPrefab;
 
     ClassInformation hunter, watchman, werewolf, vampire;
     List<List<ClassInformation>> classes = new List<List<ClassInformation>>();
     int[,] classSelectionIndex = { { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
-    bool[] ready = { false, false, false, true };
+    bool[] ready = { false, false, false, false };
     int[] typeOfClassIndex = { 0, 0, 0, 0 };
 
     GameObject startButton;
@@ -87,8 +87,11 @@ public class GameController : MonoBehaviour {
         monsterAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterAIController.prefab", typeof(GameObject));
         humanAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanAIController.prefab", typeof(GameObject));
 
-        AIControllers[0] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
-        AIControllers[1] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
+        for( int i=0; i< 4; ++i )
+        {
+            AIControllers[i, 0] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
+            AIControllers[i, 1] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
+        }
 
         StartCharacterSelect();
     }
@@ -275,12 +278,14 @@ public class GameController : MonoBehaviour {
         //playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
         playerInfo[1].character = Instantiate(playerInfo[1].classes[1].prefab, new Vector2(cols*unitSize - 1, 1) + offset, Quaternion.identity);
         //playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
-        //playerInfo[2].character = Instantiate(playerInfo[2].classes[0].prefab, new Vector2(1, rows*unitSize -1) + offset, Quaternion.identity);
+        playerInfo[2].character = Instantiate(playerInfo[2].classes[1].prefab, new Vector2(1, rows*unitSize -1) + offset, Quaternion.identity);
         //playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        //playerInfo[3].character = Instantiate(playerInfo[3].classes[1].prefab, new Vector2(cols*unitSize - 1, rows*unitSize - 1) + offset, Quaternion.identity);
+        playerInfo[3].character = Instantiate(playerInfo[3].classes[1].prefab, new Vector2(cols*unitSize - 1, rows*unitSize - 1) + offset, Quaternion.identity);
 
-        AIControllers[0].GetComponent<HumanAI>().Init(stageMap, playerInfo[0].character);
-        AIControllers[1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[1].character);
+        AIControllers[0,0].GetComponent<HumanAI>().Init(stageMap, playerInfo[0].character);
+        AIControllers[1,1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[1].character);
+        AIControllers[2,1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[2].character);
+        AIControllers[3,1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[3].character);
 
         GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
         for(int i=0;i<lights.Length;++i)

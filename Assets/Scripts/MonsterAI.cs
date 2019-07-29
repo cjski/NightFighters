@@ -7,7 +7,7 @@ public class MonsterAI : AI
     static Map map;
     static float directionToTargetWeight = 1.0f;
     static float directionToBestTileWeight = 0.75f;
-    static float directionAwayFromWallWeight = 1.0f;
+    static float directionAwayFromObstacleWeight = 1.0f;
     MonsterController monsterController;
     private Vector2 finalDirection = new Vector2(0, 0);
     private Vector2 previousDirection = new Vector2(0, 0);
@@ -238,9 +238,9 @@ public class MonsterAI : AI
         }
 
         // If the AI is moving into the wall then offset their direction
-        Vector2 directionAwayFromWall = GetDirectionAwayFromWall(direction.normalized);
+        Vector2 directionAwayFromWall = GetDirectionAwayFromObstacles(direction.normalized);
         Vector2 moveDirection = direction;
-        direction += GetDirectionAwayFromWall(direction.normalized);
+        direction += GetDirectionAwayFromObstacles(direction.normalized);
         Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
     }
 
@@ -274,26 +274,73 @@ public class MonsterAI : AI
         return false;
     }
 
-    Vector2 GetDirectionAwayFromWall(Vector2 direction)
+    Vector2 GetDirectionAwayFromObstacles(Vector2 direction)
     {
-        Vector2 directionAwayFromWall = new Vector2();
+        Vector2 directionAwayFromObstacle = new Vector2();
 
+        Vector2 pos = monsterController.transform.position;
         Vector2 size = monsterController.GetSize();
-        monsterController.GetComponent<BoxCollider2D>().enabled = false;
-        RaycastHit2D hitTargetX = Physics2D.Raycast(monsterController.transform.position, new Vector2(direction.x, 0), size.x * 2);
-        RaycastHit2D hitTargetY = Physics2D.Raycast(monsterController.transform.position, new Vector2(0, direction.y), size.y * 2);
+
+        Vector2[] originsForRaycastsX =
+        {
+            pos + new Vector2(0, size.y * 0.5f),
+            pos + new Vector2(0, size.y * 0.25f),
+            pos,
+            pos - new Vector2(0, size.y * 0.25f),
+            pos - new Vector2(0, size.y * 0.5f)
+        };
+
+        Vector2 directionXVector = new Vector2(direction.x, 0);
+        float distanceForRaycastX = size.x * 2;
+        bool gameObjectInX = false;
+
+        monsterController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
+        for (int i = 0; i < originsForRaycastsX.Length; ++i)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLayerMask);
+            if (hit.collider != null)
+            {
+                gameObjectInX = true;
+                break;
+            }
+        }
         monsterController.GetComponent<BoxCollider2D>().enabled = true;
 
-        if(hitTargetX.collider != null && hitTargetX.collider.gameObject.tag == "Wall")
+        Vector2[] originsForRaycastsY =
         {
-            directionAwayFromWall.x = -direction.x;
+            pos - new Vector2(size.x * 0.5f, 0),
+            pos - new Vector2(size.x * 0.25f, 0),
+            pos,
+            pos + new Vector2(size.x * 0.25f, 0),
+            pos + new Vector2(size.x * 0.5f, 0)
+        };
+
+        Vector2 directionYVector = new Vector2(0, direction.y);
+        float distanceForRaycastY = size.y * 2;
+        bool gameObjectInY = false;
+
+        monsterController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
+        for (int i = 0; i < originsForRaycastsY.Length; ++i)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLayerMask);
+            if (hit.collider != null)
+            {
+                gameObjectInY = true;
+                break;
+            }
+        }
+        monsterController.GetComponent<BoxCollider2D>().enabled = true;
+
+        if (gameObjectInX)
+        {
+            directionAwayFromObstacle.x = -direction.x;
         }
 
-        if (hitTargetY.collider != null && hitTargetY.collider.gameObject.tag == "Wall")
+        if (gameObjectInY)
         {
-            directionAwayFromWall.y = -direction.y;
+            directionAwayFromObstacle.y = -direction.y;
         }
 
-        return directionAwayFromWall * directionAwayFromWallWeight;
+        return directionAwayFromObstacle * directionAwayFromObstacleWeight;
     }
 }

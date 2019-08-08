@@ -86,8 +86,8 @@ public class GameController : MonoBehaviour {
 
         for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
         {
-            AIControllers[i, 0] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
-            AIControllers[i, 1] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
+            AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
+            AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
         }
 
         StartCharacterSelect();

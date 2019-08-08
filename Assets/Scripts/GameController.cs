@@ -50,11 +50,8 @@ public class GameController : MonoBehaviour {
         new PlayerInformation(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S),
         new PlayerInformation(KeyCode.Mouse0, KeyCode.Mouse1)};
     Map stageMap;
-    int rows = 4, cols = 6;// 4, 6, 3
-    float unitSize = 3.5f;
-    Vector2 offset = new Vector2(-4,-2);
 
-    GameObject[,] AIControllers = new GameObject[4, 2];
+    GameObject[,] AIControllers = new GameObject[GameConstants.NUM_PLAYERS, GameConstants.NUM_TYPES_OF_CLASSES];
     static GameObject monsterAIControllerPrefab, humanAIControllerPrefab;
 
     ClassInformation hunter, watchman, werewolf, vampire;
@@ -65,7 +62,7 @@ public class GameController : MonoBehaviour {
 
     GameObject startButton;
     GameObject characterInfoPanelPrefab; 
-    GameObject[] characterInfoPanels = new GameObject[4];
+    GameObject[] characterInfoPanels = new GameObject[GameConstants.NUM_PLAYERS];
 
     // Use this for initialization
     void Start () {
@@ -80,14 +77,14 @@ public class GameController : MonoBehaviour {
         classes.Add(new List<ClassInformation> { hunter, watchman });
         classes.Add(new List<ClassInformation> { werewolf, vampire });
 
-        stageMap = new Map(cols, rows, unitSize, offset);
+        stageMap = new Map(GameConstants.MAP_COLUMNS, GameConstants.MAP_ROWS, GameConstants.MAP_TILE_SIZE, GameConstants.MAP_OFFSET);
 
         characterInfoPanelPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/CharacterInfoPanelPrefab.prefab", typeof(GameObject));
 
         monsterAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterAIController.prefab", typeof(GameObject));
         humanAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanAIController.prefab", typeof(GameObject));
 
-        for( int i=0; i< 4; ++i )
+        for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
         {
             AIControllers[i, 0] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
             AIControllers[i, 1] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
@@ -121,14 +118,14 @@ public class GameController : MonoBehaviour {
         startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), new Vector3(10, -1.7f, 0), Quaternion.identity);
         startButton.SetActive(false);
 
-        characterInfoPanels[0] = Instantiate(characterInfoPanelPrefab, new Vector3(0, 8.6f, 0), Quaternion.identity);
-        characterInfoPanels[1] = Instantiate(characterInfoPanelPrefab, new Vector3(6.2f, 8.6f, 0), Quaternion.identity);
-        characterInfoPanels[2] = Instantiate(characterInfoPanelPrefab, new Vector3(12.4f, 8.6f, 0), Quaternion.identity);
-        characterInfoPanels[3] = Instantiate(characterInfoPanelPrefab, new Vector3(18.6f, 8.6f, 0), Quaternion.identity);
-
-        for (int i = 0; i < characterInfoPanels.Length; ++i)
+        for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            for (int j = 0; j < 2; ++j) 
+            characterInfoPanels[i] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[i], Quaternion.identity);
+        }
+
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            for (int j = 0; j < GameConstants.NUM_TYPES_OF_CLASSES; ++j) 
             {
                 playerInfo[i].classes[j] = classes[j][classSelectionIndex[j, i]];
                 characterInfoPanels[i].transform.Find("Canvas" + j).GetComponentInChildren<Text>().text =
@@ -143,7 +140,7 @@ public class GameController : MonoBehaviour {
 
     private void CharacterSelect()
     {
-        for (int i = 0; i < playerInfo.Length; ++i)
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             if (!ready[i])
             {
@@ -154,7 +151,7 @@ public class GameController : MonoBehaviour {
                         BoxCollider2D readyBox = characterInfoPanels[i].transform.Find("Ready").GetComponent<BoxCollider2D>();
                         Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                         mPos = new Vector3(mPos.x, mPos.y, readyBox.transform.position.z);
-                        for (int j = 0; j < 2; ++j)
+                        for (int j = 0; j < GameConstants.NUM_TYPES_OF_CLASSES; ++j)
                         {
                             BoxCollider2D leftArrow = characterInfoPanels[i].transform.Find("LeftArrow"+j).GetComponent<BoxCollider2D>();
                             BoxCollider2D rightArrow = characterInfoPanels[i].transform.Find("RightArrow"+j).GetComponent<BoxCollider2D>();
@@ -210,11 +207,11 @@ public class GameController : MonoBehaviour {
                     }
                     else if (Input.GetKeyDown(playerInfo[i].u))
                     {
-                        typeOfClassIndex[i] = 0;
+                        typeOfClassIndex[i] = GameConstants.HUMAN_CLASS_TYPE_INDEX;
                     }
                     else if (Input.GetKeyDown(playerInfo[i].d))
                     {
-                        typeOfClassIndex[i] = 1;
+                        typeOfClassIndex[i] = GameConstants.MONSTER_CLASS_TYPE_INDEX;
                     }
                     else if (Input.GetKeyDown(playerInfo[i].a))
                     {
@@ -234,7 +231,7 @@ public class GameController : MonoBehaviour {
         }
 
         bool allReady = true;
-        for(int i=0; i < ready.Length; ++i)
+        for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
         {
             if (!ready[i]) allReady = false;
         }
@@ -274,18 +271,18 @@ public class GameController : MonoBehaviour {
             Destroy(players[i]);
         }
 
-        playerInfo[0].character = Instantiate(playerInfo[0].classes[0].prefab, new Vector2(1, 1) + offset, Quaternion.identity);
+        playerInfo[0].character = Instantiate(playerInfo[0].classes[GameConstants.HUMAN_CLASS_TYPE_INDEX].prefab, new Vector2(1, 1) + GameConstants.MAP_OFFSET, Quaternion.identity);
         //playerInfo[0].character.GetComponent<PlayerController>().MapControls(KeyCode.Mouse0, KeyCode.Mouse1);
-        playerInfo[1].character = Instantiate(playerInfo[1].classes[1].prefab, new Vector2(cols*unitSize - 1, 1) + offset, Quaternion.identity);
+        playerInfo[1].character = Instantiate(playerInfo[1].classes[GameConstants.MONSTER_CLASS_TYPE_INDEX].prefab, new Vector2(GameConstants.MAP_COLUMNS * GameConstants.MAP_TILE_SIZE - 1, 1) + GameConstants.MAP_OFFSET, Quaternion.identity);
         //playerInfo[1].character.GetComponent<PlayerController>().MapControls(KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S, KeyCode.K, KeyCode.L);
-        playerInfo[2].character = Instantiate(playerInfo[2].classes[1].prefab, new Vector2(1, rows*unitSize -1) + offset, Quaternion.identity);
+        playerInfo[2].character = Instantiate(playerInfo[2].classes[GameConstants.MONSTER_CLASS_TYPE_INDEX].prefab, new Vector2(1, GameConstants.MAP_ROWS * GameConstants.MAP_TILE_SIZE - 1) + GameConstants.MAP_OFFSET, Quaternion.identity);
         //playerInfo[2].character.GetComponent<PlayerController>().MapControls(KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Z, KeyCode.X);
-        playerInfo[3].character = Instantiate(playerInfo[3].classes[1].prefab, new Vector2(cols*unitSize - 1, rows*unitSize - 1) + offset, Quaternion.identity);
+        playerInfo[3].character = Instantiate(playerInfo[3].classes[GameConstants.MONSTER_CLASS_TYPE_INDEX].prefab, new Vector2(GameConstants.MAP_COLUMNS * GameConstants.MAP_TILE_SIZE - 1, GameConstants.MAP_ROWS * GameConstants.MAP_TILE_SIZE - 1) + GameConstants.MAP_OFFSET, Quaternion.identity);
 
-        AIControllers[0,0].GetComponent<HumanAI>().Init(stageMap, playerInfo[0].character);
-        AIControllers[1,1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[1].character);
-        AIControllers[2,1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[2].character);
-        AIControllers[3,1].GetComponent<MonsterAI>().Init(stageMap, playerInfo[3].character);
+        AIControllers[0, GameConstants.HUMAN_CLASS_TYPE_INDEX].GetComponent<HumanAI>().Init(stageMap, playerInfo[0].character);
+        AIControllers[1, GameConstants.MONSTER_CLASS_TYPE_INDEX].GetComponent<MonsterAI>().Init(stageMap, playerInfo[1].character);
+        AIControllers[2, GameConstants.MONSTER_CLASS_TYPE_INDEX].GetComponent<MonsterAI>().Init(stageMap, playerInfo[2].character);
+        AIControllers[3, GameConstants.MONSTER_CLASS_TYPE_INDEX].GetComponent<MonsterAI>().Init(stageMap, playerInfo[3].character);
 
         GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
         for(int i=0;i<lights.Length;++i)

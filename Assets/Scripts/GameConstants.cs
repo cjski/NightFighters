@@ -22,7 +22,15 @@ public static class GameConstants
         new Vector3(0, 8.6f, 0),
         new Vector3(6.2f, 8.6f, 0),
         new Vector3(12.4f, 8.6f, 0),
-        new Vector3(18.6f, 8.6f, 0)
+        new Vector3(18.6f, 8.6f, 0),
+    };
+
+    public static Vector2[] PLAYER_SPAWN_POSITIONS =
+    {
+        new Vector2(1, 1) + MAP_OFFSET,
+        new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 1, 1) + MAP_OFFSET,
+        new Vector2(1, MAP_ROWS * MAP_TILE_SIZE - 1) + MAP_OFFSET,
+        new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 1, MAP_ROWS * MAP_TILE_SIZE - 1) + GameConstants.MAP_OFFSET,
     };
 
 }

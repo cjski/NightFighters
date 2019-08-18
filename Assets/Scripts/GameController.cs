@@ -328,18 +328,39 @@ public class GameController : MonoBehaviour {
     private void Restart()
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        for(int i=0;i<players.Length;++i)
+        for (int i = 0; i < players.Length; ++i)
         {
             Destroy(players[i]);
         }
 
-        for( int i=0; i < GameConstants.NUM_PLAYERS; ++i)
+        // Check if we have at least one human character or an AI we can force to be human
+        bool anyPlayerHasPickedHuman = false;
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            if(!playerInfo[i].isRealPlayer || playerInfo[i].classInformation.isHumanClass)
+            {
+                anyPlayerHasPickedHuman = true;
+            }
+        }
+
+        // If we don't have a human then set someone to randomly be it(this case will only occur if we have no AI and 4 human players)
+        if(!anyPlayerHasPickedHuman)
+        {
+            int playerForcedToBeHumanIndex = Random.Range(0, GameConstants.NUM_PLAYERS);
+            playerInfo[playerForcedToBeHumanIndex].classSelectionIndex = Random.Range(0, GameConstants.NUM_HUMAN_CLASSES);
+            allowedHumanPlayerIndex = playerForcedToBeHumanIndex;
+            playerInfo[playerForcedToBeHumanIndex].classInformation = classes[playerInfo[playerForcedToBeHumanIndex].classSelectionIndex];
+        }
+        
+        // Instantiating all the players, human and AI
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             PlayerInformation currentPlayerInfo = playerInfo[i];
 
             // Resolve the AI classes before spawning, set them to random ones
             if (!currentPlayerInfo.isRealPlayer)
             {
+                // Force an AI to be the human if no real player has chosen it
                 if (allowedHumanPlayerIndex == -1)
                 {
                     currentPlayerInfo.classSelectionIndex = Random.Range(0, GameConstants.NUM_HUMAN_CLASSES);
@@ -349,12 +370,13 @@ public class GameController : MonoBehaviour {
                 {
                     currentPlayerInfo.classSelectionIndex = GameConstants.NUM_HUMAN_CLASSES + Random.Range(0, GameConstants.NUM_MONSTER_CLASSES);
                 }
-                Debug.Log(i + ":" + currentPlayerInfo.classSelectionIndex);
+
                 currentPlayerInfo.classInformation = classes[currentPlayerInfo.classSelectionIndex];
             }
 
             currentPlayerInfo.character = Instantiate(currentPlayerInfo.classInformation.prefab, GameConstants.PLAYER_SPAWN_POSITIONS[i], Quaternion.identity);
-
+            
+            // Spawn player with the correct control scheme
             if (playerInfo[i].isRealPlayer)
             {
                 if (currentPlayerInfo.l == KeyCode.None)
@@ -376,6 +398,7 @@ public class GameController : MonoBehaviour {
                     );
                 }
             }
+            // Spawn AI with controllers to support them
             else
             {
                 // Allow the AI to spawn as a human if all players are monsters
@@ -391,7 +414,7 @@ public class GameController : MonoBehaviour {
         }
 
         GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
-        for(int i=0;i<lights.Length;++i)
+        for (int i = 0; i < lights.Length; ++i)
         {
             lights[i].GetComponent<LightController>().TurnOff();
         }

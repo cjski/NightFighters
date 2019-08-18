@@ -255,6 +255,7 @@ public class GameController : MonoBehaviour {
                         // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
                         if(i == allowedHumanPlayerIndex)
                         {
+                            // If no player picks the allowed human index then sets it back to -1
                             allowedHumanPlayerIndex = -1;
                             int j = 0;
                             while(j < GameConstants.NUM_PLAYERS && allowedHumanPlayerIndex == -1)

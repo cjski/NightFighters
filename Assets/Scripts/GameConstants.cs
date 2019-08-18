@@ -11,7 +11,7 @@ public static class GameConstants
     public static int NUM_TYPES_OF_CLASSES = 2;
     public static int HUMAN_CLASS_TYPE_INDEX = 0;
     public static int MONSTER_CLASS_TYPE_INDEX = 1;
-
+    
     public static int MAP_ROWS = 4;
     public static int MAP_COLUMNS = 6;
     public static float MAP_TILE_SIZE = 3.5f;

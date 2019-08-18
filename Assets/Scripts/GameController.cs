@@ -133,19 +133,14 @@ public class GameController : MonoBehaviour {
             if (playerInfo[i].isRealPlayer)
             {
                 playerInfo[i].isReady = false;
+                characterInfoPanels[i] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[i], Quaternion.identity);
+                playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
             }
             else
             {
                 playerInfo[i].isReady = true;
             }
-            characterInfoPanels[i] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[i], Quaternion.identity);
         }
-
-        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
-        {
-            playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
-        }
-
     }
 
     private void CharacterSelectRegisterInput()
@@ -252,8 +247,10 @@ public class GameController : MonoBehaviour {
                         playerInfo[i].isRealPlayer = false;
                         playerInfo[i].isReady = true;
 
+                        Destroy(characterInfoPanels[i]);
+
                         // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
-                        if(i == allowedHumanPlayerIndex)
+                        if (i == allowedHumanPlayerIndex)
                         {
                             // If no player picks the allowed human index then sets it back to -1
                             allowedHumanPlayerIndex = -1;
@@ -284,7 +281,10 @@ public class GameController : MonoBehaviour {
                     playerInfo[i].isRealPlayer = true;
                     playerInfo[i].isReady = false;
 
-                    if(allowedHumanPlayerIndex == -1 && playerInfo[i].classInformation.isHumanClass)
+                    characterInfoPanels[i] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[i], Quaternion.identity);
+                    playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
+
+                    if (allowedHumanPlayerIndex == -1 && playerInfo[i].classInformation.isHumanClass)
                     {
                         allowedHumanPlayerIndex = i;
                     }
@@ -430,33 +430,32 @@ public class GameController : MonoBehaviour {
     {
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            characterInfoPanels[i].transform.Find("Canvas").GetComponentInChildren<Text>().text =
-                "Name: " + playerInfo[i].classInformation.name +
-                "\nPassive: " + playerInfo[i].classInformation.passiveDescription +
-                "\nPrimary: " + playerInfo[i].classInformation.primaryDescription +
-                "\nSecondary: " + playerInfo[i].classInformation.secondaryDescription;
+            if (playerInfo[i].isRealPlayer)
+            {
+                characterInfoPanels[i].transform.Find("Canvas").GetComponentInChildren<Text>().text =
+                    "Name: " + playerInfo[i].classInformation.name +
+                    "\nPassive: " + playerInfo[i].classInformation.passiveDescription +
+                    "\nPrimary: " + playerInfo[i].classInformation.primaryDescription +
+                    "\nSecondary: " + playerInfo[i].classInformation.secondaryDescription;
 
-            SpriteRenderer characterInfoPanelSpriteRenderer = characterInfoPanels[i].transform.Find("ClassSprite").gameObject.GetComponent<SpriteRenderer>();
-            SpriteRenderer classSpriteRenderer = playerInfo[i].classInformation.prefab.GetComponent<SpriteRenderer>();
+                SpriteRenderer characterInfoPanelSpriteRenderer = characterInfoPanels[i].transform.Find("ClassSprite").gameObject.GetComponent<SpriteRenderer>();
+                SpriteRenderer classSpriteRenderer = playerInfo[i].classInformation.prefab.GetComponent<SpriteRenderer>();
 
-            characterInfoPanelSpriteRenderer.sprite = classSpriteRenderer.sprite;
-            characterInfoPanelSpriteRenderer.color = classSpriteRenderer.color;
+                characterInfoPanelSpriteRenderer.sprite = classSpriteRenderer.sprite;
+                characterInfoPanelSpriteRenderer.color = classSpriteRenderer.color;
 
-            if(!playerInfo[i].isRealPlayer)
-            {
-                characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.black;
-            }
-            else if(playerInfo[i].isReady)
-            {
-                characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
-            }
-            else if(playerInfo[i].classInformation.isHumanClass && i != allowedHumanPlayerIndex)
-            {
-                characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-            }
-            else
-            {
-                characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+                if (playerInfo[i].isReady)
+                {
+                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
+                }
+                else if (playerInfo[i].classInformation.isHumanClass && i != allowedHumanPlayerIndex)
+                {
+                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                }
+                else
+                {
+                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+                }
             }
         }
     }

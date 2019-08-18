@@ -436,6 +436,12 @@ public class GameController : MonoBehaviour {
                 "\nPrimary: " + playerInfo[i].classInformation.primaryDescription +
                 "\nSecondary: " + playerInfo[i].classInformation.secondaryDescription;
 
+            SpriteRenderer characterInfoPanelSpriteRenderer = characterInfoPanels[i].transform.Find("ClassSprite").gameObject.GetComponent<SpriteRenderer>();
+            SpriteRenderer classSpriteRenderer = playerInfo[i].classInformation.prefab.GetComponent<SpriteRenderer>();
+
+            characterInfoPanelSpriteRenderer.sprite = classSpriteRenderer.sprite;
+            characterInfoPanelSpriteRenderer.color = classSpriteRenderer.color;
+
             if(!playerInfo[i].isRealPlayer)
             {
                 characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.black;

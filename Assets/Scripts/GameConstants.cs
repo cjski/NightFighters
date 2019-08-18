@@ -32,4 +32,6 @@ public static class GameConstants
         new Vector2(1, MAP_ROWS * MAP_TILE_SIZE - 1) + MAP_OFFSET,
         new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 1, MAP_ROWS * MAP_TILE_SIZE - 1) + GameConstants.MAP_OFFSET,
     };
+
+    public static KeyCode DEFAULT_GAME_START_KEY = KeyCode.Return;
 }

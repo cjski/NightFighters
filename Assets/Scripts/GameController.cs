@@ -145,13 +145,79 @@ public class GameController : MonoBehaviour {
 
     private void CharacterSelectRegisterInput()
     {
+        // Register the game start input before the ready input so that they dont happen in the same frame
+        bool allReady = true;
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            if (!playerInfo[i].isReady) allReady = false;
+        }
+
+        if (allReady)
+        {
+            startButton.SetActive(true);
+            KeyCode activateStartKey = KeyCode.None;
+
+            // Find the first person in the list who is a real player - they will control the start button
+            int firstRealPlayerIndex = 0;
+            while (firstRealPlayerIndex < GameConstants.NUM_PLAYERS && !playerInfo[firstRealPlayerIndex].isRealPlayer)
+            {
+                firstRealPlayerIndex++;
+            }
+            // If the players are all AI then use the default key to start game otherwise use the first available players key
+            if (firstRealPlayerIndex == GameConstants.NUM_PLAYERS)
+            {
+                activateStartKey = GameConstants.DEFAULT_GAME_START_KEY;
+            }
+            else
+            {
+                activateStartKey = playerInfo[firstRealPlayerIndex].a;
+            }
+
+            bool startButtonActivated = false;
+            if (activateStartKey == KeyCode.Mouse0)
+            {
+                if (Input.GetKeyDown(KeyCode.Mouse0))
+                {
+                    Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    mPos = new Vector3(mPos.x, mPos.y, startButton.transform.position.z);
+
+                    if (startButton.GetComponent<BoxCollider2D>().bounds.Contains(mPos))
+                    {
+                        startButtonActivated = true;
+                    }
+                }
+            }
+            else
+            {
+                if (Input.GetKeyDown(activateStartKey))
+                {
+                    startButtonActivated = true;
+                }
+            }
+
+            if (startButtonActivated)
+            {
+                for (int i = 0; i < characterInfoPanels.Length; ++i)
+                {
+                    Destroy(characterInfoPanels[i]);
+                    Destroy(startButton);
+                }
+                ReGen();
+                state = State.game;
+            }
+        }
+        else
+        {
+            startButton.SetActive(false);
+        }
+
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             if (playerInfo[i].isRealPlayer)
             {
                 if (!playerInfo[i].isReady)
                 {
-                    if (playerInfo[i].l == KeyCode.None)
+                    if (playerInfo[i].a == KeyCode.Mouse0)
                     {
                         if (Input.GetKeyDown(KeyCode.Mouse0))
                         {
@@ -290,38 +356,6 @@ public class GameController : MonoBehaviour {
                     }
                 }
             }
-        }
-
-        bool allReady = true;
-        for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
-        {
-            if (!playerInfo[i].isReady) allReady = false;
-        }
-
-        if (allReady)
-        {
-            startButton.SetActive(true);
-
-            if(Input.GetKeyDown(KeyCode.Mouse0))
-            {
-                Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                mPos = new Vector3(mPos.x, mPos.y, startButton.transform.position.z);
-
-                if (startButton.GetComponent<BoxCollider2D>().bounds.Contains(mPos))
-                {
-                    for (int i = 0; i < characterInfoPanels.Length; ++i)
-                    {
-                        Destroy(characterInfoPanels[i]);
-                        Destroy(startButton);
-                    }
-                    ReGen();
-                    state = State.game;
-                }
-            }
-        }
-        else
-        {
-            startButton.SetActive(false);
         }
     }
 

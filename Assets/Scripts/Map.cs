@@ -89,7 +89,7 @@ public class Map
             }
         }
 
-        GenerateWalls(8);
+        RegenerateWalls(8);
         while (!EntirelyConnected())
         {
             // Reset the Node Map so nothing is connected
@@ -100,10 +100,10 @@ public class Map
                     map[i, j] = new Node(i, j);
                 }
             }
-            GenerateWalls(8);
+            RegenerateWalls(8);
         }
 
-        GenerateLights(4);
+        RegenerateLights(4);
 
         GenerateDistances();
     }
@@ -123,7 +123,7 @@ public class Map
         }
     }
 
-    private void GenerateWalls(int walls)
+    private void RegenerateWalls(int walls)
     {
         GameObject[] gameWalls = GameObject.FindGameObjectsWithTag("Wall");
         for (int i = 0; i < gameWalls.Length; ++i)
@@ -221,7 +221,7 @@ public class Map
         }
     }
 
-    private void GenerateLights(int lights)
+    private void RegenerateLights(int lights)
     {
         GameObject[] gameLights = GameObject.FindGameObjectsWithTag("Light");
         for (int i = 0; i < gameLights.Length; ++i)

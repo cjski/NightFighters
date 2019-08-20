@@ -47,9 +47,9 @@ public class PlayerInformation
 
 public class GameController : MonoBehaviour {
 
-    enum State { game, charSelect }
+    enum State { game, characterSelect, newHumanSelect }
 
-    State state = State.charSelect;
+    State state = State.characterSelect;
     PlayerInformation[] playerInfo = {new PlayerInformation(KeyCode.Mouse0, KeyCode.Mouse1),
         new PlayerInformation(KeyCode.Z, KeyCode.X, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow),
         new PlayerInformation(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S),
@@ -62,6 +62,9 @@ public class GameController : MonoBehaviour {
     ClassInformation hunter, watchman, werewolf, vampire;
     List<ClassInformation> classes;
     int allowedHumanPlayerIndex = 0;
+
+    // Index of character now choosing their human class after being converted from a monster
+    int newHumanIndex = 0;
 
     GameObject startButton;
     GameObject characterInfoPanelPrefab; 
@@ -111,7 +114,7 @@ public class GameController : MonoBehaviour {
                 ReGen();
             }
         }
-        else if(state == State.charSelect)
+        else if(state == State.characterSelect)
         {
             UpdateCharacterSelect();
         }
@@ -119,8 +122,14 @@ public class GameController : MonoBehaviour {
 
     private void UpdateCharacterSelect()
     {
-        CharacterSelectRegisterInput();
-        ResetCharacterInfoPanels();
+        // Register the game start input before the ready input so that they dont happen in the same frame
+        CharacterSelectRegisterStartButtonInput();
+
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            CharacterSelectRegisterInput(i);
+            ResetCharacterInfoPanel(i);
+        }
     }
 
     private void StartCharacterSelect()
@@ -143,9 +152,8 @@ public class GameController : MonoBehaviour {
         }
     }
 
-    private void CharacterSelectRegisterInput()
+    private void CharacterSelectRegisterStartButtonInput()
     {
-        // Register the game start input before the ready input so that they dont happen in the same frame
         bool allReady = true;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
@@ -210,150 +218,156 @@ public class GameController : MonoBehaviour {
         {
             startButton.SetActive(false);
         }
+    }
 
-        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+    private void ResolveAllowedHumanIndex()
+    {
+        // If no player picks the allowed human index then sets it back to -1 otherwise resolve it if we can
+        allowedHumanPlayerIndex = -1;
+        int j = 0;
+        while (j < GameConstants.NUM_PLAYERS && allowedHumanPlayerIndex == -1)
         {
-            if (playerInfo[i].isRealPlayer)
+            if (playerInfo[j].isRealPlayer && playerInfo[j].classInformation.isHumanClass)
             {
-                if (!playerInfo[i].isReady)
+                allowedHumanPlayerIndex = j;
+            }
+            ++j;
+        }
+    }
+
+    private void CharacterSelectRegisterInput(int playerIndex)
+    {
+        PlayerInformation currentPlayer = playerInfo[playerIndex];
+        if (currentPlayer.isRealPlayer)
+        {
+            if (!currentPlayer.isReady)
+            {
+                if (currentPlayer.a == KeyCode.Mouse0)
                 {
-                    if (playerInfo[i].a == KeyCode.Mouse0)
+                    if (Input.GetKeyDown(KeyCode.Mouse0))
                     {
-                        if (Input.GetKeyDown(KeyCode.Mouse0))
+                        BoxCollider2D readyBox = characterInfoPanels[playerIndex].transform.Find("Ready").GetComponent<BoxCollider2D>();
+                        Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                        mPos = new Vector3(mPos.x, mPos.y, readyBox.transform.position.z);
+
+                        BoxCollider2D leftArrow = characterInfoPanels[playerIndex].transform.Find("LeftArrow").GetComponent<BoxCollider2D>();
+                        BoxCollider2D rightArrow = characterInfoPanels[playerIndex].transform.Find("RightArrow").GetComponent<BoxCollider2D>();
+
+                        bool arrowPressed = false;
+
+                        if (leftArrow.bounds.Contains(mPos))
                         {
-                            BoxCollider2D readyBox = characterInfoPanels[i].transform.Find("Ready").GetComponent<BoxCollider2D>();
-                            Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                            mPos = new Vector3(mPos.x, mPos.y, readyBox.transform.position.z);
+                            currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + classes.Count - 1) % classes.Count;
+                            arrowPressed = true;
+                        }
+                        else if (rightArrow.bounds.Contains(mPos))
+                        {
+                            currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
+                            arrowPressed = true; 
+                        }
 
-                            BoxCollider2D leftArrow = characterInfoPanels[i].transform.Find("LeftArrow").GetComponent<BoxCollider2D>();
-                            BoxCollider2D rightArrow = characterInfoPanels[i].transform.Find("RightArrow").GetComponent<BoxCollider2D>();
+                        if(arrowPressed)
+                        {
+                            currentPlayer.classInformation = classes[currentPlayer.classSelectionIndex];
 
-                            bool arrowPressed = false;
-
-                            if (leftArrow.bounds.Contains(mPos))
+                            if(playerIndex == allowedHumanPlayerIndex && !currentPlayer.classInformation.isHumanClass)
                             {
-                                playerInfo[i].classSelectionIndex = (playerInfo[i].classSelectionIndex + classes.Count - 1) % classes.Count;
-                                arrowPressed = true;
+                                ResolveAllowedHumanIndex();
                             }
-                            else if (rightArrow.bounds.Contains(mPos))
+                            else if(allowedHumanPlayerIndex == -1 && currentPlayer.classInformation.isHumanClass)
                             {
-                                playerInfo[i].classSelectionIndex = (playerInfo[i].classSelectionIndex + 1) % classes.Count;
-                                arrowPressed = true; 
-                            }
-
-                            if(arrowPressed)
-                            {
-                                playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
-
-                                if(i == allowedHumanPlayerIndex && !playerInfo[i].classInformation.isHumanClass)
-                                {
-                                    allowedHumanPlayerIndex = -1;
-                                }
-                                else if(allowedHumanPlayerIndex == -1 && playerInfo[i].classInformation.isHumanClass)
-                                {
-                                    allowedHumanPlayerIndex = i;
-                                }
-                            }
-
-                            if (readyBox.bounds.Contains(mPos))
-                            {
-                                if (!playerInfo[i].classInformation.isHumanClass || allowedHumanPlayerIndex == i)
-                                {
-                                    playerInfo[i].isReady = true;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        bool changedClass = false;
-                        if (Input.GetKeyDown(playerInfo[i].l))
-                        {
-                            playerInfo[i].classSelectionIndex = (playerInfo[i].classSelectionIndex + classes.Count - 1) % classes.Count;
-                            changedClass = true;
-                        }
-                        else if (Input.GetKeyDown(playerInfo[i].r))
-                        {
-                            playerInfo[i].classSelectionIndex = (playerInfo[i].classSelectionIndex + 1) % classes.Count;
-                            changedClass = true;
-                        }
-                        else if (Input.GetKeyDown(playerInfo[i].u))
-                        {
-                            
-                        }
-                        else if (Input.GetKeyDown(playerInfo[i].d))
-                        {
-                            
-                        }
-                        else if (Input.GetKeyDown(playerInfo[i].a))
-                        {
-                            if (!playerInfo[i].classInformation.isHumanClass || allowedHumanPlayerIndex == i)
-                            {
-                                playerInfo[i].isReady = true;
+                                allowedHumanPlayerIndex = playerIndex;
                             }
                         }
 
-                        if(changedClass)
+                        if (readyBox.bounds.Contains(mPos))
                         {
-                            playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
-
-                            if (i == allowedHumanPlayerIndex && !playerInfo[i].classInformation.isHumanClass)
+                            if (!currentPlayer.classInformation.isHumanClass || allowedHumanPlayerIndex == playerIndex)
                             {
-                                allowedHumanPlayerIndex = -1;
+                                currentPlayer.isReady = true;
                             }
-                            else if (allowedHumanPlayerIndex == -1 && playerInfo[i].classInformation.isHumanClass)
-                            {
-                                allowedHumanPlayerIndex = i;
-                            }
-                        }
-                    }
-
-                    if (Input.GetKeyDown(playerInfo[i].b))
-                    {
-                        playerInfo[i].isRealPlayer = false;
-                        playerInfo[i].isReady = true;
-
-                        Destroy(characterInfoPanels[i]);
-
-                        // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
-                        if (i == allowedHumanPlayerIndex)
-                        {
-                            // If no player picks the allowed human index then sets it back to -1
-                            allowedHumanPlayerIndex = -1;
-                            int j = 0;
-                            while(j < GameConstants.NUM_PLAYERS && allowedHumanPlayerIndex == -1)
-                            {
-                                if(playerInfo[j].isRealPlayer && playerInfo[j].classInformation.isHumanClass)
-                                {
-                                    allowedHumanPlayerIndex = j;
-                                }
-                                ++j;
-                            } 
                         }
                     }
                 }
                 else
                 {
-                    if (Input.GetKeyDown(playerInfo[i].b))
+                    bool changedClass = false;
+                    if (Input.GetKeyDown(currentPlayer.l))
                     {
-                        playerInfo[i].isReady = false;
+                        currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + classes.Count - 1) % classes.Count;
+                        changedClass = true;
+                    }
+                    else if (Input.GetKeyDown(currentPlayer.r))
+                    {
+                        currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
+                        changedClass = true;
+                    }
+                    else if (Input.GetKeyDown(currentPlayer.u))
+                    {
+                            
+                    }
+                    else if (Input.GetKeyDown(currentPlayer.d))
+                    {
+                            
+                    }
+                    else if (Input.GetKeyDown(currentPlayer.a))
+                    {
+                        if (!currentPlayer.classInformation.isHumanClass || allowedHumanPlayerIndex == playerIndex)
+                        {
+                            currentPlayer.isReady = true;
+                        }
+                    }
+
+                    if(changedClass)
+                    {
+                        currentPlayer.classInformation = classes[currentPlayer.classSelectionIndex];
+
+                        if (playerIndex == allowedHumanPlayerIndex && !currentPlayer.classInformation.isHumanClass)
+                        {
+                            ResolveAllowedHumanIndex();
+                        }
+                        else if (allowedHumanPlayerIndex == -1 && currentPlayer.classInformation.isHumanClass)
+                        {
+                            allowedHumanPlayerIndex = playerIndex;
+                        }
+                    }
+                }
+
+                if (Input.GetKeyDown(currentPlayer.b))
+                {
+                    currentPlayer.isRealPlayer = false;
+                    currentPlayer.isReady = true;
+
+                    Destroy(characterInfoPanels[playerIndex]);
+
+                    // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
+                    if (playerIndex == allowedHumanPlayerIndex)
+                    {
+                        ResolveAllowedHumanIndex(); 
                     }
                 }
             }
             else
             {
-                if (Input.GetKeyDown(playerInfo[i].a))
+                if (Input.GetKeyDown(currentPlayer.b))
                 {
-                    playerInfo[i].isRealPlayer = true;
-                    playerInfo[i].isReady = false;
+                    currentPlayer.isReady = false;
+                }
+            }
+        }
+        else
+        {
+            if (Input.GetKeyDown(currentPlayer.a))
+            {
+                currentPlayer.isRealPlayer = true;
+                currentPlayer.isReady = false;
 
-                    characterInfoPanels[i] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[i], Quaternion.identity);
-                    playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
+                characterInfoPanels[playerIndex] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[playerIndex], Quaternion.identity);
+                currentPlayer.classInformation = classes[currentPlayer.classSelectionIndex];
 
-                    if (allowedHumanPlayerIndex == -1 && playerInfo[i].classInformation.isHumanClass)
-                    {
-                        allowedHumanPlayerIndex = i;
-                    }
+                if (allowedHumanPlayerIndex == -1 && currentPlayer.classInformation.isHumanClass)
+                {
+                    allowedHumanPlayerIndex = playerIndex;
                 }
             }
         }
@@ -460,36 +474,34 @@ public class GameController : MonoBehaviour {
         Restart();
     }
 
-    private void ResetCharacterInfoPanels()
+    private void ResetCharacterInfoPanel(int playerIndex)
     {
-        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        PlayerInformation currentPlayerInfo = playerInfo[playerIndex];
+        if (currentPlayerInfo.isRealPlayer)
         {
-            if (playerInfo[i].isRealPlayer)
+            characterInfoPanels[playerIndex].transform.Find("Canvas").GetComponentInChildren<Text>().text =
+                "Name: " + currentPlayerInfo.classInformation.name +
+                "\nPassive: " + currentPlayerInfo.classInformation.passiveDescription +
+                "\nPrimary: " + currentPlayerInfo.classInformation.primaryDescription +
+                "\nSecondary: " + currentPlayerInfo.classInformation.secondaryDescription;
+
+            SpriteRenderer characterInfoPanelSpriteRenderer = characterInfoPanels[playerIndex].transform.Find("ClassSprite").gameObject.GetComponent<SpriteRenderer>();
+            SpriteRenderer classSpriteRenderer = currentPlayerInfo.classInformation.prefab.GetComponent<SpriteRenderer>();
+
+            characterInfoPanelSpriteRenderer.sprite = classSpriteRenderer.sprite;
+            characterInfoPanelSpriteRenderer.color = classSpriteRenderer.color;
+
+            if (currentPlayerInfo.isReady)
             {
-                characterInfoPanels[i].transform.Find("Canvas").GetComponentInChildren<Text>().text =
-                    "Name: " + playerInfo[i].classInformation.name +
-                    "\nPassive: " + playerInfo[i].classInformation.passiveDescription +
-                    "\nPrimary: " + playerInfo[i].classInformation.primaryDescription +
-                    "\nSecondary: " + playerInfo[i].classInformation.secondaryDescription;
-
-                SpriteRenderer characterInfoPanelSpriteRenderer = characterInfoPanels[i].transform.Find("ClassSprite").gameObject.GetComponent<SpriteRenderer>();
-                SpriteRenderer classSpriteRenderer = playerInfo[i].classInformation.prefab.GetComponent<SpriteRenderer>();
-
-                characterInfoPanelSpriteRenderer.sprite = classSpriteRenderer.sprite;
-                characterInfoPanelSpriteRenderer.color = classSpriteRenderer.color;
-
-                if (playerInfo[i].isReady)
-                {
-                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
-                }
-                else if (playerInfo[i].classInformation.isHumanClass && i != allowedHumanPlayerIndex)
-                {
-                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-                }
-                else
-                {
-                    characterInfoPanels[i].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
-                }
+                characterInfoPanels[playerIndex].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.gray;
+            }
+            else if (currentPlayerInfo.classInformation.isHumanClass && playerIndex != allowedHumanPlayerIndex)
+            {
+                characterInfoPanels[playerIndex].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            }
+            else
+            {
+                characterInfoPanels[playerIndex].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
             }
         }
     }

@@ -12,8 +12,8 @@ public class WatchmanController : HumanController
     Timer catchTimer = new Timer(.5f);
     float hitRange = 1;
     float hitCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
-    float stunTime = 0.5f;
-    int damage = 10;
+    float stunTime = 1.0f;
+    int damage = 40;
 
     // Start is called before the first frame update
     new protected void Start()

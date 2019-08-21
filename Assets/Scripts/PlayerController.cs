@@ -40,6 +40,8 @@ public abstract class PlayerController : MonoBehaviour {
     private bool IsAI = false;
     private bool moveAINext = false;
 
+    public bool isAlive { get; private set; } = true;
+
     private Animator anim;
 
     // Use this for initialization
@@ -286,7 +288,10 @@ public abstract class PlayerController : MonoBehaviour {
     public void Damage(int damage)
     {
         health -= damage;
-        if (health <= 0) Destroy(gameObject);
+        if (health <= 0)
+        {
+            isAlive = false;
+        }
     }
 
     public void Heal(int heal)

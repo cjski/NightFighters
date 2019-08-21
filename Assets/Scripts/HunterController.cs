@@ -23,7 +23,7 @@ public class HunterController : HumanController
     protected override void OnPrimaryPressed()
     {
         GameObject attack = Instantiate(arrowPrefab, transform.position, transform.rotation);
-        attack.GetComponent<DamageProjectileController>().Init(direction, 0.2f, 2, gameObject, 10);
+        attack.GetComponent<DamageProjectileController>().Init(direction, 0.2f, 2, gameObject, 25);
         primaryCooldown.Reset();
     }
 

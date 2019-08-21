@@ -104,15 +104,7 @@ public class GameController : MonoBehaviour {
 	void Update () {
         if (state == State.game)
         {
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                Restart();
-            }
-
-            if (Input.GetKeyDown(KeyCode.G))
-            {
-                Regenerate();
-            }
+            UpdateGame();
         }
         else if(state == State.characterSelect)
         {
@@ -124,6 +116,29 @@ public class GameController : MonoBehaviour {
         }
     }
 
+    private void UpdateGame()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RegeneratePlayers();
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            Regenerate();
+        }
+
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            if(!playerInfo[i].character.GetComponent<PlayerController>().isAlive)
+            {
+                Destroy(playerInfo[i].character);
+                newHumanIndex = i;
+                StartNewHumanCharacterSelection();
+            }
+        }
+    }
+
     private void UpdateCharacterSelect()
     {
         // Register the game start input before the ready input so that they dont happen in the same frame
@@ -131,7 +146,7 @@ public class GameController : MonoBehaviour {
 
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            CharacterSelectRegisterInput(i);
+            CharacterSelectRegisterInput(i, false);
             ResetCharacterInfoPanel(i, false);
         }
     }
@@ -154,6 +169,40 @@ public class GameController : MonoBehaviour {
                 playerInfo[i].isReady = true;
             }
         }
+    }
+
+    private void EndCharacterSelect()
+    {
+        for (int i = 0; i < characterInfoPanels.Length; ++i)
+        {
+            Destroy(characterInfoPanels[i]);
+            Destroy(startButton);
+        }
+
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            PlayerInformation currentPlayerInfo = playerInfo[i];
+            // Resolve the AI classes before spawning, set them to random ones
+            if (!currentPlayerInfo.isRealPlayer)
+            {
+                // Force an AI to be the human if no real player has chosen it
+                if (allowedHumanPlayerIndex == -1)
+                {
+                    currentPlayerInfo.classSelectionIndex = GetRandomHumanClassIndex();
+                    allowedHumanPlayerIndex = i;
+                }
+                else
+                {
+                    currentPlayerInfo.classSelectionIndex = GetRandomMonsterClassIndex();
+                }
+
+                currentPlayerInfo.classInformation = classes[currentPlayerInfo.classSelectionIndex];
+            }
+        }
+
+        // Set the state before regenerating so we don't override setting it to new human selection
+        state = State.game;
+        Regenerate();
     }
 
     private void CharacterSelectRegisterStartButtonInput()
@@ -209,14 +258,7 @@ public class GameController : MonoBehaviour {
 
             if (startButtonActivated)
             {
-                for (int i = 0; i < characterInfoPanels.Length; ++i)
-                {
-                    Destroy(characterInfoPanels[i]);
-                    Destroy(startButton);
-                }
-                // Set the state before regenerating so we don't override setting it to new human selection
-                state = State.game;
-                Regenerate();
+                EndCharacterSelect();
             }
         }
         else
@@ -240,7 +282,7 @@ public class GameController : MonoBehaviour {
         }
     }
 
-    private void CharacterSelectRegisterInput(int playerIndex)
+    private void CharacterSelectRegisterInput(int playerIndex, bool isNewHumanSelection)
     {
         PlayerInformation currentPlayer = playerInfo[playerIndex];
         if (currentPlayer.isRealPlayer)
@@ -287,7 +329,10 @@ public class GameController : MonoBehaviour {
 
                         if (readyBox.bounds.Contains(mPos))
                         {
-                            if (!currentPlayer.classInformation.isHumanClass || allowedHumanPlayerIndex == playerIndex)
+                            if (
+                                (!isNewHumanSelection && (!currentPlayer.classInformation.isHumanClass || playerIndex == allowedHumanPlayerIndex)) ||
+                                (isNewHumanSelection && currentPlayer.classInformation.isHumanClass)
+                               )
                             {
                                 currentPlayer.isReady = true;
                             }
@@ -317,7 +362,10 @@ public class GameController : MonoBehaviour {
                     }
                     else if (Input.GetKeyDown(currentPlayer.a))
                     {
-                        if (!currentPlayer.classInformation.isHumanClass || allowedHumanPlayerIndex == playerIndex)
+                        if (
+                            (!isNewHumanSelection && (!currentPlayer.classInformation.isHumanClass || playerIndex == allowedHumanPlayerIndex)) ||
+                            (isNewHumanSelection && currentPlayer.classInformation.isHumanClass)
+                           )
                         {
                             currentPlayer.isReady = true;
                         }
@@ -338,7 +386,7 @@ public class GameController : MonoBehaviour {
                     }
                 }
 
-                if (Input.GetKeyDown(currentPlayer.b))
+                if (Input.GetKeyDown(currentPlayer.b) && !isNewHumanSelection)
                 {
                     currentPlayer.isRealPlayer = false;
                     currentPlayer.isReady = true;
@@ -380,13 +428,23 @@ public class GameController : MonoBehaviour {
 
     private void StartNewHumanCharacterSelection()
     {
-        startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
-        startButton.SetActive(false);
-        stageMap.ClearAll();
-        HidePlayers();
-        state = State.newHumanSelect;
-        playerInfo[newHumanIndex].isReady = false;
-        characterInfoPanels[newHumanIndex] = Instantiate(characterInfoPanelPrefab, GameConstants.NEW_HUMAN_CHARACTER_INFO_PANEL_POSITION, Quaternion.identity);
+        if (playerInfo[newHumanIndex].isRealPlayer)
+        {
+            startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
+            startButton.SetActive(false);
+            stageMap.ClearAll();
+            HidePlayers();
+            state = State.newHumanSelect;
+            playerInfo[newHumanIndex].isReady = false;
+            characterInfoPanels[newHumanIndex] = Instantiate(characterInfoPanelPrefab, GameConstants.NEW_HUMAN_CHARACTER_INFO_PANEL_POSITION, Quaternion.identity);
+        }
+        else
+        {
+            playerInfo[newHumanIndex].classSelectionIndex = GetRandomHumanClassIndex();
+            playerInfo[newHumanIndex].classInformation = classes[playerInfo[newHumanIndex].classSelectionIndex];
+            state = State.game;
+            Regenerate();
+        }
     }
 
     private void NewHumanCharacterSelectionRegisterStartButtonInput()
@@ -438,11 +496,11 @@ public class GameController : MonoBehaviour {
     private void UpdateNewHumanCharacterSelection()
     {
         NewHumanCharacterSelectionRegisterStartButtonInput();
-        CharacterSelectRegisterInput(newHumanIndex);
+        CharacterSelectRegisterInput(newHumanIndex, true);
         ResetCharacterInfoPanel(newHumanIndex, true);
     }
 
-    private void Restart()
+    private void RegeneratePlayers()
     {
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         for (int i = 0; i < players.Length; ++i)
@@ -472,23 +530,6 @@ public class GameController : MonoBehaviour {
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             PlayerInformation currentPlayerInfo = playerInfo[i];
-
-            // Resolve the AI classes before spawning, set them to random ones
-            if (!currentPlayerInfo.isRealPlayer)
-            {
-                // Force an AI to be the human if no real player has chosen it
-                if (allowedHumanPlayerIndex == -1)
-                {
-                    currentPlayerInfo.classSelectionIndex = Random.Range(0, GameConstants.NUM_HUMAN_CLASSES);
-                    allowedHumanPlayerIndex = i;
-                }
-                else
-                {
-                    currentPlayerInfo.classSelectionIndex = GameConstants.NUM_HUMAN_CLASSES + Random.Range(0, GameConstants.NUM_MONSTER_CLASSES);
-                }
-
-                currentPlayerInfo.classInformation = classes[currentPlayerInfo.classSelectionIndex];
-            }
 
             currentPlayerInfo.character = Instantiate(currentPlayerInfo.classInformation.prefab, GameConstants.PLAYER_SPAWN_POSITIONS[i], Quaternion.identity);
             
@@ -557,7 +598,7 @@ public class GameController : MonoBehaviour {
     private void Regenerate()
     {
         stageMap.Generate();
-        Restart();
+        RegeneratePlayers();
     }
 
     private void ResetCharacterInfoPanel(int playerIndex, bool isNewHumanSelection)
@@ -594,5 +635,16 @@ public class GameController : MonoBehaviour {
                 characterInfoPanels[playerIndex].transform.Find("Background").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
             }
         }
+    }
+
+    private int GetRandomHumanClassIndex()
+    {
+        return Random.Range(0, GameConstants.NUM_HUMAN_CLASSES);
+    }
+
+    // This random return is based on the fact that human classes are all listed first in the index
+    private int GetRandomMonsterClassIndex()
+    {
+        return GameConstants.NUM_HUMAN_CLASSES + Random.Range(0, GameConstants.NUM_MONSTER_CLASSES);
     }
 }

@@ -63,28 +63,25 @@ public abstract class PlayerController : MonoBehaviour {
         anim = GetComponent<Animator>();
     }
 
-    /* Map Controls using keys as movement in the following order:
-     * Left, Right, Up, Down, A, B
-     */
-    public void MapControls(KeyCode l, KeyCode r, KeyCode u, KeyCode d, KeyCode a, KeyCode b)
+    public void MapControls(Controller controller)
     {
-        useMouseMovement = false;
-        lKey = l;
-        rKey = r;
-        uKey = u;
-        dKey = d;
-        aKey = a;
-        bKey = b;
-    }
-
-    /* Map controls using mouse for movement in the following order:
-     * A, B
-     */
-    public void MapControls(KeyCode a, KeyCode b)
-    {
-        useMouseMovement = true;
-        aKey = a;
-        bKey = b;
+        if(controller.Type() == Controller.ControllerType.Mouse)
+        {
+            useMouseMovement = true;
+            aKey = controller.aKey;
+            bKey = controller.bKey;
+        }
+        else if(controller.Type() == Controller.ControllerType.Keyboard)
+        {
+            KeyboardController keyboardController = (KeyboardController)controller;
+            useMouseMovement = false;
+            aKey = keyboardController.aKey;
+            bKey = keyboardController.bKey;
+            lKey = keyboardController.lKey;
+            rKey = keyboardController.rKey;
+            uKey = keyboardController.uKey;
+            dKey = keyboardController.dKey;
+        }
     }
 
     // Update is called once per frame

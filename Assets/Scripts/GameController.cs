@@ -24,9 +24,58 @@ public class ClassInformation
     }
 }
 
+public abstract class Controller
+{
+    public enum ControllerType
+    {
+        Keyboard,
+        Mouse,
+        Gamepad
+    }
+
+    public KeyCode aKey, bKey;
+
+    public Controller(KeyCode a, KeyCode b)
+    {
+        aKey = a;
+        bKey = b;
+    }
+
+    public abstract ControllerType Type();
+}
+
+public class KeyboardController : Controller
+{
+    public KeyCode lKey, rKey, uKey, dKey;
+
+    public KeyboardController(KeyCode a, KeyCode b, KeyCode l, KeyCode r, KeyCode u, KeyCode d) : base(a, b)
+    {
+        lKey = l;
+        rKey = r;
+        uKey = u;
+        dKey = d;
+    }
+
+    public override ControllerType Type()
+    {
+        return ControllerType.Keyboard;
+    }
+}
+
+public class MouseController : Controller
+{
+    public MouseController() : base(KeyCode.Mouse0, KeyCode.Mouse1)
+    { }
+
+    public override ControllerType Type()
+    {
+        return ControllerType.Mouse;
+    }
+}
+
 public class PlayerInformation
 {
-    public KeyCode l, r, u, d, a, b;
+    public Controller controller;
     public ClassInformation classInformation; //0 Human, 1 Monster
     public GameObject character;
     public bool isReady = false;
@@ -34,26 +83,22 @@ public class PlayerInformation
     public int classSelectionIndex = 0;
     public enum CharacterState { HumanAlive, HumanDead, MonsterAlive, MonsterDead }
 
-    public PlayerInformation(KeyCode pA, KeyCode pB, KeyCode pL=KeyCode.None, KeyCode pR=KeyCode.None, KeyCode pU=KeyCode.None, KeyCode pD=KeyCode.None)
+    public PlayerInformation(Controller newController)
     {
-        a = pA;
-        b = pB;
-        l = pL;
-        r = pR;
-        u = pU;
-        d = pD;
+        controller = newController;
     }
 }
 
-public class GameController : MonoBehaviour {
-
+public class GameController : MonoBehaviour
+{
     enum State { game, characterSelect, newHumanSelect }
 
     State state = State.characterSelect;
-    PlayerInformation[] playerInfo = {new PlayerInformation(KeyCode.Mouse0, KeyCode.Mouse1),
-        new PlayerInformation(KeyCode.Z, KeyCode.X, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow),
-        new PlayerInformation(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S),
-        new PlayerInformation(KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad1, KeyCode.Keypad3, KeyCode.Keypad5, KeyCode.Keypad2)};
+    PlayerInformation[] playerInfo = {new PlayerInformation(new MouseController()),
+        new PlayerInformation(new KeyboardController(KeyCode.Z, KeyCode.X, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow)),
+        new PlayerInformation(new KeyboardController(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S)),
+        new PlayerInformation(new KeyboardController(KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad1, KeyCode.Keypad3, KeyCode.Keypad5, KeyCode.Keypad2))
+    };
     Map stageMap;
 
     GameObject[,] AIControllers = new GameObject[GameConstants.NUM_PLAYERS, GameConstants.NUM_TYPES_OF_CLASSES];
@@ -67,11 +112,12 @@ public class GameController : MonoBehaviour {
     int newHumanIndex = 0;
 
     GameObject startButton;
-    GameObject characterInfoPanelPrefab; 
+    GameObject characterInfoPanelPrefab;
     GameObject[] characterInfoPanels = new GameObject[GameConstants.NUM_PLAYERS];
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         hunter = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterPrefab.prefab", typeof(GameObject)),
             "Hunter", "None", "Arrow", "Dash", true);
         watchman = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanPrefab.prefab", typeof(GameObject)),
@@ -80,7 +126,7 @@ public class GameController : MonoBehaviour {
             "Werewolf", "Break Lights", "Knockback", "Dash", false);
         vampire = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject)),
             "Vampire", "None", "Bite(Heal)", "Slow Projectile", false);
-        classes = new List<ClassInformation>{ hunter, watchman, werewolf, vampire };
+        classes = new List<ClassInformation> { hunter, watchman, werewolf, vampire };
 
         stageMap = new Map(GameConstants.MAP_COLUMNS, GameConstants.MAP_ROWS, GameConstants.MAP_TILE_SIZE, GameConstants.MAP_OFFSET);
 
@@ -89,7 +135,7 @@ public class GameController : MonoBehaviour {
         monsterAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterAIController.prefab", typeof(GameObject));
         humanAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanAIController.prefab", typeof(GameObject));
 
-        for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
             AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
@@ -99,18 +145,19 @@ public class GameController : MonoBehaviour {
 
         StartCharacterSelect();
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
         if (state == State.game)
         {
             UpdateGame();
         }
-        else if(state == State.characterSelect)
+        else if (state == State.characterSelect)
         {
             UpdateCharacterSelect();
         }
-        else if(state == State.newHumanSelect)
+        else if (state == State.newHumanSelect)
         {
             UpdateNewHumanCharacterSelection();
         }
@@ -130,7 +177,7 @@ public class GameController : MonoBehaviour {
 
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            if(!playerInfo[i].character.GetComponent<PlayerController>().isAlive)
+            if (!playerInfo[i].character.GetComponent<PlayerController>().isAlive)
             {
                 Destroy(playerInfo[i].character);
                 newHumanIndex = i;
@@ -156,7 +203,7 @@ public class GameController : MonoBehaviour {
         startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
         startButton.SetActive(false);
 
-        for( int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             if (playerInfo[i].isRealPlayer)
             {
@@ -231,7 +278,7 @@ public class GameController : MonoBehaviour {
             }
             else
             {
-                activateStartKey = playerInfo[firstRealPlayerIndex].a;
+                activateStartKey = playerInfo[firstRealPlayerIndex].controller.aKey;
             }
 
             bool startButtonActivated = false;
@@ -289,7 +336,7 @@ public class GameController : MonoBehaviour {
         {
             if (!currentPlayer.isReady)
             {
-                if (currentPlayer.a == KeyCode.Mouse0)
+                if (currentPlayer.controller.Type() == Controller.ControllerType.Mouse)
                 {
                     if (Input.GetKeyDown(KeyCode.Mouse0))
                     {
@@ -310,18 +357,18 @@ public class GameController : MonoBehaviour {
                         else if (rightArrow.bounds.Contains(mPos))
                         {
                             currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
-                            arrowPressed = true; 
+                            arrowPressed = true;
                         }
 
-                        if(arrowPressed)
+                        if (arrowPressed)
                         {
                             currentPlayer.classInformation = classes[currentPlayer.classSelectionIndex];
 
-                            if(playerIndex == allowedHumanPlayerIndex && !currentPlayer.classInformation.isHumanClass)
+                            if (playerIndex == allowedHumanPlayerIndex && !currentPlayer.classInformation.isHumanClass)
                             {
                                 ResolveAllowedHumanIndex();
                             }
-                            else if(allowedHumanPlayerIndex == -1 && currentPlayer.classInformation.isHumanClass)
+                            else if (allowedHumanPlayerIndex == -1 && currentPlayer.classInformation.isHumanClass)
                             {
                                 allowedHumanPlayerIndex = playerIndex;
                             }
@@ -339,28 +386,29 @@ public class GameController : MonoBehaviour {
                         }
                     }
                 }
-                else
+                else if(currentPlayer.controller.Type() == Controller.ControllerType.Keyboard)
                 {
                     bool changedClass = false;
-                    if (Input.GetKeyDown(currentPlayer.l))
+                    KeyboardController playerController = (KeyboardController)currentPlayer.controller;
+                    if (Input.GetKeyDown(playerController.lKey))
                     {
                         currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + classes.Count - 1) % classes.Count;
                         changedClass = true;
                     }
-                    else if (Input.GetKeyDown(currentPlayer.r))
+                    else if (Input.GetKeyDown(playerController.rKey))
                     {
                         currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
                         changedClass = true;
                     }
-                    else if (Input.GetKeyDown(currentPlayer.u))
+                    else if (Input.GetKeyDown(playerController.uKey))
                     {
-                            
+
                     }
-                    else if (Input.GetKeyDown(currentPlayer.d))
+                    else if (Input.GetKeyDown(playerController.dKey))
                     {
-                            
+
                     }
-                    else if (Input.GetKeyDown(currentPlayer.a))
+                    else if (Input.GetKeyDown(playerController.aKey))
                     {
                         if (
                             (!isNewHumanSelection && (!currentPlayer.classInformation.isHumanClass || playerIndex == allowedHumanPlayerIndex)) ||
@@ -371,7 +419,7 @@ public class GameController : MonoBehaviour {
                         }
                     }
 
-                    if(changedClass)
+                    if (changedClass)
                     {
                         currentPlayer.classInformation = classes[currentPlayer.classSelectionIndex];
 
@@ -385,8 +433,12 @@ public class GameController : MonoBehaviour {
                         }
                     }
                 }
+                else if(currentPlayer.controller.Type() == Controller.ControllerType.Gamepad)
+                {
 
-                if (Input.GetKeyDown(currentPlayer.b) && !isNewHumanSelection)
+                }
+
+                if (Input.GetKeyDown(currentPlayer.controller.bKey) && !isNewHumanSelection)
                 {
                     currentPlayer.isRealPlayer = false;
                     currentPlayer.isReady = true;
@@ -396,13 +448,13 @@ public class GameController : MonoBehaviour {
                     // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
                     if (playerIndex == allowedHumanPlayerIndex)
                     {
-                        ResolveAllowedHumanIndex(); 
+                        ResolveAllowedHumanIndex();
                     }
                 }
             }
             else
             {
-                if (Input.GetKeyDown(currentPlayer.b))
+                if (Input.GetKeyDown(currentPlayer.controller.bKey))
                 {
                     currentPlayer.isReady = false;
                 }
@@ -410,7 +462,7 @@ public class GameController : MonoBehaviour {
         }
         else
         {
-            if (Input.GetKeyDown(currentPlayer.a))
+            if (Input.GetKeyDown(currentPlayer.controller.aKey))
             {
                 currentPlayer.isRealPlayer = true;
                 currentPlayer.isReady = false;
@@ -453,7 +505,7 @@ public class GameController : MonoBehaviour {
         if (newHumanPlayer.isReady)
         {
             startButton.SetActive(true);
-            KeyCode activateStartKey = newHumanPlayer.a;
+            KeyCode activateStartKey = newHumanPlayer.controller.aKey;
 
             bool startButtonActivated = false;
             if (activateStartKey == KeyCode.Mouse0)
@@ -512,48 +564,31 @@ public class GameController : MonoBehaviour {
         bool anyPlayerHasPickedHuman = false;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            if(!playerInfo[i].isRealPlayer || playerInfo[i].classInformation.isHumanClass)
+            if (!playerInfo[i].isRealPlayer || playerInfo[i].classInformation.isHumanClass)
             {
                 anyPlayerHasPickedHuman = true;
             }
         }
 
         // If we don't have a human then set someone to randomly be it(this case will only occur if we have no AI and 4 human players)
-        if(!anyPlayerHasPickedHuman)
+        if (!anyPlayerHasPickedHuman)
         {
             newHumanIndex = Random.Range(0, GameConstants.NUM_PLAYERS);
             StartNewHumanCharacterSelection();
             return;
         }
-        
+
         // Instantiating all the players, human and AI
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             PlayerInformation currentPlayerInfo = playerInfo[i];
 
             currentPlayerInfo.character = Instantiate(currentPlayerInfo.classInformation.prefab, GameConstants.PLAYER_SPAWN_POSITIONS[i], Quaternion.identity);
-            
+
             // Spawn player with the correct control scheme
             if (playerInfo[i].isRealPlayer)
             {
-                if (currentPlayerInfo.l == KeyCode.None)
-                {
-                    currentPlayerInfo.character.GetComponent<PlayerController>().MapControls(
-                        currentPlayerInfo.a,
-                        currentPlayerInfo.b
-                    );
-                }
-                else
-                {
-                    currentPlayerInfo.character.GetComponent<PlayerController>().MapControls(
-                        currentPlayerInfo.l,
-                        currentPlayerInfo.r,
-                        currentPlayerInfo.u,
-                        currentPlayerInfo.d,
-                        currentPlayerInfo.a,
-                        currentPlayerInfo.b
-                    );
-                }
+                currentPlayerInfo.character.GetComponent<PlayerController>().MapControls(playerInfo[i].controller);
             }
             // Spawn AI with controllers to support them
             else

@@ -76,9 +76,9 @@ public class MouseController : Controller
 public class PlayerInformation
 {
     public Controller controller;
-    public ClassInformation classInformation; //0 Human, 1 Monster
+    public ClassInformation classInformation;
     public GameObject character;
-    public bool isReady = false;
+    public bool isReady;
     public bool isRealPlayer = false;
     public int classSelectionIndex = 0;
     public enum CharacterState { HumanAlive, HumanDead, MonsterAlive, MonsterDead }
@@ -86,6 +86,13 @@ public class PlayerInformation
     public PlayerInformation(Controller newController)
     {
         controller = newController;
+        isReady = false;
+    }
+
+    public PlayerInformation()
+    {
+        controller = new KeyboardController(KeyCode.None, KeyCode.None, KeyCode.None, KeyCode.None, KeyCode.None, KeyCode.None);
+        isReady = true;
     }
 }
 
@@ -94,11 +101,8 @@ public class GameController : MonoBehaviour
     enum State { game, characterSelect, newHumanSelect }
 
     State state = State.characterSelect;
-    PlayerInformation[] playerInfo = {new PlayerInformation(new MouseController()),
-        new PlayerInformation(new KeyboardController(KeyCode.Z, KeyCode.X, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow)),
-        new PlayerInformation(new KeyboardController(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S)),
-        new PlayerInformation(new KeyboardController(KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad1, KeyCode.Keypad3, KeyCode.Keypad5, KeyCode.Keypad2))
-    };
+    PlayerInformation[] playerInfo = new PlayerInformation[GameConstants.NUM_PLAYERS];
+    int nextPlayerToAddIndex = 0;
     Map stageMap;
 
     GameObject[,] AIControllers = new GameObject[GameConstants.NUM_PLAYERS, GameConstants.NUM_TYPES_OF_CLASSES];
@@ -139,9 +143,18 @@ public class GameController : MonoBehaviour
         {
             AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
             AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
-        }
 
-        playerInfo[0].isRealPlayer = true;
+            if (i == 0)
+            {
+                playerInfo[i] = new PlayerInformation(ControlSchemeHandler.controlSchemes[0].controller);
+                ControlSchemeHandler.controlSchemes[0].isInUse = true;
+                ++nextPlayerToAddIndex;
+            }
+            else
+            {
+                playerInfo[i] = new PlayerInformation();
+            }
+        }
 
         StartCharacterSelect();
     }
@@ -188,8 +201,10 @@ public class GameController : MonoBehaviour
 
     private void UpdateCharacterSelect()
     {
-        // Register the game start input before the ready input so that they dont happen in the same frame
+        // Register the game start input before the ready input so they don't cause 2 events
         CharacterSelectRegisterStartButtonInput();
+        // Register the new controller input here so that the
+        RegisterNewControllerAdded();
 
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
@@ -207,13 +222,8 @@ public class GameController : MonoBehaviour
         {
             if (playerInfo[i].isRealPlayer)
             {
-                playerInfo[i].isReady = false;
                 characterInfoPanels[i] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[i], Quaternion.identity);
                 playerInfo[i].classInformation = classes[playerInfo[i].classSelectionIndex];
-            }
-            else
-            {
-                playerInfo[i].isReady = true;
             }
         }
     }
@@ -475,6 +485,32 @@ public class GameController : MonoBehaviour
                     allowedHumanPlayerIndex = playerIndex;
                 }
             }
+        }
+    }
+
+    private void RegisterNewControllerAdded()
+    {
+        int i = 0;
+        while (i < ControlSchemeHandler.controlSchemes.Length && nextPlayerToAddIndex < GameConstants.NUM_PLAYERS)
+        {
+            if (!ControlSchemeHandler.controlSchemes[i].isInUse && Input.GetKeyDown(ControlSchemeHandler.controlSchemes[i].controller.aKey))
+            {
+                playerInfo[nextPlayerToAddIndex] = new PlayerInformation(ControlSchemeHandler.controlSchemes[i].controller);
+                ControlSchemeHandler.controlSchemes[i].isInUse = true;
+
+                playerInfo[nextPlayerToAddIndex].isRealPlayer = true;
+
+                characterInfoPanels[nextPlayerToAddIndex] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[nextPlayerToAddIndex], Quaternion.identity);
+                playerInfo[nextPlayerToAddIndex].classInformation = classes[playerInfo[nextPlayerToAddIndex].classSelectionIndex];
+
+                if (allowedHumanPlayerIndex == -1 && playerInfo[nextPlayerToAddIndex].classInformation.isHumanClass)
+                {
+                    allowedHumanPlayerIndex = nextPlayerToAddIndex;
+                }
+
+                ++nextPlayerToAddIndex;
+            }
+            ++i;
         }
     }
 

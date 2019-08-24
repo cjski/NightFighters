@@ -185,9 +185,15 @@ public class GameController : MonoBehaviour
     {
         enterGameMenuPanel = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/EnterGamePanelPrefab.prefab", typeof(GameObject)), GameConstants.ENTER_GAME_MENU_PANEL_POSITION, Quaternion.identity);
         state = State.enterGameMenu;
+        nextPlayerToAddIndex = 0;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             playerInfo[i] = new PlayerInformation();
+        }
+
+        for (int i = 0; i < ControlSchemeHandler.controlSchemes.Length; ++i)
+        {
+            ControlSchemeHandler.controlSchemes[i].isInUse = false;
         }
     }
 
@@ -221,6 +227,25 @@ public class GameController : MonoBehaviour
         // Register the new controller input here so that the panels get made
         RegisterNewControllersAdded();
 
+        bool anyRealPlayers = false;
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            if (playerInfo[i].isRealPlayer)
+            {
+                anyRealPlayers = true;
+            }
+        }
+
+        // Back out to the menu
+        if (!anyRealPlayers)
+        {
+            if (Input.GetKeyDown(playerInfo[0].controller.bKey))
+            {
+                Destroy(startButton);
+                StartEnterGameMenu();
+            }
+        }
+
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             CharacterSelectRegisterInput(i, false);
@@ -249,6 +274,7 @@ public class GameController : MonoBehaviour
         state = State.characterSelect;
         startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
         startButton.SetActive(false);
+        allowedHumanPlayerIndex = 0;
 
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {

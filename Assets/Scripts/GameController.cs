@@ -98,9 +98,9 @@ public class PlayerInformation
 
 public class GameController : MonoBehaviour
 {
-    enum State { game, characterSelect, newHumanSelect }
+    enum State { game, characterSelect, newHumanSelect, enterGameMenu }
 
-    State state = State.characterSelect;
+    State state;
     PlayerInformation[] playerInfo = new PlayerInformation[GameConstants.NUM_PLAYERS];
     int nextPlayerToAddIndex = 0;
     Map stageMap;
@@ -115,6 +115,7 @@ public class GameController : MonoBehaviour
     // Index of character now choosing their human class after being converted from a monster
     int newHumanIndex = 0;
 
+    GameObject enterGameMenuPanel;
     GameObject startButton;
     GameObject characterInfoPanelPrefab;
     GameObject[] characterInfoPanels = new GameObject[GameConstants.NUM_PLAYERS];
@@ -143,20 +144,9 @@ public class GameController : MonoBehaviour
         {
             AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
             AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
-
-            if (i == 0)
-            {
-                playerInfo[i] = new PlayerInformation(ControlSchemeHandler.controlSchemes[0].controller);
-                ControlSchemeHandler.controlSchemes[0].isInUse = true;
-                ++nextPlayerToAddIndex;
-            }
-            else
-            {
-                playerInfo[i] = new PlayerInformation();
-            }
         }
 
-        StartCharacterSelect();
+        StartEnterGameMenu();
     }
 
     // Update is called once per frame
@@ -173,6 +163,31 @@ public class GameController : MonoBehaviour
         else if (state == State.newHumanSelect)
         {
             UpdateNewHumanCharacterSelection();
+        }
+        else if(state == State.enterGameMenu)
+        {
+            UpdateEnterGameMenu();
+        }
+    }
+
+    private void UpdateEnterGameMenu()
+    {
+        RegisterNewControllersAdded();
+        if(nextPlayerToAddIndex != 0)
+        {
+            playerInfo[0].isRealPlayer = true; //TO-DO: REMOVE THIS LINE, TO BE IMPLEMENTED IN THE NEXT MENU
+            Destroy(enterGameMenuPanel);
+            StartCharacterSelect();
+        }
+    }
+
+    private void StartEnterGameMenu()
+    {
+        enterGameMenuPanel = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/EnterGamePanelPrefab.prefab", typeof(GameObject)), GameConstants.ENTER_GAME_MENU_PANEL_POSITION, Quaternion.identity);
+        state = State.enterGameMenu;
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            playerInfo[i] = new PlayerInformation();
         }
     }
 
@@ -203,8 +218,8 @@ public class GameController : MonoBehaviour
     {
         // Register the game start input before the ready input so they don't cause 2 events
         CharacterSelectRegisterStartButtonInput();
-        // Register the new controller input here so that the
-        RegisterNewControllerAdded();
+        // Register the new controller input here so that the panels get made
+        RegisterNewControllersAdded();
 
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
@@ -213,8 +228,25 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void RegisterNewControllersAdded()
+    {
+        int i = 0;
+        while (i < ControlSchemeHandler.controlSchemes.Length && nextPlayerToAddIndex < GameConstants.NUM_PLAYERS)
+        {
+            if (!ControlSchemeHandler.controlSchemes[i].isInUse && Input.GetKeyDown(ControlSchemeHandler.controlSchemes[i].controller.aKey))
+            {
+                playerInfo[nextPlayerToAddIndex] = new PlayerInformation(ControlSchemeHandler.controlSchemes[i].controller);
+                ControlSchemeHandler.controlSchemes[i].isInUse = true;
+
+                ++nextPlayerToAddIndex;
+            }
+            ++i;
+        }
+    }
+
     private void StartCharacterSelect()
     {
+        state = State.characterSelect;
         startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
         startButton.SetActive(false);
 
@@ -485,32 +517,6 @@ public class GameController : MonoBehaviour
                     allowedHumanPlayerIndex = playerIndex;
                 }
             }
-        }
-    }
-
-    private void RegisterNewControllerAdded()
-    {
-        int i = 0;
-        while (i < ControlSchemeHandler.controlSchemes.Length && nextPlayerToAddIndex < GameConstants.NUM_PLAYERS)
-        {
-            if (!ControlSchemeHandler.controlSchemes[i].isInUse && Input.GetKeyDown(ControlSchemeHandler.controlSchemes[i].controller.aKey))
-            {
-                playerInfo[nextPlayerToAddIndex] = new PlayerInformation(ControlSchemeHandler.controlSchemes[i].controller);
-                ControlSchemeHandler.controlSchemes[i].isInUse = true;
-
-                playerInfo[nextPlayerToAddIndex].isRealPlayer = true;
-
-                characterInfoPanels[nextPlayerToAddIndex] = Instantiate(characterInfoPanelPrefab, GameConstants.CHARACTER_INFO_PANEL_POSITIONS[nextPlayerToAddIndex], Quaternion.identity);
-                playerInfo[nextPlayerToAddIndex].classInformation = classes[playerInfo[nextPlayerToAddIndex].classSelectionIndex];
-
-                if (allowedHumanPlayerIndex == -1 && playerInfo[nextPlayerToAddIndex].classInformation.isHumanClass)
-                {
-                    allowedHumanPlayerIndex = nextPlayerToAddIndex;
-                }
-
-                ++nextPlayerToAddIndex;
-            }
-            ++i;
         }
     }
 

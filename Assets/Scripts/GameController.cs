@@ -188,8 +188,13 @@ public class GameController : MonoBehaviour
         nextPlayerToAddIndex = 0;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
+            if (playerInfo[i] != null)
+            {
+                Destroy(playerInfo[i].character);
+            }
             playerInfo[i] = new PlayerInformation();
         }
+        stageMap.ClearAll();
 
         for (int i = 0; i < ControlSchemeHandler.controlSchemes.Length; ++i)
         {
@@ -209,14 +214,31 @@ public class GameController : MonoBehaviour
             Regenerate();
         }
 
+        bool needToRestart = true;
+        int deadMonsterIndex = -1;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            if (!playerInfo[i].character.GetComponent<PlayerController>().isAlive)
+            if (!playerInfo[i].character.GetComponent<PlayerController>().isAlive && deadMonsterIndex == -1)
             {
-                Destroy(playerInfo[i].character);
-                newHumanIndex = i;
-                StartNewHumanCharacterSelection();
+                deadMonsterIndex = i;
             }
+
+            // If we saw that this monster has died and the rest are human then we should be restarting
+            if(!(playerInfo[i].classInformation.isHumanClass || deadMonsterIndex == i))
+            {
+                needToRestart = false;
+            }
+        }
+
+        if (needToRestart)
+        {
+            StartEnterGameMenu();
+        }
+        else if (deadMonsterIndex != -1)
+        {
+            Destroy(playerInfo[deadMonsterIndex].character);
+            newHumanIndex = deadMonsterIndex;
+            StartNewHumanCharacterSelection();
         }
     }
 

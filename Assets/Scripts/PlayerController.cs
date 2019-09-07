@@ -13,7 +13,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected enum MovementType { Normal, Dashing, Stun };
 
-    private PlayerInformation player;
+    protected int playerNumber;
 
     private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
     protected float baseSpeed;
@@ -67,7 +67,7 @@ public abstract class PlayerController : MonoBehaviour {
         ignoreLightLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern");
     }
 
-    public void MapControls(Controller controller)
+    public void InitializePlayer(Controller controller, int newPlayerNumber)
     {
         if(controller.Type() == Controller.ControllerType.Mouse)
         {
@@ -86,6 +86,8 @@ public abstract class PlayerController : MonoBehaviour {
             uKey = keyboardController.uKey;
             dKey = keyboardController.dKey;
         }
+
+        playerNumber = newPlayerNumber;
     }
 
     // Update is called once per frame
@@ -130,7 +132,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         if (!primaryCooldown.done) primaryCooldown.Update();
         if (!secondaryCooldown.done) secondaryCooldown.Update();
-        text.text = "Health: " + health +"\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
+        text.text = "Player " + playerNumber + " Health: " + health +"\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
 	}
 
     private void MoveWithKeys()
@@ -336,10 +338,10 @@ public abstract class PlayerController : MonoBehaviour {
         return GetComponent<Renderer>().bounds.size;
     }
 
-    public void ActivateAI()
+    public void ActivateAI(int newPlayerNumber)
     {
         IsAI = true;
-        ModifySpeed(-0.05f); // For testing purposes so the monsters can run away
+        playerNumber = newPlayerNumber;
     }
 
     public void AIMove(Vector2 newDirection)

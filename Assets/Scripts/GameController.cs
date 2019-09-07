@@ -678,7 +678,7 @@ public class GameController : MonoBehaviour
             // Spawn player with the correct control scheme
             if (playerInfo[i].isRealPlayer)
             {
-                currentPlayerInfo.character.GetComponent<PlayerController>().MapControls(playerInfo[i].controller);
+                currentPlayerInfo.character.GetComponent<PlayerController>().InitializePlayer(playerInfo[i].controller, i + 1);
             }
             // Spawn AI with controllers to support them
             else
@@ -686,11 +686,11 @@ public class GameController : MonoBehaviour
                 // Allow the AI to spawn as a human if all players are monsters
                 if (playerInfo[i].classInformation.isHumanClass)
                 {
-                    AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX].GetComponent<HumanAI>().Init(stageMap, currentPlayerInfo.character);
+                    AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX].GetComponent<HumanAI>().Init(stageMap, currentPlayerInfo.character, i + 1);
                 }
                 else
                 {
-                    AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX].GetComponent<MonsterAI>().Init(stageMap, currentPlayerInfo.character);
+                    AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX].GetComponent<MonsterAI>().Init(stageMap, currentPlayerInfo.character, i + 1);
                 }
             }
         }

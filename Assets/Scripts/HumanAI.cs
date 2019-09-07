@@ -14,14 +14,14 @@ public class HumanAI : AI
         base.Start();
     }
 
-    public void Init(Map gameMap, GameObject human)
+    public void Init(Map gameMap, GameObject human, int newPlayerNumber)
     {
         if (map == null)
         {
             map = gameMap;
         }
         playerController = human.GetComponent<HumanController>();
-        playerController.ActivateAI();
+        playerController.ActivateAI(newPlayerNumber);
     }
 
     void Update()

@@ -121,4 +121,10 @@ public class LightController : MonoBehaviour {
             halo.enabled = true;
         }
     }
+
+    // This will be overridden in the LanternController class to return true
+    public virtual bool IsLantern()
+    {
+        return false;
+    }
 }

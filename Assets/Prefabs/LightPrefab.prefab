@@ -94,6 +94,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8b8c572dae20ed408bffd56c28baf25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  humansIn: 0
+  monstersIn: 0
+  broken: 0
+  currentHumanInLight: {fileID: 0}
+  currentMonsterInLight: {fileID: 0}
 --- !u!122 &122164854936768822
 Halo:
   m_ObjectHideFlags: 0

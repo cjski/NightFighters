@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7c4507cdb45b18469cd6cb011a4b674, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  humansIn: 0
+  monstersIn: 0
+  broken: 0
+  currentHumanInLight: {fileID: 0}
+  currentMonsterInLight: {fileID: 0}
+  speed: 2
+  direction: {x: 0, y: 0}
 --- !u!1001 &1684152718466828935
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22,6 +29,10 @@ PrefabInstance:
     - target: {fileID: 1819133072334304, guid: 014bbf74bd140354a8e9a6b8f46c6e2b, type: 3}
       propertyPath: m_Name
       value: LanternPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 1819133072334304, guid: 014bbf74bd140354a8e9a6b8f46c6e2b, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4246805442112694, guid: 014bbf74bd140354a8e9a6b8f46c6e2b, type: 3}
       propertyPath: m_LocalPosition.x

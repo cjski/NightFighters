@@ -44,6 +44,8 @@ public abstract class PlayerController : MonoBehaviour {
 
     private Animator anim;
 
+    protected static int ignoreLightLanternLayerMask;
+
     // Use this for initialization
     protected void Start () {
         baseSpeed = 0.1f;
@@ -61,6 +63,8 @@ public abstract class PlayerController : MonoBehaviour {
         text = GetComponentInChildren<Text>();
 
         anim = GetComponent<Animator>();
+
+        ignoreLightLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern");
     }
 
     public void MapControls(Controller controller)
@@ -169,7 +173,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
     }
 
-    private void Move(Vector2 direction, float moveSpeed, int layerMask=-261)
+    private void Move(Vector2 direction, float moveSpeed)
     {
         Vector2 pos = transform.position;
         Vector2 size = GetSize();
@@ -191,7 +195,7 @@ public abstract class PlayerController : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, layerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternLayerMask);
             if(hit.collider != null)
             {
                 moveInX = false;
@@ -220,7 +224,7 @@ public abstract class PlayerController : MonoBehaviour {
         GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, layerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternLayerMask);
             if (hit.collider != null)
             {
                 moveInY = false;

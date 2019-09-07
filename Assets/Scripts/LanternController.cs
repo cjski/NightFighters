@@ -38,4 +38,9 @@ public class LanternController : LightController
             speed -= 0.01f;
         }
     }
+
+    public override bool IsLantern()
+    {
+        return true;
+    }
 }

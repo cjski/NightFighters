@@ -8,25 +8,24 @@ public class MonsterAI : AI
     static float directionToTargetWeight = 1.0f;
     static float directionToBestTileWeight = 0.75f;
     static float directionAwayFromObstacleWeight = 1.0f;
-    MonsterController monsterController;
     private Vector2 finalDirection = new Vector2(0, 0);
     private Vector2 previousDirection = new Vector2(0, 0);
 
-    void Start()
+    protected new void Start()
     {
-
+        base.Start();
     }
 
     public void Init(Map gameMap, GameObject monster)
     {
         if (map == null) map = gameMap;
-        monsterController = monster.GetComponent<MonsterController>();
-        monsterController.ActivateAI();
+        playerController = monster.GetComponent<MonsterController>();
+        playerController.ActivateAI();
     }
 
     void Update()
     {
-        if (monsterController != null)
+        if (playerController != null)
         {
             bool canSeeTarget = false;
             bool isPlayer = false;
@@ -34,7 +33,7 @@ public class MonsterAI : AI
 
             if (finalDirection.sqrMagnitude > 0.01f)
             {
-                monsterController.AIMove(finalDirection);
+                playerController.AIMove(finalDirection);
             }
 
             previousDirection = finalDirection;
@@ -50,11 +49,11 @@ public class MonsterAI : AI
 
         canSeeTarget = false;
         
-        Node selfNode = map.GetNode(monsterController.gameObject.transform.position);
+        Node selfNode = map.GetNode(playerController.gameObject.transform.position);
         
         Vector2 targetPosition = Vector2.zero;
         Vector2 toTarget = Vector2.zero;
-        Vector2 selfPosition = monsterController.gameObject.transform.position;
+        Vector2 selfPosition = playerController.gameObject.transform.position;
 
         Vector2 totalAwayFromHuman = new Vector2();
         Vector2 totalToTiles = new Vector2();
@@ -72,7 +71,7 @@ public class MonsterAI : AI
                 toTarget = targetPosition - selfPosition;
 
                 Vector2 newTargetDirection = Vector2.zero;
-                canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection);
+                canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLightLanternLayerMask);
 
                 if(canSeeTarget)
                 {
@@ -244,42 +243,12 @@ public class MonsterAI : AI
         Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
     }
 
-    bool FindIfTargetIsVisible(Vector2 targetPosition, Vector2 toTarget, ref Vector2 direction)
-    {
-        monsterController.GetComponent<BoxCollider2D>().enabled = false;
-        RaycastHit2D hitTarget = Physics2D.Raycast(monsterController.transform.position, toTarget, 100.0f, ignoreLightLayerMask);
-        monsterController.GetComponent<BoxCollider2D>().enabled = true;
-        // Don't check against the collider, because we expect the whole area to be surrounded by walls and the ray 
-        // Will eventually hit something
-        if (hitTarget.collider.transform != null && hitTarget.collider.transform.position.Equals(targetPosition))
-        {
-            // Catches any walls that the single ray would miss so that the AI can clip around walls
-            Vector3 size = monsterController.GetComponent<Renderer>().bounds.size;
-            int xDir = 1;
-            if (toTarget.x * toTarget.y > 0) xDir = -1;
-            Vector2 pos1 = (Vector2)monsterController.transform.position + new Vector2(size.y * 0.5f, xDir * size.x * 0.5f);
-            Vector2 pos2 = (Vector2)monsterController.transform.position + new Vector2(-size.y * 0.5f, -xDir * size.x * 0.5f);
-            monsterController.GetComponent<BoxCollider2D>().enabled = false;
-            RaycastHit2D hitTargetCorner1 = Physics2D.Raycast(pos1, targetPosition - pos1, size.y * 2);
-            RaycastHit2D hitTargetCorner2 = Physics2D.Raycast(pos2, targetPosition - pos2, size.y * 2);
-            monsterController.GetComponent<BoxCollider2D>().enabled = true;
-
-            if ((hitTargetCorner1.collider == null || hitTargetCorner1.collider.gameObject.tag != "Wall") &&
-                (hitTargetCorner2.collider == null || hitTargetCorner2.collider.gameObject.tag != "Wall"))
-            {
-                direction = toTarget;
-                return true;
-            }
-        }
-        return false;
-    }
-
     Vector2 GetDirectionAwayFromObstacles(Vector2 direction)
     {
         Vector2 directionAwayFromObstacle = new Vector2();
 
-        Vector2 pos = monsterController.transform.position;
-        Vector2 size = monsterController.GetSize();
+        Vector2 pos = playerController.transform.position;
+        Vector2 size = playerController.GetSize();
 
         Vector2[] originsForRaycastsX =
         {
@@ -294,17 +263,17 @@ public class MonsterAI : AI
         float distanceForRaycastX = size.x * 2;
         bool gameObjectInX = false;
 
-        monsterController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
+        playerController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternLayerMask);
             if (hit.collider != null)
             {
                 gameObjectInX = true;
                 break;
             }
         }
-        monsterController.GetComponent<BoxCollider2D>().enabled = true;
+        playerController.GetComponent<BoxCollider2D>().enabled = true;
 
         Vector2[] originsForRaycastsY =
         {
@@ -319,17 +288,17 @@ public class MonsterAI : AI
         float distanceForRaycastY = size.y * 2;
         bool gameObjectInY = false;
 
-        monsterController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
+        playerController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternLayerMask);
             if (hit.collider != null)
             {
                 gameObjectInY = true;
                 break;
             }
         }
-        monsterController.GetComponent<BoxCollider2D>().enabled = true;
+        playerController.GetComponent<BoxCollider2D>().enabled = true;
 
         if (gameObjectInX)
         {

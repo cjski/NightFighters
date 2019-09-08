@@ -25,10 +25,8 @@ public class LanternController : LightController
     {
         if(speed > 0)
         {
-            GetComponent<BoxCollider2D>().enabled = false;
             RaycastHit2D hitWallX = Physics2D.Raycast(transform.position, new Vector2(direction.x, 0), 0.5f);
             RaycastHit2D hitWallY = Physics2D.Raycast(transform.position, new Vector2(0, direction.y), 0.5f);
-            GetComponent<BoxCollider2D>().enabled = true;
 
             if (hitWallX.collider != null && hitWallX.collider.gameObject.tag == "Wall") direction.x *= -1;
             if (hitWallY.collider != null && hitWallY.collider.gameObject.tag == "Wall") direction.y *= -1;

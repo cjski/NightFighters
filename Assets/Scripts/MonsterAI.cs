@@ -263,7 +263,6 @@ public class MonsterAI : AI
         float distanceForRaycastX = size.x * 2;
         bool gameObjectInX = false;
 
-        playerController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternLayerMask);
@@ -273,7 +272,6 @@ public class MonsterAI : AI
                 break;
             }
         }
-        playerController.GetComponent<BoxCollider2D>().enabled = true;
 
         Vector2[] originsForRaycastsY =
         {
@@ -288,7 +286,6 @@ public class MonsterAI : AI
         float distanceForRaycastY = size.y * 2;
         bool gameObjectInY = false;
 
-        playerController.GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternLayerMask);
@@ -298,7 +295,6 @@ public class MonsterAI : AI
                 break;
             }
         }
-        playerController.GetComponent<BoxCollider2D>().enabled = true;
 
         if (gameObjectInX)
         {

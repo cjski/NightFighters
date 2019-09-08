@@ -179,22 +179,22 @@ public abstract class PlayerController : MonoBehaviour {
     {
         Vector2 pos = transform.position;
         Vector2 size = GetSize();
-        //int layMask = 1 << 8; // Layer mask for environment layer
+        Vector2 halfSizeY = new Vector2(0, size.y * 0.5f);
+        Vector2 halfSizeX = new Vector2(size.x * 0.5f, 0);
 
         Vector2[] originsForRaycastsX =
         {
-            pos + new Vector2(0, size.y * 0.5f),
-            pos + new Vector2(0, size.y * 0.25f),
+            pos + halfSizeY,
+            pos + halfSizeY * 0.5f,
             pos,
-            pos - new Vector2(0, size.y * 0.25f),
-            pos - new Vector2(0, size.y * 0.5f)
+            pos - halfSizeY * 0.5f,
+            pos - halfSizeY
         };
 
         Vector2 directionXVector = new Vector2(direction.x, 0);
-        float distanceForRaycastX = moveSpeed + size.x * 0.5f;
+        float distanceForRaycastX = moveSpeed + halfSizeX.x;
         bool moveInX = true;
 
-        GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternLayerMask);
@@ -204,7 +204,6 @@ public abstract class PlayerController : MonoBehaviour {
                 break;
             }
         }
-        GetComponent<BoxCollider2D>().enabled = true;
         if (moveInX)
         {
             transform.Translate(moveSpeed * directionXVector);
@@ -212,18 +211,17 @@ public abstract class PlayerController : MonoBehaviour {
 
         Vector2[] originsForRaycastsY =
         {
-            pos - new Vector2(size.x * 0.5f, 0),
-            pos - new Vector2(size.x * 0.25f, 0),
+            pos - halfSizeX,
+            pos - halfSizeX * 0.5f,
             pos,
-            pos + new Vector2(size.x * 0.25f, 0),
-            pos + new Vector2(size.x * 0.5f, 0)
+            pos + halfSizeX * 0.5f,
+            pos + halfSizeX
         };
 
         Vector2 directionYVector = new Vector2(0, direction.y);
-        float distanceForRaycastY = moveSpeed + size.y * 0.5f;
+        float distanceForRaycastY = moveSpeed + halfSizeY.y;
         bool moveInY = true;
 
-        GetComponent<BoxCollider2D>().enabled = false; // Don't cast to hit yourself
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternLayerMask);
@@ -233,7 +231,6 @@ public abstract class PlayerController : MonoBehaviour {
                 break;
             }
         }
-        GetComponent<BoxCollider2D>().enabled = true;
         if (moveInY)
         {
             transform.Translate(moveSpeed * directionYVector);

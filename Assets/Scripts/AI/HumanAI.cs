@@ -4,38 +4,39 @@ using UnityEngine;
 
 public class HumanAI : AI
 {
-    static Map map;
-    static float lightTargetDistanceOffset = 50; //Offsets the distance for the lights so the AI is more likely to target players
-    private Vector2 finalDirection = new Vector2(0, 0);
-    private float distanceToTargetSquared;
-    private Node selfNode;
-    private Vector2 selfPosition;
-    private Vector2 direction;
-    private float range = 3;
+    protected static Map map;
+    protected static float lightTargetDistanceOffset = 50; //Offsets the distance for the lights so the AI is more likely to target players
+    protected Vector2 finalDirection = new Vector2(0, 0);
+    protected float distanceToTargetSquared;
+    protected Node selfNode;
+    protected Vector2 selfPosition;
+    protected bool canSeeTarget;
+    protected bool targetIsPlayer;
+    protected float range = 3;
 
-    protected new void Start()
+    protected override void Start()
     {
         base.Start();
     }
 
-    public void Init(Map gameMap, GameObject human, int newPlayerNumber)
+    public override void Init(Map gameMap, GameObject player, int newPlayerNumber)
     {
         if (map == null)
         {
             map = gameMap;
         }
-        playerController = human.GetComponent<HumanController>();
+        playerController = player.GetComponent<HumanController>();
         playerController.ActivateAI(newPlayerNumber);
     }
 
-    void Update()
+    protected override void Update()
     {
         if (playerController != null)
         {
-            bool canSeeTarget = false;
-            bool isPlayer = false;
-            finalDirection = GetDirectionToTargetForMovement(ref canSeeTarget, ref isPlayer);
-            if (canSeeTarget && isPlayer && playerController.primaryCooldown.done)
+            canSeeTarget = false;
+            targetIsPlayer = false;
+            finalDirection = GetDirectionToTargetForMovement();
+            if (canSeeTarget && targetIsPlayer && playerController.primaryCooldown.done)
             {
                 playerController.AIUsePrimary();
             }
@@ -44,9 +45,9 @@ public class HumanAI : AI
         }
     }
 
-    Vector2 GetDirectionToTargetForMovement(ref bool canSeeTarget, ref bool isPlayer )
+    protected Vector2 GetDirectionToTargetForMovement()
     {
-        direction = Vector2.zero;
+        Vector2 direction = Vector2.zero;
         
         canSeeTarget = false;
         
@@ -67,9 +68,9 @@ public class HumanAI : AI
             MonsterController mc = players[i].GetComponent<MonsterController>();
             if (mc != null)
             {
-                if(IsNewTargetCloser(mc.gameObject, ref direction, ref canSeeTarget, ignoreLightLanternLayerMask))
+                if(IsNewTargetCloser(mc.gameObject, ref direction, ignoreLightLanternLayerMask))
                 {
-                    isPlayer = true;
+                    targetIsPlayer = true;
                 }
             }
         }
@@ -80,9 +81,9 @@ public class HumanAI : AI
             // Don't go for any lights that another human is turning on already, don't go for lanterns
             if (lc != null && !lc.On() && !lc.IsLantern() && (!lc.humansIn || lc.currentHumanInLight == playerController.gameObject))
             {
-                if(IsNewTargetCloser(lc.gameObject, ref direction, ref canSeeTarget, ignoreLanternLayerMask, lightTargetDistanceOffset))
+                if(IsNewTargetCloser(lc.gameObject, ref direction, ignoreLanternLayerMask, lightTargetDistanceOffset))
                 {
-                    isPlayer = false;
+                    targetIsPlayer = false;
                 }
             }
         }
@@ -90,7 +91,7 @@ public class HumanAI : AI
         return direction;
     }
 
-    bool IsNewTargetCloser(GameObject targetObject, ref Vector2 direction, ref bool canSeeTarget, int layerMask, float distanceOffset = 0)
+    protected bool IsNewTargetCloser(GameObject targetObject, ref Vector2 direction, int layerMask, float distanceOffset = 0)
     {
         Vector3 targetPosition = targetObject.transform.position;
         Vector2 toTarget = targetPosition - playerController.gameObject.transform.position;

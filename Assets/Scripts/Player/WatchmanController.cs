@@ -8,12 +8,13 @@ public class WatchmanController : HumanController
     static GameObject lightPrefab;
     public GameObject lantern;
     private GameObject lanternPointer;
-    bool holdingLantern;
-    Timer catchTimer = new Timer(.5f);
-    float hitRange = 1;
-    float hitCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
-    float stunTime = 1.0f;
-    int damage = 40;
+    public bool holdingLantern { get; private set; }
+    private Timer catchTimer = new Timer(.5f);
+    public float hitRange { get; private set; } = 1;
+    public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
+    private float stunTime = 0.5f;
+    private int damage = 10;
+    public float lanternInitialSpeed { get; private set; } = 0.325f;
 
     // Start is called before the first frame update
     new protected void Start()
@@ -73,7 +74,7 @@ public class WatchmanController : HumanController
         if (holdingLantern)
         {
             holdingLantern = false;
-            lantern.GetComponent<LanternController>().Throw(direction, 0.325f);
+            lantern.GetComponent<LanternController>().Throw(direction, lanternInitialSpeed);
             lanternPointer.SetActive(true);
             secondaryCooldown.Reset();
         }

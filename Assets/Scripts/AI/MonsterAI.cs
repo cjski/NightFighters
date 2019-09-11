@@ -16,14 +16,14 @@ public class MonsterAI : AI
         base.Start();
     }
 
-    public void Init(Map gameMap, GameObject monster, int newPlayerNumber)
+    public override void Init(Map gameMap, GameObject player, int newPlayerNumber)
     {
         if (map == null) map = gameMap;
-        playerController = monster.GetComponent<MonsterController>();
+        playerController = player.GetComponent<MonsterController>();
         playerController.ActivateAI(newPlayerNumber);
     }
 
-    void Update()
+    protected override void Update()
     {
         if (playerController != null)
         {

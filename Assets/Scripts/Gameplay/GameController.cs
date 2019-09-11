@@ -105,8 +105,8 @@ public class GameController : MonoBehaviour
     int nextPlayerToAddIndex = 0;
     Map stageMap;
 
-    GameObject[,] AIControllers = new GameObject[GameConstants.NUM_PLAYERS, GameConstants.NUM_TYPES_OF_CLASSES];
-    static GameObject monsterAIControllerPrefab, humanAIControllerPrefab;
+    List<GameObject> AIControllerPrefabs;
+    GameObject[] AIControllers = new GameObject[GameConstants.NUM_PLAYERS];
 
     ClassInformation hunter, watchman, werewolf, vampire;
     List<ClassInformation> classes;
@@ -137,14 +137,13 @@ public class GameController : MonoBehaviour
 
         characterInfoPanelPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/CharacterInfoPanelPrefab.prefab", typeof(GameObject));
 
-        monsterAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MonsterAIController.prefab", typeof(GameObject));
-        humanAIControllerPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HumanAIController.prefab", typeof(GameObject));
-
-        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        AIControllerPrefabs = new List<GameObject>
         {
-            AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX] = Instantiate(humanAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
-            AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX] = Instantiate(monsterAIControllerPrefab, new Vector3(-100, -100, -100), Quaternion.identity);
-        }
+            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterAIController.prefab", typeof(GameObject)),
+            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanAIController.prefab", typeof(GameObject)),
+            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfAIController.prefab", typeof(GameObject)),
+            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampireAIController.prefab", typeof(GameObject)),
+        };
 
         StartEnterGameMenu();
     }
@@ -683,15 +682,9 @@ public class GameController : MonoBehaviour
             // Spawn AI with controllers to support them
             else
             {
-                // Allow the AI to spawn as a human if all players are monsters
-                if (playerInfo[i].classInformation.isHumanClass)
-                {
-                    AIControllers[i, GameConstants.HUMAN_CLASS_TYPE_INDEX].GetComponent<HumanAI>().Init(stageMap, currentPlayerInfo.character, i + 1);
-                }
-                else
-                {
-                    AIControllers[i, GameConstants.MONSTER_CLASS_TYPE_INDEX].GetComponent<MonsterAI>().Init(stageMap, currentPlayerInfo.character, i + 1);
-                }
+                if(AIControllers[i] != null) Destroy(AIControllers[i]);
+                AIControllers[i] = Instantiate(AIControllerPrefabs[playerInfo[i].classSelectionIndex], new Vector3(-100, -100, -100), Quaternion.identity);
+                AIControllers[i].GetComponent<AI>().Init(stageMap, currentPlayerInfo.character, i+1);
             }
         }
 

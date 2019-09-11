@@ -9,10 +9,20 @@ public class AI : MonoBehaviour
 
     protected PlayerController playerController;
 
-    protected void Start()
+    protected virtual void Start()
     {
         ignoreLightLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern");
         ignoreLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Lantern");
+    }
+
+    protected virtual void Update()
+    {
+
+    }
+
+    public virtual void Init(Map gameMap, GameObject player, int newPlayerNumber)
+    {
+
     }
 
     protected bool FindIfTargetIsVisible(Vector2 targetPosition, Vector2 toTarget, ref Vector2 direction, int layerMask)

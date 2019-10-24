@@ -22,13 +22,13 @@ public abstract class PlayerController : MonoBehaviour {
     protected Vector2 direction;
     protected MovementType movementType;
     protected float speedModifier;
-    private float minSpeed;
-    private float maxSpeed;
+    private float minSpeed = 0.025f;
+    private float maxSpeed = 1.0f;
     private List<TimedSpeedModifier> timedSpeedModifiers;
     private Timer stunTimer = new Timer(1);
 
     protected int health;
-    protected int maxHealth = 100;
+    protected int maxHealth;
 
     protected Timer dashTime = new Timer(.5f);
     private float dashSpeed = 0;
@@ -48,17 +48,14 @@ public abstract class PlayerController : MonoBehaviour {
 
     // Use this for initialization
     protected void Start () {
-        baseSpeed = 0.1f;
         speed = baseSpeed;
-        minSpeed = 0.025f;
-        maxSpeed = 1f;
-        speedModifier = 0;
+        
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
         speedModifier = 0;
         timedSpeedModifiers = new List<TimedSpeedModifier>();
 
-        health = 100;
+        health = maxHealth;
 
         text = GetComponentInChildren<Text>();
 
@@ -132,7 +129,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         if (!primaryCooldown.done) primaryCooldown.Update();
         if (!secondaryCooldown.done) secondaryCooldown.Update();
-        text.text = "Player " + playerNumber + " Health: " + health +"\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
+        text.text = "Player " + playerNumber + " Health: " + health + "/" + maxHealth + "\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
 	}
 
     private void MoveWithKeys()

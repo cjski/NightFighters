@@ -10,6 +10,8 @@ public class WerewolfController : MonsterController
     // Start is called before the first frame update
     new protected void Start()
     {
+        baseSpeed = 0.1f;
+        maxHealth = 100;
         base.Start();
     }
 

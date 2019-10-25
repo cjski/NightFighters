@@ -119,7 +119,8 @@ public class GamepadController : Controller
 
     public Vector2 GetAxis()
     {
-        return new Vector2(Input.GetAxis("CXAxis_" + joystickString), Input.GetAxis("CYAxis_" + joystickString));
+        // Return - on the y axis because it is inverted normally
+        return new Vector2(Input.GetAxis("CXAxis_" + joystickString), -Input.GetAxis("CYAxis_" + joystickString));
     }
 
     // Updates the wait timer, prevents the selection from calling 30 times in one frame and looping past the selection way too fast

@@ -15,10 +15,9 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected int playerNumber;
 
-    private KeyCode lKey, rKey, uKey, dKey, aKey, bKey;
+    private Controller controller;
     protected float baseSpeed;
     protected float speed;
-    public bool useMouseMovement = true;
     protected Vector2 direction;
     protected MovementType movementType;
     protected float speedModifier;
@@ -64,26 +63,9 @@ public abstract class PlayerController : MonoBehaviour {
         ignoreLightLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern");
     }
 
-    public void InitializePlayer(Controller controller, int newPlayerNumber)
+    public void InitializePlayer(Controller newPlayerController, int newPlayerNumber)
     {
-        if(controller.Type() == Controller.ControllerType.Mouse)
-        {
-            useMouseMovement = true;
-            aKey = controller.aKey;
-            bKey = controller.bKey;
-        }
-        else if(controller.Type() == Controller.ControllerType.Keyboard)
-        {
-            KeyboardController keyboardController = (KeyboardController)controller;
-            useMouseMovement = false;
-            aKey = keyboardController.aKey;
-            bKey = keyboardController.bKey;
-            lKey = keyboardController.lKey;
-            rKey = keyboardController.rKey;
-            uKey = keyboardController.uKey;
-            dKey = keyboardController.dKey;
-        }
-
+        controller = newPlayerController;
         playerNumber = newPlayerNumber;
     }
 
@@ -105,8 +87,12 @@ public abstract class PlayerController : MonoBehaviour {
                     if(anim) anim.Play("Idle");
                 }
             }
-            else if (useMouseMovement) MoveWithMouse();
-            else MoveWithKeys();
+            else if (controller.Type() == Controller.ControllerType.Mouse)
+                MoveWithMouse();
+            else if (controller.Type() == Controller.ControllerType.Keyboard)
+                MoveWithKeys();
+            else if (controller.Type() == Controller.ControllerType.Gamepad)
+                MoveWithGamepad();
         }
         else if (movementType == MovementType.Dashing) Dash();
         else if (movementType == MovementType.Stun)
@@ -123,8 +109,8 @@ public abstract class PlayerController : MonoBehaviour {
         {
             if(movementType != MovementType.Stun)
             {
-                if (Input.GetKeyDown(aKey) && primaryCooldown.done) OnPrimaryPressed();
-                if (Input.GetKeyDown(bKey) && secondaryCooldown.done) OnSecondaryPressed();
+                if (controller.GetAPressed() && primaryCooldown.done) OnPrimaryPressed();
+                if (controller.GetBPressed() && secondaryCooldown.done) OnSecondaryPressed();
             }
         }
         if (!primaryCooldown.done) primaryCooldown.Update();
@@ -135,10 +121,11 @@ public abstract class PlayerController : MonoBehaviour {
     private void MoveWithKeys()
     {
         int moveX = 0, moveY = 0;
-        if (Input.GetKey(lKey)) moveX -= 1;
-        if (Input.GetKey(rKey)) moveX += 1;
-        if (Input.GetKey(uKey)) moveY += 1;
-        if (Input.GetKey(dKey)) moveY -= 1;
+        KeyboardController kc = (KeyboardController)controller;
+        if (Input.GetKey(kc.lKey)) moveX -= 1;
+        if (Input.GetKey(kc.rKey)) moveX += 1;
+        if (Input.GetKey(kc.uKey)) moveY += 1;
+        if (Input.GetKey(kc.dKey)) moveY -= 1;
 
         Vector2 move = new Vector2(moveX, moveY);
 
@@ -162,9 +149,22 @@ public abstract class PlayerController : MonoBehaviour {
         float distToMoveSqr = move.sqrMagnitude;
 
         direction = move.normalized;
-        if(distToMoveSqr >= 4 *speed * speed)
+        if(distToMoveSqr >= 4 * speed * speed)
         {
             Move(direction, speed);
+        }
+        else
+        {
+            if (anim) anim.Play("Idle");
+        }
+    }
+
+    private void MoveWithGamepad()
+    {
+        Vector2 move = ((GamepadController)controller).GetAxis();
+        if(move.sqrMagnitude > .25f)
+        {
+            Move(move.normalized, speed);
         }
         else
         {

@@ -162,9 +162,10 @@ public abstract class PlayerController : MonoBehaviour {
     private void MoveWithGamepad()
     {
         Vector2 move = ((GamepadController)controller).GetAxis();
+        direction = move.normalized;
         if(move.sqrMagnitude > .25f)
         {
-            Move(move.normalized, speed);
+            Move(direction, speed);
         }
         else
         {

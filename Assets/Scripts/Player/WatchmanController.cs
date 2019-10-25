@@ -19,7 +19,7 @@ public class WatchmanController : HumanController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.08f;
+        baseSpeed = 0.085f;
         maxHealth = 100;
 
         lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LanternPrefab.prefab", typeof(GameObject));

@@ -6,6 +6,8 @@ public class WerewolfController : MonsterController
 {
     private float knockbackCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
     private float knockbackRange = 2;
+    private float knockbackDuration = 1.0f;
+    private float knockbackSpeed = 0.15f;
 
     // Start is called before the first frame update
     new protected void Start()
@@ -36,7 +38,7 @@ public class WerewolfController : MonsterController
                     lanterns.Add(players[i].GetComponent<WatchmanController>().lantern);
                 }
                 Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
-                if(InRange(toPlayer, knockbackRange, knockbackCosAngle)) players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, 1f, 0.15f);
+                if(InRange(toPlayer, knockbackRange, knockbackCosAngle)) players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
             }
         }
 
@@ -61,7 +63,7 @@ public class WerewolfController : MonsterController
                 toLantern.Normalize();
                 if (Vector2.Dot(toLantern, direction) > knockbackCosAngle)
                 {
-                    lanterns[i].GetComponent<LanternController>().direction = toLantern;
+                    lanterns[i].GetComponent<LanternController>().Throw(toLantern, knockbackSpeed);
                 }
             }
         }

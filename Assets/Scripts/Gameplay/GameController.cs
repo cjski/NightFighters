@@ -545,7 +545,7 @@ public class GameController : MonoBehaviour
                         }
                     }
                 }
-                else // The A and B press checks for gamepad and keyboard are handled the same
+                else // The A press checks for gamepad and keyboard are handled the same
                 {
                     bool changedClass = false;
                     Controller playerController = currentPlayer.controller;
@@ -619,19 +619,19 @@ public class GameController : MonoBehaviour
                             allowedHumanPlayerIndex = playerIndex;
                         }
                     }
+                }
+                // The B press is handled the same for every controller type
+                if (currentPlayer.controller.GetBPressed() && !isNewHumanSelection)
+                {
+                    currentPlayer.isRealPlayer = false;
+                    currentPlayer.isReady = true;
 
-                    if (currentPlayer.controller.GetBPressed() && !isNewHumanSelection)
+                    Destroy(characterInfoPanels[playerIndex]);
+
+                    // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
+                    if (playerIndex == allowedHumanPlayerIndex)
                     {
-                        currentPlayer.isRealPlayer = false;
-                        currentPlayer.isReady = true;
-
-                        Destroy(characterInfoPanels[playerIndex]);
-
-                        // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
-                        if (playerIndex == allowedHumanPlayerIndex)
-                        {
-                            ResolveAllowedHumanIndex();
-                        }
+                        ResolveAllowedHumanIndex();
                     }
                 }
             }

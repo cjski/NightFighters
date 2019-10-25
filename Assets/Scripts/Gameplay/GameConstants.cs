@@ -40,4 +40,7 @@ public static class GameConstants
     };
 
     public static KeyCode DEFAULT_GAME_START_KEY = KeyCode.Return;
+
+    public static float GAMEPAD_SELECTION_WAIT_TIME = 0.25f;
+    public static float GAMEPAD_SELECTION_SENSITIVITY = 0.25f;
 }

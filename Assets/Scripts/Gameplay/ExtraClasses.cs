@@ -9,11 +9,11 @@ public class Timer
     private float presetTime;
     public bool done { get; private set; }
 
-    public Timer(float duration)
+    public Timer(float duration, bool isDone=false)
     {
         time = 0;
         presetTime = duration;
-        done = false;
+        done = isDone;
     }
 
     public void Reset()

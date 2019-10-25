@@ -21,6 +21,10 @@ public static class ControlSchemeHandler
         new ControlSchemeInformation(new MouseController()),
         new ControlSchemeInformation(new KeyboardController(KeyCode.Z, KeyCode.X, KeyCode.LeftArrow, KeyCode.RightArrow, KeyCode.UpArrow, KeyCode.DownArrow)),
         new ControlSchemeInformation(new KeyboardController(KeyCode.K, KeyCode.L, KeyCode.A, KeyCode.D, KeyCode.W, KeyCode.S)),
-        new ControlSchemeInformation(new KeyboardController(KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad1, KeyCode.Keypad3, KeyCode.Keypad5, KeyCode.Keypad2))
+        new ControlSchemeInformation(new KeyboardController(KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad1, KeyCode.Keypad3, KeyCode.Keypad5, KeyCode.Keypad2)),
+        new ControlSchemeInformation(new GamepadController(1)),
+        new ControlSchemeInformation(new GamepadController(2)),
+        new ControlSchemeInformation(new GamepadController(3)),
+        new ControlSchemeInformation(new GamepadController(4))
     };
 }

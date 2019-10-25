@@ -42,6 +42,8 @@ public abstract class Controller
     }
 
     public abstract ControllerType Type();
+    public abstract bool GetAPressed();
+    public abstract bool GetBPressed();
 }
 
 public class KeyboardController : Controller
@@ -56,6 +58,16 @@ public class KeyboardController : Controller
         dKey = d;
     }
 
+    public override bool GetAPressed()
+    {
+        return Input.GetKeyDown(aKey);
+    }
+
+    public override bool GetBPressed()
+    {
+        return Input.GetKeyDown(bKey);
+    }
+
     public override ControllerType Type()
     {
         return ControllerType.Keyboard;
@@ -67,9 +79,67 @@ public class MouseController : Controller
     public MouseController() : base(KeyCode.Mouse0, KeyCode.Mouse1)
     { }
 
+    public override bool GetAPressed()
+    {
+        return Input.GetKeyDown(aKey);
+    }
+
+    public override bool GetBPressed()
+    {
+        return Input.GetKeyDown(bKey);
+    }
+
     public override ControllerType Type()
     {
         return ControllerType.Mouse;
+    }
+}
+
+public class GamepadController : Controller
+{
+    public int joystick { get; private set; }
+    public string joystickString { get; private set; }
+    private Timer selectionWaitTimer;
+    public GamepadController(int joystickNum) : base(KeyCode.None, KeyCode.None)
+    {
+        joystick = joystickNum;
+        joystickString = joystick.ToString();
+        selectionWaitTimer = new Timer(GameConstants.GAMEPAD_SELECTION_WAIT_TIME, true);
+    }
+
+    public override bool GetAPressed()
+    {
+        return Input.GetButtonDown("CA_" + joystickString);
+    }
+
+    public override bool GetBPressed()
+    {
+        return Input.GetButtonDown("CB_" + joystickString);
+    }
+
+    public Vector2 GetAxis()
+    {
+        return new Vector2(Input.GetAxis("CXAxis_" + joystickString), Input.GetAxis("CYAxis_" + joystickString));
+    }
+
+    // Updates the wait timer, prevents the selection from calling 30 times in one frame and looping past the selection way too fast
+    public Vector2 GetAxisForSelection()
+    {
+        if(selectionWaitTimer.done)
+        {
+            selectionWaitTimer.Reset();
+            return GetAxis();
+        }
+        else
+        {
+            selectionWaitTimer.Update();
+            return Vector2.zero;
+        }
+    }
+
+    public override ControllerType Type()
+    {
+        return ControllerType.Gamepad;
     }
 }
 
@@ -81,7 +151,6 @@ public class PlayerInformation
     public bool isReady;
     public bool isRealPlayer = false;
     public int classSelectionIndex = 0;
-    public enum CharacterState { HumanAlive, HumanDead, MonsterAlive, MonsterDead }
 
     public PlayerInformation(Controller newController)
     {
@@ -260,7 +329,7 @@ public class GameController : MonoBehaviour
         // Back out to the menu
         if (!anyRealPlayers)
         {
-            if (Input.GetKeyDown(playerInfo[0].controller.bKey))
+            if (playerInfo[0].controller.GetBPressed())
             {
                 Destroy(startButton);
                 StartEnterGameMenu();
@@ -279,7 +348,7 @@ public class GameController : MonoBehaviour
         int i = 0;
         while (i < ControlSchemeHandler.controlSchemes.Length && nextPlayerToAddIndex < GameConstants.NUM_PLAYERS)
         {
-            if (!ControlSchemeHandler.controlSchemes[i].isInUse && Input.GetKeyDown(ControlSchemeHandler.controlSchemes[i].controller.aKey))
+            if (!ControlSchemeHandler.controlSchemes[i].isInUse && ControlSchemeHandler.controlSchemes[i].controller.GetAPressed())
             {
                 playerInfo[nextPlayerToAddIndex] = new PlayerInformation(ControlSchemeHandler.controlSchemes[i].controller);
                 ControlSchemeHandler.controlSchemes[i].isInUse = true;
@@ -352,8 +421,8 @@ public class GameController : MonoBehaviour
         if (allReady)
         {
             startButton.SetActive(true);
-            KeyCode activateStartKey = KeyCode.None;
 
+            Controller c;
             // Find the first person in the list who is a real player - they will control the start button
             int firstRealPlayerIndex = 0;
             while (firstRealPlayerIndex < GameConstants.NUM_PLAYERS && !playerInfo[firstRealPlayerIndex].isRealPlayer)
@@ -363,17 +432,17 @@ public class GameController : MonoBehaviour
             // If the players are all AI then use the default key to start game otherwise use the first available players key
             if (firstRealPlayerIndex == GameConstants.NUM_PLAYERS)
             {
-                activateStartKey = GameConstants.DEFAULT_GAME_START_KEY;
+                c = new KeyboardController(GameConstants.DEFAULT_GAME_START_KEY, KeyCode.None, KeyCode.None, KeyCode.None, KeyCode.None, KeyCode.None);
             }
             else
             {
-                activateStartKey = playerInfo[firstRealPlayerIndex].controller.aKey;
+                c = playerInfo[firstRealPlayerIndex].controller;
             }
 
             bool startButtonActivated = false;
-            if (activateStartKey == KeyCode.Mouse0)
+            if (c.Type() == Controller.ControllerType.Mouse)
             {
-                if (Input.GetKeyDown(KeyCode.Mouse0))
+                if (c.GetAPressed())
                 {
                     Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     mPos = new Vector3(mPos.x, mPos.y, startButton.transform.position.z);
@@ -386,7 +455,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(activateStartKey))
+                if (c.GetAPressed())
                 {
                     startButtonActivated = true;
                 }
@@ -427,7 +496,7 @@ public class GameController : MonoBehaviour
             {
                 if (currentPlayer.controller.Type() == Controller.ControllerType.Mouse)
                 {
-                    if (Input.GetKeyDown(KeyCode.Mouse0))
+                    if (currentPlayer.controller.GetAPressed())
                     {
                         BoxCollider2D readyBox = characterInfoPanels[playerIndex].transform.Find("Ready").GetComponent<BoxCollider2D>();
                         Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -475,29 +544,57 @@ public class GameController : MonoBehaviour
                         }
                     }
                 }
-                else if(currentPlayer.controller.Type() == Controller.ControllerType.Keyboard)
+                else // The A and B press checks for gamepad and keyboard are handled the same
                 {
                     bool changedClass = false;
-                    KeyboardController playerController = (KeyboardController)currentPlayer.controller;
-                    if (Input.GetKeyDown(playerController.lKey))
+                    Controller playerController = currentPlayer.controller;
+                    if (currentPlayer.controller.Type() == Controller.ControllerType.Keyboard)
                     {
-                        currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + classes.Count - 1) % classes.Count;
-                        changedClass = true;
-                    }
-                    else if (Input.GetKeyDown(playerController.rKey))
-                    {
-                        currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
-                        changedClass = true;
-                    }
-                    else if (Input.GetKeyDown(playerController.uKey))
-                    {
+                        KeyboardController keyboardController = (KeyboardController)currentPlayer.controller;
+                        if (Input.GetKeyDown(keyboardController.lKey))
+                        {
+                            currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + classes.Count - 1) % classes.Count;
+                            changedClass = true;
+                        }
+                        else if (Input.GetKeyDown(keyboardController.rKey))
+                        {
+                            currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
+                            changedClass = true;
+                        }
+                        else if (Input.GetKeyDown(keyboardController.uKey))
+                        {
 
-                    }
-                    else if (Input.GetKeyDown(playerController.dKey))
-                    {
+                        }
+                        else if (Input.GetKeyDown(keyboardController.dKey))
+                        {
 
+                        }
                     }
-                    else if (Input.GetKeyDown(playerController.aKey))
+                    else if (currentPlayer.controller.Type() == Controller.ControllerType.Gamepad)
+                    {
+                        GamepadController gamepadController = (GamepadController)currentPlayer.controller;
+                        Vector2 axis = gamepadController.GetAxisForSelection();
+                        if (axis.x < -GameConstants.GAMEPAD_SELECTION_SENSITIVITY)
+                        {
+                            currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + classes.Count - 1) % classes.Count;
+                            changedClass = true;
+                        }
+                        else if (axis.x > GameConstants.GAMEPAD_SELECTION_SENSITIVITY)
+                        {
+                            currentPlayer.classSelectionIndex = (currentPlayer.classSelectionIndex + 1) % classes.Count;
+                            changedClass = true;
+                        }
+                        else if (axis.y > GameConstants.GAMEPAD_SELECTION_SENSITIVITY)
+                        {
+
+                        }
+                        else if (axis.y < -GameConstants.GAMEPAD_SELECTION_SENSITIVITY)
+                        {
+
+                        }
+                    }
+                    
+                    if (playerController.GetAPressed())
                     {
                         if (
                             (!isNewHumanSelection && (!currentPlayer.classInformation.isHumanClass || playerIndex == allowedHumanPlayerIndex)) ||
@@ -521,29 +618,25 @@ public class GameController : MonoBehaviour
                             allowedHumanPlayerIndex = playerIndex;
                         }
                     }
-                }
-                else if(currentPlayer.controller.Type() == Controller.ControllerType.Gamepad)
-                {
 
-                }
-
-                if (Input.GetKeyDown(currentPlayer.controller.bKey) && !isNewHumanSelection)
-                {
-                    currentPlayer.isRealPlayer = false;
-                    currentPlayer.isReady = true;
-
-                    Destroy(characterInfoPanels[playerIndex]);
-
-                    // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
-                    if (playerIndex == allowedHumanPlayerIndex)
+                    if (currentPlayer.controller.GetBPressed() && !isNewHumanSelection)
                     {
-                        ResolveAllowedHumanIndex();
+                        currentPlayer.isRealPlayer = false;
+                        currentPlayer.isReady = true;
+
+                        Destroy(characterInfoPanels[playerIndex]);
+
+                        // If the allowed human is removed then search through the rest of the active players to give them the chance to be the human
+                        if (playerIndex == allowedHumanPlayerIndex)
+                        {
+                            ResolveAllowedHumanIndex();
+                        }
                     }
                 }
             }
             else
             {
-                if (Input.GetKeyDown(currentPlayer.controller.bKey))
+                if (currentPlayer.controller.GetBPressed())
                 {
                     currentPlayer.isReady = false;
                 }
@@ -551,7 +644,7 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            if (Input.GetKeyDown(currentPlayer.controller.aKey))
+            if (currentPlayer.controller.GetAPressed())
             {
                 currentPlayer.isRealPlayer = true;
                 currentPlayer.isReady = false;
@@ -594,12 +687,11 @@ public class GameController : MonoBehaviour
         if (newHumanPlayer.isReady)
         {
             startButton.SetActive(true);
-            KeyCode activateStartKey = newHumanPlayer.controller.aKey;
 
             bool startButtonActivated = false;
-            if (activateStartKey == KeyCode.Mouse0)
+            if (newHumanPlayer.controller.Type() == Controller.ControllerType.Mouse)
             {
-                if (Input.GetKeyDown(KeyCode.Mouse0))
+                if (newHumanPlayer.controller.GetAPressed())
                 {
                     Vector3 mPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     mPos = new Vector3(mPos.x, mPos.y, startButton.transform.position.z);
@@ -612,7 +704,7 @@ public class GameController : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(activateStartKey))
+                if (newHumanPlayer.controller.GetAPressed())
                 {
                     startButtonActivated = true;
                 }

@@ -21,11 +21,12 @@ Top down arcade game where humans try and hunt down and convert the monsters att
 - ### Random Map Generation
   - Ensures every tile can be connected to every other tile
   - Quickly calculates distances to every other tile for fast in-game pathfinding
+- ### Local Multiplayer
+  - Support for 1-4 players on any combination of keyboard, controller, or mouse
   
 ## Planned Features
 - AI able to complete secondary objectives (Turning off lights, using abilities)
 - Boss Monster fights
-- Gamepad/Controller support
 
 ## Tools
 Unity is the game engine being using to develop the code, which is all written in C#. The artwork is being done with Piskel.

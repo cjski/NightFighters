@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class WerewolfBossController : BossController
 {
+    private float knockbackCosAngle = Mathf.Cos(3.14159265f * 90 / 180);
+    private float knockbackRange = 2;
+    private float knockbackDuration = 1.0f;
+    private float knockbackSpeed = 0.15f;
+
     // Start is called before the first frame update
     new protected void Start()
     {
@@ -20,7 +25,22 @@ public class WerewolfBossController : BossController
 
     protected override void OnPrimaryPressed()
     {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        for (int i = 0; i < players.Length; ++i)
+        {
+            if (!(players[i].GetComponent<MonsterController>()))
+            {
+                Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
+                if (InRange(toPlayer, knockbackRange, knockbackCosAngle))
+                {
+                    PlayerController pc = players[i].GetComponent<PlayerController>();
+                    pc.ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
+                    pc.Damage(45);
+                }
+            }
+        }
 
+        primaryCooldown.Reset();
     }
 
     protected override void OnSecondaryPressed()

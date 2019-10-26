@@ -38,7 +38,8 @@ public class WerewolfController : MonsterController
                     lanterns.Add(players[i].GetComponent<WatchmanController>().lantern);
                 }
                 Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
-                if(InRange(toPlayer, knockbackRange, knockbackCosAngle)) players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
+                if(InRange(toPlayer, knockbackRange, knockbackCosAngle))
+                    players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
             }
         }
 

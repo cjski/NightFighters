@@ -12,8 +12,9 @@ public class ClassInformation
     public string primaryDescription { get; private set; }
     public string secondaryDescription { get; private set; }
     public bool isHumanClass { get; private set; }
+    public bool isBossClass { get; private set; }
 
-    public ClassInformation(GameObject classPrefab, string className, string classPassiveDescription, string classPrimaryDescription, string classSecondaryDescription, bool classIsHumanClass)
+    public ClassInformation(GameObject classPrefab, string className, string classPassiveDescription, string classPrimaryDescription, string classSecondaryDescription, bool classIsHumanClass, bool classIsBossClass)
     {
         prefab = classPrefab;
         name = className;
@@ -21,6 +22,7 @@ public class ClassInformation
         primaryDescription = classPrimaryDescription;
         secondaryDescription = classSecondaryDescription;
         isHumanClass = classIsHumanClass;
+        isBossClass = classIsBossClass;
     }
 }
 
@@ -178,8 +180,8 @@ public class GameController : MonoBehaviour
     List<GameObject> AIControllerPrefabs;
     GameObject[] AIControllers = new GameObject[GameConstants.NUM_PLAYERS];
 
-    ClassInformation hunter, watchman, werewolf, vampire;
     List<ClassInformation> classes;
+    List<ClassInformation> bossClasses;
     int allowedHumanPlayerIndex = 0;
 
     // Index of character now choosing their human class after being converted from a monster
@@ -193,15 +195,24 @@ public class GameController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        hunter = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterPrefab.prefab", typeof(GameObject)),
-            "Hunter", "None", "Arrow", "Dash", true);
-        watchman = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanPrefab.prefab", typeof(GameObject)),
-            "Watchman", "Lantern", "Stun", "Lantern Toss", true);
-        werewolf = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfPrefab.prefab", typeof(GameObject)),
-            "Werewolf", "Break Lights", "Knockback", "Dash", false);
-        vampire = new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject)),
-            "Vampire", "None", "Bite(Heal)", "Slow Projectile", false);
-        classes = new List<ClassInformation> { hunter, watchman, werewolf, vampire };
+        classes = new List<ClassInformation> {
+            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterPrefab.prefab", typeof(GameObject)),
+            "Hunter", "None", "Arrow", "Dash", true, false),
+            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanPrefab.prefab", typeof(GameObject)),
+            "Watchman", "Lantern", "Stun", "Lantern Toss", true, false),
+            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfPrefab.prefab", typeof(GameObject)),
+            "Werewolf", "Break Lights", "Knockback", "Dash", false, false),
+            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject)),
+            "Vampire", "None", "Bite(Heal)", "Slow Projectile", false, false)
+        };
+
+        bossClasses = new List<ClassInformation>
+        {
+           new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfBossPrefab.prefab", typeof(GameObject)),
+           "", "", "", "", false, true),
+           new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfBossPrefab.prefab", typeof(GameObject)),
+           "", "", "", "", false, true)
+        };
 
         stageMap = new Map(GameConstants.MAP_COLUMNS, GameConstants.MAP_ROWS, GameConstants.MAP_TILE_SIZE, GameConstants.MAP_OFFSET);
 
@@ -283,7 +294,8 @@ public class GameController : MonoBehaviour
             Regenerate();
         }
 
-        bool needToRestart = true;
+        int numMonstersLeft = 0;
+        int lastMonsterIndex = 0;
         int deadMonsterIndex = -1;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
@@ -292,19 +304,25 @@ public class GameController : MonoBehaviour
                 deadMonsterIndex = i;
             }
 
-            // If we saw that this monster has died and the rest are human then we should be restarting
-            if(!(playerInfo[i].classInformation.isHumanClass || deadMonsterIndex == i))
+            if(!playerInfo[i].classInformation.isHumanClass && deadMonsterIndex != i)
             {
-                needToRestart = false;
+                lastMonsterIndex = i;
+                ++numMonstersLeft;
             }
         }
 
-        if (needToRestart)
+        // Restart when there are no monsters left
+        if (numMonstersLeft == 0)
         {
             StartEnterGameMenu();
         }
         else if (deadMonsterIndex != -1)
         {
+            if(numMonstersLeft == 1)
+            {
+                // Sets the monsters boss form to the corresponding monster they already are
+                playerInfo[lastMonsterIndex].classInformation = bossClasses[playerInfo[lastMonsterIndex].classSelectionIndex - GameConstants.NUM_HUMAN_CLASSES];
+            }
             Destroy(playerInfo[deadMonsterIndex].character);
             newHumanIndex = deadMonsterIndex;
             StartNewHumanCharacterSelection();

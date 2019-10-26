@@ -82,4 +82,9 @@ public class WatchmanController : HumanController
             secondaryCooldown.Reset();
         }
     }
+
+    private void OnDestroy()
+    {
+        Destroy(lantern);
+    }
 }

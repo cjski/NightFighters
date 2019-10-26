@@ -35,7 +35,7 @@ public class WerewolfBossController : BossController
                 {
                     PlayerController pc = players[i].GetComponent<PlayerController>();
                     pc.ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
-                    pc.Damage(45);
+                    pc.Damage(99);
                 }
             }
         }

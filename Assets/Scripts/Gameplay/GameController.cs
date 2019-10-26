@@ -170,7 +170,7 @@ public class PlayerInformation
 
 public class GameController : MonoBehaviour
 {
-    enum State { game, characterSelect, newHumanSelect, enterGameMenu }
+    enum State { game, bossFight, characterSelect, newHumanSelect, enterGameMenu }
 
     State state;
     PlayerInformation[] playerInfo = new PlayerInformation[GameConstants.NUM_PLAYERS];
@@ -186,6 +186,9 @@ public class GameController : MonoBehaviour
 
     // Index of character now choosing their human class after being converted from a monster
     int newHumanIndex = 0;
+    int newBossIndex = 0;
+    int numHumans = 1;
+    int numMonsters = 3;
 
     GameObject enterGameMenuPanel;
     GameObject startButton;
@@ -236,6 +239,10 @@ public class GameController : MonoBehaviour
         {
             UpdateGame();
         }
+        else if(state == State.bossFight)
+        {
+            UpdateBossFight();
+        }
         else if (state == State.characterSelect)
         {
             UpdateCharacterSelect();
@@ -255,7 +262,6 @@ public class GameController : MonoBehaviour
         RegisterNewControllersAdded();
         if(nextPlayerToAddIndex != 0)
         {
-            playerInfo[0].isRealPlayer = true; //TO-DO: REMOVE THIS LINE, TO BE IMPLEMENTED IN THE NEXT MENU
             Destroy(enterGameMenuPanel);
             StartCharacterSelect();
         }
@@ -266,6 +272,8 @@ public class GameController : MonoBehaviour
         enterGameMenuPanel = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/EnterGamePanelPrefab.prefab", typeof(GameObject)), GameConstants.ENTER_GAME_MENU_PANEL_POSITION, Quaternion.identity);
         state = State.enterGameMenu;
         nextPlayerToAddIndex = 0;
+        numHumans = 1;
+        numMonsters = 3;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             if (playerInfo[i] != null)
@@ -293,39 +301,74 @@ public class GameController : MonoBehaviour
         {
             Regenerate();
         }
-
-        int numMonstersLeft = 0;
+        
         int lastMonsterIndex = 0;
-        int deadMonsterIndex = -1;
+        newHumanIndex = -1;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            if (!playerInfo[i].character.GetComponent<PlayerController>().isAlive && deadMonsterIndex == -1)
+            if (!playerInfo[i].character.GetComponent<PlayerController>().isAlive)
             {
-                deadMonsterIndex = i;
+                newHumanIndex = i;
             }
 
-            if(!playerInfo[i].classInformation.isHumanClass && deadMonsterIndex != i)
+            if(!playerInfo[i].classInformation.isHumanClass && newHumanIndex != i)
             {
                 lastMonsterIndex = i;
-                ++numMonstersLeft;
             }
         }
 
-        // Restart when there are no monsters left
-        if (numMonstersLeft == 0)
+        if (newHumanIndex != -1)
+        {
+            --numMonsters;
+            ++numHumans;
+            if(numMonsters == 1)
+            {
+                newBossIndex = lastMonsterIndex;
+            }
+            Destroy(playerInfo[newHumanIndex].character);
+            StartNewHumanCharacterSelection();
+        }
+    }
+
+    private void StartBossFight()
+    {
+        playerInfo[newBossIndex].classInformation = bossClasses[playerInfo[newBossIndex].classSelectionIndex - GameConstants.NUM_HUMAN_CLASSES];
+        state = State.bossFight;
+        Regenerate();
+    }
+
+    private void UpdateBossFight()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RegeneratePlayers();
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            Regenerate();
+        }
+        
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            if (playerInfo[i].character != null && !playerInfo[i].character.GetComponent<PlayerController>().isAlive)
+            {
+                if (playerInfo[i].classInformation.isHumanClass)
+                {
+                    --numHumans;
+                    Destroy(playerInfo[i].character);
+                    playerInfo[i].character = null;
+                }
+                else
+                {
+                    --numMonsters;
+                }
+            }
+        }
+
+        if (numHumans == 0 || numMonsters == 0)
         {
             StartEnterGameMenu();
-        }
-        else if (deadMonsterIndex != -1)
-        {
-            if(numMonstersLeft == 1)
-            {
-                // Sets the monsters boss form to the corresponding monster they already are
-                playerInfo[lastMonsterIndex].classInformation = bossClasses[playerInfo[lastMonsterIndex].classSelectionIndex - GameConstants.NUM_HUMAN_CLASSES];
-            }
-            Destroy(playerInfo[deadMonsterIndex].character);
-            newHumanIndex = deadMonsterIndex;
-            StartNewHumanCharacterSelection();
         }
     }
 
@@ -384,6 +427,7 @@ public class GameController : MonoBehaviour
         startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
         startButton.SetActive(false);
         allowedHumanPlayerIndex = 0;
+        playerInfo[0].isRealPlayer = true;
 
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
@@ -695,8 +739,15 @@ public class GameController : MonoBehaviour
         {
             playerInfo[newHumanIndex].classSelectionIndex = GetRandomHumanClassIndex();
             playerInfo[newHumanIndex].classInformation = classes[playerInfo[newHumanIndex].classSelectionIndex];
-            state = State.game;
-            Regenerate();
+            if (numMonsters == 1)
+            {
+                StartBossFight();
+            }
+            else
+            {
+                state = State.game;
+                Regenerate();
+            }
         }
     }
 
@@ -733,10 +784,17 @@ public class GameController : MonoBehaviour
             {
                 Destroy(characterInfoPanels[newHumanIndex]);
                 Destroy(startButton);
-
-                Regenerate();
                 ShowPlayers();
-                state = State.game;
+
+                if (numMonsters == 1)
+                {
+                    StartBossFight();
+                }
+                else
+                {
+                    state = State.game;
+                    Regenerate();
+                }
             }
         }
         else

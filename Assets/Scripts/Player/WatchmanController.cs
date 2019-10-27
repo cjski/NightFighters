@@ -6,17 +6,18 @@ using UnityEditor;
 public class WatchmanController : HumanController
 {
     static GameObject lightPrefab;
-    private float hitRange = 2;
-    private float hitCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
-    private float stunTime = 1.0f;
-    private int damage = 20;
-    private float lanternInitialSpeed = 0.325f;
-    private float lanternDistanceToPickUpSqr = 0.3f;
+    public float hitRange { get; private set; } = 2;
+    public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
+    public float stunTime { get; private set; } = 1.0f;
+    public int damage { get; private set; } = 20;
+    public float lanternInitialSpeed { get; private set; } = 0.325f;
+    public float lanternDistanceToPickUpSqr { get; private set; } = 0.3f;
+    public Timer catchTimer { get; private set; } = new Timer(.5f);
+    public Timer returnTimer { get; private set; } = new Timer(5);
 
     public GameObject lantern;
     private GameObject lanternPointer;
     public bool holdingLantern { get; private set; }
-    private Timer catchTimer = new Timer(.5f);
 
     // Start is called before the first frame update
     new protected void Start()
@@ -39,7 +40,18 @@ public class WatchmanController : HumanController
     new protected void Update()
     {
         base.Update();
-        if(holdingLantern) lantern.transform.position = transform.position;
+        if (holdingLantern)
+        {
+            lantern.transform.position = transform.position;
+            if(!returnTimer.done)
+            {
+                returnTimer.Update();
+                if(returnTimer.done)
+                {
+                    lantern.SetActive(true);
+                }
+            }
+        }
         else
         {
             Vector2 toLantern = (lantern.transform.position - transform.position);
@@ -84,6 +96,12 @@ public class WatchmanController : HumanController
             lantern.GetComponent<LanternController>().Throw(direction, lanternInitialSpeed);
             lanternPointer.SetActive(true);
             secondaryCooldown.Reset();
+        }
+        else
+        {
+            lantern.SetActive(false);
+            holdingLantern = true;
+            returnTimer.Reset();
         }
     }
 

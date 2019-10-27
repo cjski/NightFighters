@@ -7,14 +7,14 @@ public class VampireController : MonsterController
 {
     private static GameObject slowProjectilePrefab;
 
-    private float biteCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
-    private float biteRange = 2;
-    private float biteStunDuration = 1;
-    private int biteHealAmount = 5;
-    private float slowProjectileSpeed = 0.12f;
-    private float slowProjectileDuration = 2.5f;
-    private float slowAmount = 0.05f;
-    private float slowDuration = 10;
+    public float biteCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
+    public float biteRange { get; private set; } = 2;
+    public float biteStunDuration { get; private set; } = 1;
+    public int biteHealAmount { get; private set; } = 5;
+    public float slowProjectileSpeed { get; private set; } = 0.12f;
+    public float slowProjectileDuration { get; private set; } = 2.5f;
+    public float slowAmount { get; private set; } = 0.05f;
+    public float slowDuration { get; private set; } = 10;
 
     // Start is called before the first frame update
     new protected void Start()

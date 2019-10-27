@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class WerewolfController : MonsterController
 {
-    private float knockbackCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
-    private float knockbackRange = 2.5f;
-    private float knockbackDuration = 1.0f;
-    private float knockbackSpeed = 0.15f;
-    private float dashDuration = 0.5f;
-    private float dashSpeedModifier = 1.5f;
+    public float knockbackCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
+    public float knockbackRange { get; private set; } = 2.5f;
+    public float knockbackDuration { get; private set; } = 1.0f;
+    public float knockbackSpeed { get; private set; } = 0.15f;
+    public float dashDuration { get; private set; } = 0.5f;
+    public float dashSpeedModifier { get; private set; } = 1.5f;
 
     // Start is called before the first frame update
     new protected void Start()

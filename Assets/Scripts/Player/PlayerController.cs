@@ -31,6 +31,9 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected Timer dashTime = new Timer(.5f);
     private float dashSpeed = 0;
+    private bool hitWall = false;
+    private bool wallHitStuns = false;
+    private float wallHitStunDuration = 0;
 
     public Timer primaryCooldown { get; protected set; } = new Timer(1);
     public Timer secondaryCooldown { get; protected set; } = new Timer(1);
@@ -178,6 +181,8 @@ public abstract class PlayerController : MonoBehaviour {
 
     private void Move(Vector2 direction, float moveSpeed)
     {
+        hitWall = false;
+
         Vector2 pos = transform.position;
         Vector2 size = GetSize();
         Vector2 halfSizeY = new Vector2(0, size.y * 0.5f);
@@ -202,6 +207,10 @@ public abstract class PlayerController : MonoBehaviour {
             if(hit.collider != null)
             {
                 moveInX = false;
+                if(hit.collider.gameObject.tag == "Wall")
+                {
+                    hitWall = true;
+                }
                 break;
             }
         }
@@ -229,6 +238,10 @@ public abstract class PlayerController : MonoBehaviour {
             if (hit.collider != null)
             {
                 moveInY = false;
+                if (hit.collider.gameObject.tag == "Wall")
+                {
+                    hitWall = true;
+                }
                 break;
             }
         }
@@ -264,16 +277,36 @@ public abstract class PlayerController : MonoBehaviour {
     {
         Move(direction, dashSpeed);
         dashTime.Update();
-        if (dashTime.done) movementType = MovementType.Normal;
+        if (hitWall && wallHitStuns)
+        {
+            ApplyStun(wallHitStunDuration);
+        }
+        else if (dashTime.done)
+        {
+            movementType = MovementType.Normal;
+        }
     }
 
     // Apply dashes through duration and speed to determine how long you'll fly back
-    public void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed)
+    public void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed, float newStunDuration)
     {
         direction = dashDirection;
         dashSpeed = newDashSpeed;
+        wallHitStunDuration = newStunDuration;
         dashTime.Set(duration);
         movementType = MovementType.Dashing;
+    }
+
+    public void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed)
+    {
+        wallHitStuns = false;
+        ApplyDash(dashDirection, duration, newDashSpeed, 0);
+    }
+
+    public void ApplyDashWithStun(Vector2 dashDirection, float duration, float newDashSpeed, float newStunDuration)
+    {
+        wallHitStuns = true;
+        ApplyDash(dashDirection, duration, newDashSpeed, newStunDuration);
     }
 
     public void ApplyStun(float duration)

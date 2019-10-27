@@ -13,7 +13,7 @@ public class WatchmanController : HumanController
     public float lanternInitialSpeed { get; private set; } = 0.325f;
     public float lanternDistanceToPickUpSqr { get; private set; } = 0.3f;
     public Timer catchTimer { get; private set; } = new Timer(.5f);
-    public Timer returnTimer { get; private set; } = new Timer(5);
+    public Timer returnTimer { get; private set; } = new Timer(2.5f, true);
 
     public GameObject lantern;
     private GameObject lanternPointer;
@@ -43,13 +43,16 @@ public class WatchmanController : HumanController
         if (holdingLantern)
         {
             lantern.transform.position = transform.position;
-            if(!returnTimer.done)
+        }
+        else if(!returnTimer.done)
+        {
+            returnTimer.Update();
+            if (returnTimer.done)
             {
-                returnTimer.Update();
-                if(returnTimer.done)
-                {
-                    lantern.SetActive(true);
-                }
+                holdingLantern = true;
+                lantern.transform.position = transform.position;
+                catchTimer.Reset();
+                lantern.SetActive(true);
             }
         }
         else
@@ -100,7 +103,8 @@ public class WatchmanController : HumanController
         else
         {
             lantern.SetActive(false);
-            holdingLantern = true;
+            lanternPointer.SetActive(false);
+            secondaryCooldown.Reset();
             returnTimer.Reset();
         }
     }

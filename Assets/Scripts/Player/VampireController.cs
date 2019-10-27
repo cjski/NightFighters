@@ -5,15 +5,24 @@ using UnityEditor;
 
 public class VampireController : MonsterController
 {
-    GameObject slowProjectilePrefab;
+    private static GameObject slowProjectilePrefab;
+
     private float biteCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
     private float biteRange = 2;
+    private float biteStunDuration = 1;
+    private int biteHealAmount = 5;
+    private float slowProjectileSpeed = 0.12f;
+    private float slowProjectileDuration = 2.5f;
+    private float slowAmount = 0.05f;
+    private float slowDuration = 10;
 
     // Start is called before the first frame update
     new protected void Start()
     {
         baseSpeed = 0.09f;
         maxHealth = 75;
+        primaryCooldown = new Timer(3);
+        secondaryCooldown = new Timer(6);
 
         slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/SlowProjectilePrefab.prefab", typeof(GameObject));
         base.Start();
@@ -36,8 +45,8 @@ public class VampireController : MonsterController
                 Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
                 if (InRange(toPlayer, biteRange, biteCosAngle))
                 {
-                    players[i].GetComponent<PlayerController>().ApplyStun(1);
-                    Heal(5);
+                    players[i].GetComponent<PlayerController>().ApplyStun(biteStunDuration);
+                    Heal(biteHealAmount);
                 }
             }
         }
@@ -47,7 +56,7 @@ public class VampireController : MonsterController
     protected override void OnSecondaryPressed()
     {
         GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<SlowProjectileController>().Init(direction, 0.12f, 2.5f, gameObject, 0.05f, 10);
+        attack.GetComponent<SlowProjectileController>().Init(direction, slowProjectileSpeed, slowProjectileDuration, gameObject, slowAmount, slowDuration);
         secondaryCooldown.Reset();
     }
 }

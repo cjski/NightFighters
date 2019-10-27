@@ -32,8 +32,8 @@ public abstract class PlayerController : MonoBehaviour {
     protected Timer dashTime = new Timer(.5f);
     private float dashSpeed = 0;
 
-    public Timer primaryCooldown { get; private set; } = new Timer(3);
-    public Timer secondaryCooldown { get; private set; } = new Timer(1);
+    public Timer primaryCooldown { get; protected set; } = new Timer(1);
+    public Timer secondaryCooldown { get; protected set; } = new Timer(1);
     public Text text;
 
     private bool IsAI = false;

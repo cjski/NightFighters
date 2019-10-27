@@ -7,11 +7,19 @@ public class HunterController : HumanController
 {
     private static GameObject arrowPrefab;
 
+    private float dashSpeedModifier = 2;
+    private float dashDuration = 0.5f;
+    private float arrowSpeed = 0.2f;
+    private float arrowDuration = 2;
+    private int arrowDamage = 20;
+
     // Start is called before the first frame update
     protected new void Start()
     {
         baseSpeed = 0.1f;
-        maxHealth = 100;
+        maxHealth = 80;
+        primaryCooldown = new Timer(1.5f);
+        secondaryCooldown = new Timer(4.5f);
 
         arrowPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ArrowPrefab.prefab", typeof(GameObject));
         base.Start();
@@ -26,7 +34,7 @@ public class HunterController : HumanController
     protected override void OnPrimaryPressed()
     {
         GameObject attack = Instantiate(arrowPrefab, transform.position, transform.rotation);
-        attack.GetComponent<DamageProjectileController>().Init(direction, 0.2f, 2, gameObject, 25);
+        attack.GetComponent<DamageProjectileController>().Init(direction, arrowSpeed, arrowDuration, gameObject, arrowDamage);
         primaryCooldown.Reset();
     }
 
@@ -34,6 +42,6 @@ public class HunterController : HumanController
     {
         secondaryCooldown.Reset();
         //Apply the current speed instead of baseSpeed so the player will dash slower if they're slowed down
-        ApplyDash(direction, 0.5f, speed * 2);
+        ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
     }
 }

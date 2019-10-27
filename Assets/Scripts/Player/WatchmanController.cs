@@ -6,21 +6,25 @@ using UnityEditor;
 public class WatchmanController : HumanController
 {
     static GameObject lightPrefab;
+    private float hitRange = 2;
+    private float hitCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
+    private float stunTime = 1.0f;
+    private int damage = 20;
+    private float lanternInitialSpeed = 0.325f;
+    private float lanternDistanceToPickUpSqr = 0.3f;
+
     public GameObject lantern;
     private GameObject lanternPointer;
     public bool holdingLantern { get; private set; }
     private Timer catchTimer = new Timer(.5f);
-    public float hitRange { get; private set; } = 1;
-    public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
-    private float stunTime = 0.5f;
-    private int damage = 10;
-    public float lanternInitialSpeed { get; private set; } = 0.325f;
 
     // Start is called before the first frame update
     new protected void Start()
     {
         baseSpeed = 0.085f;
         maxHealth = 100;
+        primaryCooldown = new Timer(2);
+        secondaryCooldown = new Timer(5);
 
         lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LanternPrefab.prefab", typeof(GameObject));
         lantern = Instantiate(lightPrefab, transform.position, Quaternion.identity);
@@ -44,7 +48,7 @@ public class WatchmanController : HumanController
                 new Vector3(gameObject.transform.position.x + 0.5f * Mathf.Cos(angle), gameObject.transform.position.y + 0.5f * Mathf.Sin(angle), -1),
                 Quaternion.Euler(0, 0, angle * 180 / Mathf.PI + 90));
             catchTimer.Update();
-            if (catchTimer.done && toLantern.sqrMagnitude < 0.3)
+            if (catchTimer.done && toLantern.sqrMagnitude < lanternDistanceToPickUpSqr)
             {
                 holdingLantern = true;
                 catchTimer.Reset();

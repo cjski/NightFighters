@@ -8,12 +8,16 @@ public class WerewolfBossController : BossController
     private float knockbackRange = 2;
     private float knockbackDuration = 1.0f;
     private float knockbackSpeed = 0.15f;
+    private int knockbackDamage = 40;
 
     // Start is called before the first frame update
     new protected void Start()
     {
         baseSpeed = 0.08f;
         maxHealth = 200;
+        primaryCooldown = new Timer(4.5f);
+        secondaryCooldown = new Timer(4);
+
         base.Start();
     }
 
@@ -35,7 +39,7 @@ public class WerewolfBossController : BossController
                 {
                     PlayerController pc = players[i].GetComponent<PlayerController>();
                     pc.ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
-                    pc.Damage(99);
+                    pc.Damage(knockbackDamage);
                 }
             }
         }

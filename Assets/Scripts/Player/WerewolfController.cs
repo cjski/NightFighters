@@ -5,15 +5,19 @@ using UnityEngine;
 public class WerewolfController : MonsterController
 {
     private float knockbackCosAngle = Mathf.Cos(3.14159265f * 60 / 180);
-    private float knockbackRange = 2;
+    private float knockbackRange = 2.5f;
     private float knockbackDuration = 1.0f;
     private float knockbackSpeed = 0.15f;
+    private float dashDuration = 0.5f;
+    private float dashSpeedModifier = 1.5f;
 
     // Start is called before the first frame update
     new protected void Start()
     {
         baseSpeed = 0.1f;
         maxHealth = 100;
+        primaryCooldown = new Timer(3);
+        secondaryCooldown = new Timer(4);
         base.Start();
     }
 
@@ -76,6 +80,6 @@ public class WerewolfController : MonsterController
     {
         secondaryCooldown.Reset();
         //Apply the current speed instead of baseSpeed so the player will dash slower if they're slowed down
-        ApplyDash(direction, 0.5f, speed * 2);
+        ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
     }
 }

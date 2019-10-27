@@ -13,6 +13,7 @@ Top down arcade game where humans try and hunt down and convert the monsters att
 - ### Unique Characters and abilities
   - Dashes, knockbacks, projectiles for damage and slows, throwable lights that can be picked up
   - Robust player controller code to easily apply timed slows and dashes
+  - Boss monster fights in the end game
 - ### Robust character selection screen
   - Players can join, exit, and rejoin at will
   - Any controller type can become the first player
@@ -26,7 +27,8 @@ Top down arcade game where humans try and hunt down and convert the monsters att
   
 ## Planned Features
 - AI able to complete secondary objectives (Turning off lights, using abilities)
-- Boss Monster fights
+- ~~Boss Monster fights~~
+- ~~Controller Support~~
 
 ## Tools
 Unity is the game engine being using to develop the code, which is all written in C#. The artwork is being done with Piskel.

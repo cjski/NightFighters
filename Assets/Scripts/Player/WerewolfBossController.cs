@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class WerewolfBossController : BossController
 {
-    private float knockbackCosAngle = Mathf.Cos(3.14159265f * 90 / 180);
-    private float knockbackRange = 2;
-    private float knockbackDuration = 1.0f;
-    private float knockbackSpeed = 0.15f;
-    private int knockbackDamage = 40;
-    private float knockbackStunDuration = 1.5f;
+    public float knockbackCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 90 / 180);
+    public float knockbackRange { get; private set; } = 2;
+    public float knockbackDuration { get; private set; } = 1.0f;
+    public float knockbackSpeed { get; private set; } = 0.15f;
+    public int knockbackDamage { get; private set; } = 40;
+    public float knockbackStunDuration { get; private set; } = 1.5f;
+    public float dashDuration { get; private set; } = 0.75f;
+    public float dashSpeedModifier { get; private set; } = 1.6f;
 
     // Start is called before the first frame update
     new protected void Start()
@@ -50,6 +52,8 @@ public class WerewolfBossController : BossController
 
     protected override void OnSecondaryPressed()
     {
-
+        secondaryCooldown.Reset();
+        //Apply the current speed instead of baseSpeed so the player will dash slower if they're slowed down
+        ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
     }
 }

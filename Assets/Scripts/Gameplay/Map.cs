@@ -43,20 +43,29 @@ public class Node
 
 public class Map
 {
-    private static GameObject[] wallPrefabs =
+    private static GameObject[] horizontalWallPrefabs =
     {
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallPrefab0.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallPrefab1.prefab", typeof(GameObject))
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab0.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab1.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab2.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab3.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab4.prefab", typeof(GameObject))
+    };
+
+    private static GameObject[] verticalWallPrefabs =
+    {
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab0.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab1.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab2.prefab", typeof(GameObject)),
+        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab3.prefab", typeof(GameObject))
     };
     private static Quaternion[] horizontalRotations =
     {
         Quaternion.Euler(0, 0, 0),
-        Quaternion.Euler(0, 0, 180)
     };
     private static Quaternion[] verticalRotations =
     {
-        Quaternion.Euler(0, 0, 90),
-        Quaternion.Euler(0, 0, 270)
+        Quaternion.Euler(0, 0, 0),
     };
     private static GameObject lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LightPrefab.prefab", typeof(GameObject));
 
@@ -149,28 +158,28 @@ public class Map
         for (int i = 0; i < x; ++i)
         {
             map[i, 0].d = Node.Connection.Wall;
-            Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(i + 0.5f, 0) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+            Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(i + 0.5f, 0) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
         }
 
         //Generate upper border walls
         for (int i = 0; i < x; ++i)
         {
             map[i, y - 1].u = Node.Connection.Wall;
-            Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2((i + 0.5f), y) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+            Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2((i + 0.5f), y) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
         }
 
         //Generate left border walls
         for (int i = 0; i < y; ++i)
         {
             map[0, i].l = Node.Connection.Wall;
-            Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(0, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+            Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(0, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
         }
 
         //Generate right border walls
         for (int i = 0; i < y; ++i)
         {
             map[x - 1, i].r = Node.Connection.Wall;
-            Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(x, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+            Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(x, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
         }
 
         // Generate random walls in the map
@@ -195,7 +204,7 @@ public class Map
                 {
                     node.u = Node.Connection.Wall;
                     other.d = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY + 1) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+                    Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY + 1) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
                     --walls;
                 }
             }
@@ -206,7 +215,7 @@ public class Map
                 {
                     node.l = Node.Connection.Wall;
                     other.r = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(wallX, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+                    Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(wallX, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
                     --walls;
                 }
             }
@@ -217,7 +226,7 @@ public class Map
                 {
                     node.r = Node.Connection.Wall;
                     other.l = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(wallX + 1, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+                    Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(wallX + 1, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
                     --walls;
                 }
             }
@@ -228,7 +237,7 @@ public class Map
                 {
                     node.d = Node.Connection.Wall;
                     other.u = Node.Connection.Wall;
-                    Object.Instantiate(wallPrefabs[Random.Range(0, wallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+                    Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
                     --walls;
                 }
             }

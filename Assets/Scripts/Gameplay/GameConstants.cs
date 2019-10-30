@@ -33,10 +33,10 @@ public static class GameConstants
 
     public static Vector2[] PLAYER_SPAWN_POSITIONS =
     {
-        new Vector2(1, 1) + MAP_OFFSET,
-        new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 1, 1) + MAP_OFFSET,
-        new Vector2(1, MAP_ROWS * MAP_TILE_SIZE - 1) + MAP_OFFSET,
-        new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 1, MAP_ROWS * MAP_TILE_SIZE - 1) + GameConstants.MAP_OFFSET,
+        new Vector2(3, 3) + MAP_OFFSET,
+        new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 3, 3) + MAP_OFFSET,
+        new Vector2(3, MAP_ROWS * MAP_TILE_SIZE - 3) + MAP_OFFSET,
+        new Vector2(MAP_COLUMNS * MAP_TILE_SIZE - 3, MAP_ROWS * MAP_TILE_SIZE - 3) + GameConstants.MAP_OFFSET,
     };
 
     public static KeyCode DEFAULT_GAME_START_KEY = KeyCode.Return;

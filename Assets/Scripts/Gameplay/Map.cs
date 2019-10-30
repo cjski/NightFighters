@@ -158,28 +158,32 @@ public class Map
         for (int i = 0; i < x; ++i)
         {
             map[i, 0].d = Node.Connection.Wall;
-            Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(i + 0.5f, 0) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+            GameObject wall = Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(i + 0.5f, 0) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+            wall.GetComponent<SpriteRenderer>().sortingOrder = 0;
         }
 
         //Generate upper border walls
         for (int i = 0; i < x; ++i)
         {
             map[i, y - 1].u = Node.Connection.Wall;
-            Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2((i + 0.5f), y) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+            GameObject wall = Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2((i + 0.5f), y) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+            wall.GetComponent<SpriteRenderer>().sortingOrder = -2 * y; // - 2 * (y-1 + 1)
         }
 
         //Generate left border walls
         for (int i = 0; i < y; ++i)
         {
             map[0, i].l = Node.Connection.Wall;
-            Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(0, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+            GameObject wall = Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(0, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+            wall.GetComponent<SpriteRenderer>().sortingOrder = -2*i - 1;
         }
 
         //Generate right border walls
         for (int i = 0; i < y; ++i)
         {
             map[x - 1, i].r = Node.Connection.Wall;
-            Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(x, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+            GameObject wall = Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(x, i + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+            wall.GetComponent<SpriteRenderer>().sortingOrder = -2*i - 1;
         }
 
         // Generate random walls in the map
@@ -204,7 +208,8 @@ public class Map
                 {
                     node.u = Node.Connection.Wall;
                     other.d = Node.Connection.Wall;
-                    Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY + 1) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+                    GameObject wall = Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY + 1) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+                    wall.GetComponent<SpriteRenderer>().sortingOrder = -2 * (wallY + 1);
                     --walls;
                 }
             }
@@ -215,7 +220,8 @@ public class Map
                 {
                     node.l = Node.Connection.Wall;
                     other.r = Node.Connection.Wall;
-                    Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(wallX, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+                    GameObject wall = Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(wallX, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+                    wall.GetComponent<SpriteRenderer>().sortingOrder = -(2 * wallY + 1);
                     --walls;
                 }
             }
@@ -226,7 +232,8 @@ public class Map
                 {
                     node.r = Node.Connection.Wall;
                     other.l = Node.Connection.Wall;
-                    Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(wallX + 1, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+                    GameObject wall = Object.Instantiate(verticalWallPrefabs[Random.Range(0, verticalWallPrefabs.Length)], new Vector2(wallX + 1, wallY + 0.5f) * unitSize + offset, verticalRotations[Random.Range(0, verticalRotations.Length)]);
+                    wall.GetComponent<SpriteRenderer>().sortingOrder = -(2 * wallY + 1);
                     --walls;
                 }
             }
@@ -237,7 +244,8 @@ public class Map
                 {
                     node.d = Node.Connection.Wall;
                     other.u = Node.Connection.Wall;
-                    Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+                    GameObject wall = Object.Instantiate(horizontalWallPrefabs[Random.Range(0, horizontalWallPrefabs.Length)], new Vector2(wallX + 0.5f, wallY) * unitSize + offset, horizontalRotations[Random.Range(0, horizontalRotations.Length)]);
+                    wall.GetComponent<SpriteRenderer>().sortingOrder = -2*wallY;
                     --walls;
                 }
             }

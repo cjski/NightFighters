@@ -213,7 +213,7 @@ public class GameController : MonoBehaviour
         {
            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfBossPrefab.prefab", typeof(GameObject)),
            "", "", "", "", false, true),
-           new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfBossPrefab.prefab", typeof(GameObject)),
+           new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampireBossPrefab.prefab", typeof(GameObject)),
            "", "", "", "", false, true)
         };
 

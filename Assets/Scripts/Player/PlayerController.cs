@@ -288,7 +288,7 @@ public abstract class PlayerController : MonoBehaviour {
     }
 
     // Apply dashes through duration and speed to determine how long you'll fly back
-    public void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed, float newStunDuration)
+    private void ApplyDash(Vector2 dashDirection, float duration, float newDashSpeed, float newStunDuration)
     {
         direction = dashDirection;
         dashSpeed = newDashSpeed;

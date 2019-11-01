@@ -22,6 +22,8 @@ public class VampireBossController : BossController
     };
     public float slowAmount { get; private set; } = 0.05f;
     public float slowDuration { get; private set; } = 10;
+    public float dashDuration { get; private set; } = 0.3f;
+    public float dashSpeedModifier { get; private set; } = 1.7f;
 
     // Start is called before the first frame update
     new protected void Start()
@@ -69,6 +71,7 @@ public class VampireBossController : BossController
             //Quaternions have to be multiplied first
             attack.GetComponent<SlowProjectileController>().Init(slowProjectileRotations[i] * direction, slowProjectileSpeed, slowProjectileDuration, gameObject, slowAmount, slowDuration);
         }
+        ApplyDash(-direction, dashDuration, speed * dashSpeedModifier);
         secondaryCooldown.Reset();
     }
 }

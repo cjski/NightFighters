@@ -15,6 +15,8 @@ public class VampireController : MonsterController
     public float slowProjectileDuration { get; private set; } = 2.5f;
     public float slowAmount { get; private set; } = 0.05f;
     public float slowDuration { get; private set; } = 10;
+    public float dashDuration { get; private set; } = 0.3f;
+    public float dashSpeedModifier { get; private set; } = 1.4f;
 
     // Start is called before the first frame update
     new protected void Start()
@@ -57,6 +59,7 @@ public class VampireController : MonsterController
     {
         GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
         attack.GetComponent<SlowProjectileController>().Init(direction, slowProjectileSpeed, slowProjectileDuration, gameObject, slowAmount, slowDuration);
+        ApplyDash(-direction, dashDuration, speed * dashSpeedModifier);
         secondaryCooldown.Reset();
     }
 }

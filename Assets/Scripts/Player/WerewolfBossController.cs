@@ -18,8 +18,8 @@ public class WerewolfBossController : BossController
     {
         baseSpeed = 0.08f;
         maxHealth = 200;
-        primaryCooldown = new Timer(4.5f);
-        secondaryCooldown = new Timer(4);
+        primaryCooldown = new Timer(4.5f, true);
+        secondaryCooldown = new Timer(4, true);
 
         base.Start();
     }

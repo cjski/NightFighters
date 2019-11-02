@@ -21,10 +21,10 @@ public class VampireController : MonsterController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.09f;
+        baseSpeed = 0.065f;
         maxHealth = 75;
-        primaryCooldown = new Timer(3);
-        secondaryCooldown = new Timer(6);
+        primaryCooldown = new Timer(3, true);
+        secondaryCooldown = new Timer(6, true);
 
         slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/SlowProjectilePrefab.prefab", typeof(GameObject));
         base.Start();

@@ -14,10 +14,10 @@ public class WerewolfController : MonsterController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.1f;
+        baseSpeed = 0.075f;
         maxHealth = 100;
-        primaryCooldown = new Timer(3);
-        secondaryCooldown = new Timer(4);
+        primaryCooldown = new Timer(3, true);
+        secondaryCooldown = new Timer(4, true);
         base.Start();
     }
 

@@ -7,9 +7,9 @@ public class VampireBossController : BossController
 {
     private static GameObject slowProjectilePrefab;
 
-    public float biteCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
+    public float biteCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 75 / 180);
     public float biteRange { get; private set; } = 2;
-    public float biteStunDuration { get; private set; } = 1;
+    public float biteStunDuration { get; private set; } = 1.3f;
     public int biteHealAmount { get; private set; } = 5;
     public int biteDamage { get; private set; } = 10;
     public float slowProjectileSpeed { get; private set; } = 0.12f;
@@ -28,10 +28,10 @@ public class VampireBossController : BossController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.09f;
+        baseSpeed = 0.07f;
         maxHealth = 300;
-        primaryCooldown = new Timer(3);
-        secondaryCooldown = new Timer(6);
+        primaryCooldown = new Timer(3, true);
+        secondaryCooldown = new Timer(6, true);
 
         slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/SlowProjectilePrefab.prefab", typeof(GameObject));
         base.Start();

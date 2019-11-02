@@ -8,7 +8,7 @@ public class WatchmanController : HumanController
     static GameObject lightPrefab;
     public float hitRange { get; private set; } = 1;
     public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
-    public float stunTime { get; private set; } = 0.5f;
+    public float stunTime { get; private set; } = 0.25f;
     public int damage { get; private set; } = 20;
     public float lanternInitialSpeed { get; private set; } = 0.325f;
     public float lanternDistanceToPickUpSqr { get; private set; } = 0.3f;
@@ -22,10 +22,10 @@ public class WatchmanController : HumanController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.085f;
+        baseSpeed = 0.065f;
         maxHealth = 100;
-        primaryCooldown = new Timer(2.5f);
-        secondaryCooldown = new Timer(5);
+        primaryCooldown = new Timer(2.5f, true);
+        secondaryCooldown = new Timer(5, true);
 
         lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LanternPrefab.prefab", typeof(GameObject));
         lantern = Instantiate(lightPrefab, transform.position, Quaternion.identity);

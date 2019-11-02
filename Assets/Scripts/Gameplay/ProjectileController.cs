@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectileController : MonoBehaviour {
+public abstract class ProjectileController : MonoBehaviour {
 
     public Vector2 direction;
     protected float speed;
@@ -25,4 +25,30 @@ public class ProjectileController : MonoBehaviour {
         if (lifetime.done) Destroy(gameObject);
         GetComponent<Transform>().Translate(speed * direction);
 	}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!collision.gameObject.Equals(owner))
+        {
+            if (collision.gameObject.tag == "Player" && !OwnerIsSameType(collision.gameObject))
+            {
+                OnCollisionWithPlayer(collision.gameObject);
+            }
+            Destroy(gameObject);
+        }
+    }
+
+    protected bool OwnerIsSameType(GameObject collidedObject)
+    {
+        if(owner.GetComponent<HumanController>() != null)
+        {
+            return collidedObject.GetComponent<HumanController>() != null;
+        }
+        else
+        {
+            return collidedObject.GetComponent<MonsterController>() != null;
+        }
+    }
+
+    protected abstract void OnCollisionWithPlayer(GameObject player);
 }

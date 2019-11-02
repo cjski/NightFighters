@@ -12,16 +12,9 @@ public class DamageProjectileController : ProjectileController {
         damage = newDamage;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void OnCollisionWithPlayer(GameObject player)
     {
-        if (!collision.gameObject.Equals(owner))
-        {
-            if (collision.gameObject.tag == "Player")
-            {
-                PlayerController pc = collision.gameObject.GetComponent<PlayerController>();
-                pc.Damage(damage);
-            }
-            Destroy(gameObject);
-        }
+        PlayerController pc = player.GetComponent<PlayerController>();
+        pc.Damage(damage);
     }
 }

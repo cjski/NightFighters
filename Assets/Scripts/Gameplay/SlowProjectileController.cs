@@ -6,7 +6,6 @@ public class SlowProjectileController : ProjectileController {
 
     private float slow;
     private float slowTime;
-    private PlayerController hitPlayerController;
 
     public void Init(Vector2 newDirection, float newSpeed, float duration, GameObject newOwner, float newSlow, float slowDuration)
     {
@@ -15,16 +14,9 @@ public class SlowProjectileController : ProjectileController {
         slowTime = slowDuration;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void OnCollisionWithPlayer(GameObject player)
     {
-        if (!collision.gameObject.Equals(owner))
-        {
-            if (collision.gameObject.tag == "Player")
-            {
-                hitPlayerController = collision.gameObject.GetComponent<PlayerController>();
-                hitPlayerController.ModifySpeed(-slow, slowTime);
-            }
-            Destroy(gameObject);
-        }
+        PlayerController pc = player.GetComponent<PlayerController>();
+        pc.ModifySpeed(-slow, slowTime);
     }
 }

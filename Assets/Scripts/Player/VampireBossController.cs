@@ -10,8 +10,8 @@ public class VampireBossController : BossController
     public float biteCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 75 / 180);
     public float biteRange { get; private set; } = 2;
     public float biteStunDuration { get; private set; } = 1.3f;
-    public int biteHealAmount { get; private set; } = 5;
-    public int biteDamage { get; private set; } = 10;
+    public int biteHealAmount { get; private set; } = 10;
+    public int biteDamage { get; private set; } = 15;
     public float slowProjectileSpeed { get; private set; } = 0.12f;
     public float slowProjectileDuration { get; private set; } = 2.5f;
     public Quaternion[] slowProjectileRotations { get; private set; } = 

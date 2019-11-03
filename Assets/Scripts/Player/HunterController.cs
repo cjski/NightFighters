@@ -18,8 +18,8 @@ public class HunterController : HumanController
     {
         baseSpeed = 0.07f;
         maxHealth = 80;
-        primaryCooldown = new Timer(1.5f, true);
-        secondaryCooldown = new Timer(4.5f, true);
+        primaryCooldown = new Timer(1, true);
+        secondaryCooldown = new Timer(4, true);
 
         arrowPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ArrowPrefab.prefab", typeof(GameObject));
         base.Start();

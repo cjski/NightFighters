@@ -201,14 +201,12 @@ public abstract class PlayerController : MonoBehaviour {
 
         Vector2 directionXVector = new Vector2(direction.x, 0);
         float distanceForRaycastX = moveSpeed + halfSizeX.x;
-        bool moveInX = true;
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLayerMask);
             if(hit.collider != null)
             {
-                //moveInX = false;
                 float deltaToCollide = hit.distance - halfSizeX.x;
                 if(deltaToCollide <= ellipsonCollide)
                 {
@@ -226,10 +224,7 @@ public abstract class PlayerController : MonoBehaviour {
                 break;
             }
         }
-        if (moveInX)
-        {
-            transform.Translate(moveSpeed * directionXVector);
-        }
+        transform.Translate(moveSpeed * directionXVector);
 
         Vector2[] originsForRaycastsY =
         {
@@ -242,14 +237,12 @@ public abstract class PlayerController : MonoBehaviour {
 
         Vector2 directionYVector = new Vector2(0, direction.y);
         float distanceForRaycastY = moveSpeed + halfSizeY.y;
-        bool moveInY = true;
 
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLayerMask);
             if (hit.collider != null)
             {
-                //moveInY = false;
                 float deltaToCollide = hit.distance - halfSizeY.y;
                 if (deltaToCollide <= ellipsonCollide)
                 {
@@ -267,10 +260,7 @@ public abstract class PlayerController : MonoBehaviour {
                 break;
             }
         }
-        if (moveInY)
-        {
-            transform.Translate(moveSpeed * directionYVector);
-        }
+        transform.Translate(moveSpeed * directionYVector);
 
         if (anim) anim.Play("Walk");
         if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;

@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class AI : MonoBehaviour
 {
-    protected static int ignoreLightLanternLayerMask;
-    protected static int ignoreLanternLayerMask;
+    protected static int ignoreLightLanternProjectileLayerMask;
+    protected static int ignoreLanternProjectileLayerMask;
 
     protected PlayerController playerController;
 
     protected virtual void Start()
     {
-        ignoreLightLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern");
-        ignoreLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Lantern");
+        ignoreLightLanternProjectileLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern", "Projectile");
+        ignoreLanternProjectileLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Lantern", "Projectile");
     }
 
     protected virtual void Update()

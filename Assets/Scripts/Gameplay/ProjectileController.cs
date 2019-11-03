@@ -26,7 +26,7 @@ public abstract class ProjectileController : MonoBehaviour {
         GetComponent<Transform>().Translate(speed * direction);
 	}
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.gameObject.Equals(owner))
         {

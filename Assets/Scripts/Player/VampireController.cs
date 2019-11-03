@@ -11,12 +11,21 @@ public class VampireController : MonsterController
     public float biteRange { get; private set; } = 2;
     public float biteStunDuration { get; private set; } = 1;
     public int biteHealAmount { get; private set; } = 5;
-    public float slowProjectileSpeed { get; private set; } = 0.12f;
-    public float slowProjectileDuration { get; private set; } = 2.5f;
+    public float slowProjectileExitSpeed { get; private set; } = 0.3f;
+    public float slowProjectileReturnSpeed { get; private set; } = 0.2f;
+    public float slowProjectileDuration { get; private set; } = 10f;
+    public float slowStallTime { get; private set; } = 0.75f;
+    public float slowExitTime { get; private set; } = 0.05f;
     public float slowAmount { get; private set; } = 0.05f;
-    public float slowDuration { get; private set; } = 10;
+    public float slowDuration { get; private set; } = 2;
     public float dashDuration { get; private set; } = 0.3f;
-    public float dashSpeedModifier { get; private set; } = 1.4f;
+    public float dashSpeedModifier { get; private set; } = 1.6f;
+    public Quaternion[] slowProjectileRotations { get; private set; } =
+    {
+        Quaternion.Euler(0, 0, 45),
+        Quaternion.Euler(0, 0, 0),
+        Quaternion.Euler(0, 0, -45)
+    };
 
     // Start is called before the first frame update
     new protected void Start()
@@ -26,7 +35,7 @@ public class VampireController : MonsterController
         primaryCooldown = new Timer(3, true);
         secondaryCooldown = new Timer(6, true);
 
-        slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/SlowProjectilePrefab.prefab", typeof(GameObject));
+        slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/BatProjectilePrefab.prefab", typeof(GameObject));
         base.Start();
     }
 
@@ -57,9 +66,12 @@ public class VampireController : MonsterController
 
     protected override void OnSecondaryPressed()
     {
-        GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
-        attack.GetComponent<SlowProjectileController>().Init(direction, slowProjectileSpeed, slowProjectileDuration, gameObject, slowAmount, slowDuration);
-        ApplyDash(-direction, dashDuration, speed * dashSpeedModifier);
+        for (int i = 0; i < slowProjectileRotations.Length; ++i)
+        {
+            GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
+            attack.GetComponent<BatProjectileController>().Init(slowProjectileRotations[i] * -direction, slowProjectileExitSpeed, slowProjectileReturnSpeed, slowStallTime, slowExitTime, slowProjectileDuration, gameObject, slowAmount, slowDuration);
+        }
+        ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
         secondaryCooldown.Reset();
     }
 }

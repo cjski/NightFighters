@@ -68,7 +68,7 @@ public class HumanAI : AI
             MonsterController mc = players[i].GetComponent<MonsterController>();
             if (mc != null)
             {
-                if(IsNewTargetCloser(mc.gameObject, ref direction, ignoreLightLanternLayerMask))
+                if(IsNewTargetCloser(mc.gameObject, ref direction, ignoreLightLanternProjectileLayerMask))
                 {
                     targetIsPlayer = true;
                 }
@@ -81,7 +81,7 @@ public class HumanAI : AI
             // Don't go for any lights that another human is turning on already, don't go for lanterns
             if (lc != null && !lc.On() && !lc.IsLantern() && (!lc.humansIn || lc.currentHumanInLight == playerController.gameObject))
             {
-                if(IsNewTargetCloser(lc.gameObject, ref direction, ignoreLanternLayerMask, lightTargetDistanceOffset))
+                if(IsNewTargetCloser(lc.gameObject, ref direction, ignoreLanternProjectileLayerMask, lightTargetDistanceOffset))
                 {
                     targetIsPlayer = false;
                 }

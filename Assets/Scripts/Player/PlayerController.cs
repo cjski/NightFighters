@@ -46,7 +46,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     private Animator anim;
 
-    protected static int ignoreLightLanternLayerMask;
+    protected static int ignoreLayerMask;
 
     // Use this for initialization
     protected void Start () {
@@ -63,7 +63,7 @@ public abstract class PlayerController : MonoBehaviour {
 
         anim = GetComponent<Animator>();
 
-        ignoreLightLanternLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern");
+        ignoreLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern", "Projectile");
     }
 
     public void InitializePlayer(Controller newPlayerController, int newPlayerNumber)
@@ -203,7 +203,7 @@ public abstract class PlayerController : MonoBehaviour {
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLayerMask);
             if(hit.collider != null)
             {
                 moveInX = false;
@@ -234,7 +234,7 @@ public abstract class PlayerController : MonoBehaviour {
 
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLayerMask);
             if (hit.collider != null)
             {
                 moveInY = false;

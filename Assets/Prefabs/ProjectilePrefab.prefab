@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4262059178496180}
   - component: {fileID: 61018449563115406}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: ProjectilePrefab
   m_TagString: Projectile
   m_Icon: {fileID: 0}

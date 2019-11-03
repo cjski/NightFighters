@@ -71,7 +71,7 @@ public class MonsterAI : AI
                 toTarget = targetPosition - selfPosition;
 
                 Vector2 newTargetDirection = Vector2.zero;
-                canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLightLanternLayerMask);
+                canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLightLanternProjectileLayerMask);
 
                 if(canSeeTarget)
                 {
@@ -265,7 +265,7 @@ public class MonsterAI : AI
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternProjectileLayerMask);
             if (hit.collider != null)
             {
                 gameObjectInX = true;
@@ -288,7 +288,7 @@ public class MonsterAI : AI
 
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternLayerMask);
+            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternProjectileLayerMask);
             if (hit.collider != null)
             {
                 gameObjectInY = true;

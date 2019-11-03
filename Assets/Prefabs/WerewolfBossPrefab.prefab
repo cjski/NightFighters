@@ -183,6 +183,11 @@ PrefabInstance:
       propertyPath: m_Offset.x
       value: 0.02
       objectReference: {fileID: 0}
+    - target: {fileID: 8202211065872112097, guid: f7f8879c97755b84d82987cd5f03d1c6,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: -0.03
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f7f8879c97755b84d82987cd5f03d1c6, type: 3}
 --- !u!1 &8583007127426236800 stripped

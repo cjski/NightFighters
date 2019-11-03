@@ -388,7 +388,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     public Vector2 GetSize()
     {
-        return GetComponent<Renderer>().bounds.size;
+        return GetComponent<Collider2D>().bounds.size;
     }
 
     public void ActivateAI(int newPlayerNumber)

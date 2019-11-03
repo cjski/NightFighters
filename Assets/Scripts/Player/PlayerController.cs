@@ -11,6 +11,8 @@ public abstract class PlayerController : MonoBehaviour {
         public float speedModifier;
     }
 
+    private static float ellipsonCollide = 0.05f;
+
     protected enum MovementType { Normal, Dashing, Stun };
 
     protected int playerNumber;
@@ -206,7 +208,17 @@ public abstract class PlayerController : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLayerMask);
             if(hit.collider != null)
             {
-                moveInX = false;
+                //moveInX = false;
+                float deltaToCollide = hit.distance - halfSizeX.x;
+                if(deltaToCollide <= ellipsonCollide)
+                {
+                    directionXVector.x = 0;
+                }
+                else
+                {
+                    directionXVector.x = moveSpeed / (hit.distance - halfSizeX.x) * (directionXVector.x > 0 ? 1 : -1);
+                }
+               
                 if(hit.collider.gameObject.tag == "Wall")
                 {
                     hitWall = true;
@@ -237,7 +249,17 @@ public abstract class PlayerController : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLayerMask);
             if (hit.collider != null)
             {
-                moveInY = false;
+                //moveInY = false;
+                float deltaToCollide = hit.distance - halfSizeY.y;
+                if (deltaToCollide <= ellipsonCollide)
+                {
+                    directionYVector.y = 0;
+                }
+                else
+                {
+                    directionYVector.y = moveSpeed / (hit.distance - halfSizeY.y) * (directionYVector.y > 0 ? 1 : -1);
+                }
+                
                 if (hit.collider.gameObject.tag == "Wall")
                 {
                     hitWall = true;

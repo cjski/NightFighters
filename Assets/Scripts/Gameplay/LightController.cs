@@ -15,11 +15,16 @@ public class LightController : MonoBehaviour {
     public GameObject currentHumanInLight = null;
     public GameObject currentMonsterInLight = null;
 
-	// Use this for initialization
-	protected void Start () {
+    private Animator anim;
+
+    // Use this for initialization
+    protected void Start () {
         halo = (Behaviour)GetComponent("Halo");
         halo.enabled = false;
-	}
+
+        anim = GetComponent<Animator>();
+        if (anim) anim.Play("Off");
+    }
 	
 	// Update is called once per frame
 	protected void Update () {
@@ -41,6 +46,7 @@ public class LightController : MonoBehaviour {
         if (turnOnTimer.done)
         {
             halo.enabled = true;
+            if (anim) anim.Play("On");
             turnOnTimer.Reset();
         }
         else if (turnOffTimer.done)
@@ -48,6 +54,7 @@ public class LightController : MonoBehaviour {
             if (broken) turnOnTimer.Set(turnOnBrokenTime);
             else turnOnTimer.Set(turnOnFixedTime);
             halo.enabled = false;
+            if (anim) anim.Play("Off");
             turnOffTimer.Reset();
         }
     }
@@ -109,6 +116,7 @@ public class LightController : MonoBehaviour {
         if (halo)
         {
             halo.enabled = false;
+            if (anim) anim.Play("Off");
         }
     }
 
@@ -119,6 +127,7 @@ public class LightController : MonoBehaviour {
         if (halo)
         {
             halo.enabled = true;
+            if (anim) anim.Play("On");
         }
     }
 

@@ -27,6 +27,10 @@ public class BatProjectileController : ProjectileController {
 
     protected new void Update()
     {
+        if(owner == null)
+        {
+            Destroy(gameObject);
+        }
         if(state == State.Exiting)
         {
             timeToStall.Update();

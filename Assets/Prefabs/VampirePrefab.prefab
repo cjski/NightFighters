@@ -37,8 +37,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 21300006, guid: 5a51bbd73a122354bac59fe3b8b36a10, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -60,7 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61bce7dc05a578d4c86f880fa6723d63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useMouseMovement: 1
   text: {fileID: 0}
 --- !u!1001 &6433359458369513360
 PrefabInstance:
@@ -74,15 +73,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: VampirePrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 4246056355677391704, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: b0086efa6e4cf8c4ba21f5e79d1186dc, type: 2}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 0.32
+      objectReference: {fileID: 0}
     - target: {fileID: 7535175840963685216, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.0192
       objectReference: {fileID: 0}
     - target: {fileID: 7535175840963685216, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.024
       objectReference: {fileID: 0}
     - target: {fileID: 7535175840963685216, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}

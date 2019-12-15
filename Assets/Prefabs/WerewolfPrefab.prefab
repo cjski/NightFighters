@@ -37,8 +37,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0.5754717, g: 0.38206437, b: 0.23616058, a: 1}
+  m_Sprite: {fileID: 21300006, guid: 8ec329531c700c74788b2bca26ea953a, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -60,7 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f596125470b8bd49970b37bcd56f819, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useMouseMovement: 1
   text: {fileID: 0}
 --- !u!1001 &3031224425816206413
 PrefabInstance:
@@ -82,7 +81,37 @@ PrefabInstance:
     - target: {fileID: 4246056355677391704, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 0.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Offset.x
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_UsedByComposite
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7535175840963685216, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}

@@ -23,8 +23,8 @@ public abstract class PlayerController : MonoBehaviour {
     protected Vector2 direction;
     protected MovementType movementType;
     protected float speedModifier;
-    private float minSpeed = 0.025f;
-    private float maxSpeed = 1.0f;
+    private float minSpeed = 1.25f;
+    private float maxSpeed = 50.0f;
     private List<TimedSpeedModifier> timedSpeedModifiers;
     private Timer stunTimer = new Timer(1);
 
@@ -154,7 +154,7 @@ public abstract class PlayerController : MonoBehaviour {
         float distToMoveSqr = move.sqrMagnitude;
 
         direction = move.normalized;
-        if(distToMoveSqr >= 4 * speed * speed)
+        if(distToMoveSqr >= 4 * speed * speed * Time.deltaTime * Time.deltaTime)
         {
             Move(direction, speed);
         }
@@ -200,7 +200,7 @@ public abstract class PlayerController : MonoBehaviour {
         };
 
         Vector2 directionXVector = new Vector2(direction.x, 0);
-        float distanceForRaycastX = moveSpeed + halfSizeX.x;
+        float distanceForRaycastX = moveSpeed * Time.deltaTime + halfSizeX.x;
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
@@ -224,7 +224,7 @@ public abstract class PlayerController : MonoBehaviour {
                 break;
             }
         }
-        transform.Translate(moveSpeed * directionXVector);
+        transform.Translate(moveSpeed * directionXVector * Time.deltaTime);
 
         Vector2[] originsForRaycastsY =
         {
@@ -236,7 +236,7 @@ public abstract class PlayerController : MonoBehaviour {
         };
 
         Vector2 directionYVector = new Vector2(0, direction.y);
-        float distanceForRaycastY = moveSpeed + halfSizeY.y;
+        float distanceForRaycastY = moveSpeed * Time.deltaTime + halfSizeY.y;
 
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
@@ -260,7 +260,7 @@ public abstract class PlayerController : MonoBehaviour {
                 break;
             }
         }
-        transform.Translate(moveSpeed * directionYVector);
+        transform.Translate(moveSpeed * directionYVector * Time.deltaTime);
 
         if (anim) anim.Play("Walk");
         if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;

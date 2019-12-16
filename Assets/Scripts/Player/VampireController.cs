@@ -11,8 +11,8 @@ public class VampireController : MonsterController
     public float biteRange { get; private set; } = 2;
     public float biteStunDuration { get; private set; } = 1;
     public int biteHealAmount { get; private set; } = 5;
-    public float slowProjectileExitSpeed { get; private set; } = 0.3f;
-    public float slowProjectileReturnSpeed { get; private set; } = 0.2f;
+    public float slowProjectileExitSpeed { get; private set; } = 15.0f;
+    public float slowProjectileReturnSpeed { get; private set; } = 10.0f;
     public float slowProjectileDuration { get; private set; } = 10f;
     public float slowStallTime { get; private set; } = 0.75f;
     public float slowExitTime { get; private set; } = 0.05f;
@@ -30,7 +30,7 @@ public class VampireController : MonsterController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.065f;
+        baseSpeed = 3.25f;
         maxHealth = 75;
         primaryCooldown = new Timer(3, true);
         secondaryCooldown = new Timer(6, true);

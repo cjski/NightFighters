@@ -23,7 +23,7 @@ public abstract class ProjectileController : MonoBehaviour {
 	protected void Update () {
         lifetime.Update();
         if (lifetime.done) Destroy(gameObject);
-        GetComponent<Transform>().Translate(speed * direction);
+        GetComponent<Transform>().Translate(speed * direction * Time.deltaTime);
 	}
 
     protected void OnTriggerEnter2D(Collider2D collision)

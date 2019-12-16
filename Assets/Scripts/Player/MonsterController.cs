@@ -5,6 +5,7 @@ using UnityEngine;
 public class MonsterController : PlayerController {
 
     private static float lightRadSqr = 1;
+    private static float inLightSpeedModification = 2.5f;
 
     private bool prevInLight = false;
 
@@ -21,12 +22,12 @@ public class MonsterController : PlayerController {
             if (!prevInLight)
             {
                 prevInLight = true;
-                ModifySpeed(-0.05f);
+                ModifySpeed(-inLightSpeedModification);
             }
         }
         else if (prevInLight)
         {
-            ModifySpeed(0.05f);
+            ModifySpeed(inLightSpeedModification);
             prevInLight = false;
         }
     }

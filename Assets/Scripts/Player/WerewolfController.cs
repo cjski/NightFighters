@@ -7,14 +7,14 @@ public class WerewolfController : MonsterController
     public float knockbackCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
     public float knockbackRange { get; private set; } = 2.2f;
     public float knockbackDuration { get; private set; } = 1.0f;
-    public float knockbackSpeed { get; private set; } = 0.15f;
+    public float knockbackSpeed { get; private set; } = 7.5f;
     public float dashDuration { get; private set; } = 0.5f;
     public float dashSpeedModifier { get; private set; } = 1.5f;
 
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.075f;
+        baseSpeed = 3.75f;
         maxHealth = 100;
         primaryCooldown = new Timer(4.5f, true);
         secondaryCooldown = new Timer(4, true);

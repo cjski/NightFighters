@@ -10,7 +10,7 @@ public class WatchmanController : HumanController
     public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
     public float stunTime { get; private set; } = 0.25f;
     public int damage { get; private set; } = 20;
-    public float lanternInitialSpeed { get; private set; } = 0.325f;
+    public float lanternInitialSpeed { get; private set; } = 16.25f;
     public float lanternDistanceToPickUpSqr { get; private set; } = 0.3f;
     public Timer catchTimer { get; private set; } = new Timer(.5f);
     public Timer returnTimer { get; private set; } = new Timer(2.5f, true);
@@ -22,7 +22,7 @@ public class WatchmanController : HumanController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.065f;
+        baseSpeed = 3.25f;
         maxHealth = 100;
         primaryCooldown = new Timer(2.5f, true);
         secondaryCooldown = new Timer(5, true);

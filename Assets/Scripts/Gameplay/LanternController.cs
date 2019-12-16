@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class LanternController : LightController
 {
+    public static float speedDecline = 0.2f;
     public float speed = 2;
     public Vector2 direction;
 
@@ -31,9 +32,9 @@ public class LanternController : LightController
             if (hitWallX.collider != null && hitWallX.collider.gameObject.tag == "Wall") direction.x *= -1;
             if (hitWallY.collider != null && hitWallY.collider.gameObject.tag == "Wall") direction.y *= -1;
 
-            GetComponent<Transform>().Translate(speed* direction);
+            GetComponent<Transform>().Translate(speed * direction * Time.deltaTime);
 
-            speed -= 0.01f;
+            speed -= speedDecline;
         }
     }
 

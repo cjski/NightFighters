@@ -12,9 +12,9 @@ public class VampireBossController : BossController
     public float biteStunDuration { get; private set; } = 1.3f;
     public int biteHealAmount { get; private set; } = 10;
     public int biteDamage { get; private set; } = 15;
-    public float slowProjectileSpeed { get; private set; } = 0.12f;
-    public float slowProjectileExitSpeed { get; private set; } = 0.3f;
-    public float slowProjectileReturnSpeed { get; private set; } = 0.2f;
+    public float slowProjectileSpeed { get; private set; } = 6.0f;
+    public float slowProjectileExitSpeed { get; private set; } = 15.0f;
+    public float slowProjectileReturnSpeed { get; private set; } = 10.0f;
     public float slowProjectileDuration { get; private set; } = 10f;
     public float slowStallTime { get; private set; } = 0.75f;
     public float slowExitTime { get; private set; } = 0.075f;
@@ -37,7 +37,7 @@ public class VampireBossController : BossController
     // Start is called before the first frame update
     new protected void Start()
     {
-        baseSpeed = 0.07f;
+        baseSpeed = 3.5f;
         maxHealth = 200;
         primaryCooldown = new Timer(3, true);
         secondaryCooldown = new Timer(6, true);

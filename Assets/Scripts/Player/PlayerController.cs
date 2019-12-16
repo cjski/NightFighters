@@ -214,7 +214,7 @@ public abstract class PlayerController : MonoBehaviour {
                 }
                 else
                 {
-                    directionXVector.x = moveSpeed / (hit.distance - halfSizeX.x) * (directionXVector.x > 0 ? 1 : -1);
+                    directionXVector.x = moveSpeed * Time.deltaTime / (hit.distance - halfSizeX.x) * (directionXVector.x > 0 ? 1 : -1);
                 }
                
                 if(hit.collider.gameObject.tag == "Wall")
@@ -250,7 +250,7 @@ public abstract class PlayerController : MonoBehaviour {
                 }
                 else
                 {
-                    directionYVector.y = moveSpeed / (hit.distance - halfSizeY.y) * (directionYVector.y > 0 ? 1 : -1);
+                    directionYVector.y = moveSpeed * Time.deltaTime / (hit.distance - halfSizeY.y) * (directionYVector.y > 0 ? 1 : -1);
                 }
                 
                 if (hit.collider.gameObject.tag == "Wall")

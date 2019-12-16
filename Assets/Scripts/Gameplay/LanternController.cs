@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LanternController : LightController
 {
-    public static float speedDecline = 0.2f;
+    public static float speedDecline = 25.0f;
     public float speed = 2;
     public Vector2 direction;
 
@@ -34,7 +34,7 @@ public class LanternController : LightController
 
             GetComponent<Transform>().Translate(speed * direction * Time.deltaTime);
 
-            speed -= speedDecline;
+            speed -= speedDecline * Time.deltaTime;
         }
     }
 

@@ -31,18 +31,7 @@ public class HumanAI : AI
 
     protected override void Update()
     {
-        if (playerController != null)
-        {
-            canSeeTarget = false;
-            targetIsPlayer = false;
-            finalDirection = GetDirectionToTargetForMovement();
-            if (canSeeTarget && targetIsPlayer && playerController.primaryCooldown.done)
-            {
-                playerController.AIUsePrimary();
-            }
-
-            if (finalDirection.sqrMagnitude > 0.01f) playerController.AIMove(finalDirection);
-        }
+        
     }
 
     protected Vector2 GetDirectionToTargetForMovement()

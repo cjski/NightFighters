@@ -7,7 +7,7 @@ public class MonsterAI : AI
     static Map map;
     static float directionToTargetWeight = 1.0f;
     static float directionToBestTileWeight = 0.75f;
-    static float directionAwayFromObstacleWeight = 1.0f;
+    static float directionAwayFromObstacleWeight = 1.2f;
     private Vector2 finalDirection = new Vector2(0, 0);
     private Vector2 previousDirection = new Vector2(0, 0);
 
@@ -227,10 +227,10 @@ public class MonsterAI : AI
                     }
                 }
 
-                Debug.Log("RightDist:" + rightNodeBestDistance +
+                /*Debug.Log("RightDist:" + rightNodeBestDistance +
                     ", UpDist:" + upNodeBestDistance +
                     ", DownDist:" + downNodeBestDistance +
-                    ", LeftDist:" + leftNodeBestDistance);
+                    ", LeftDist:" + leftNodeBestDistance);*/
                 direction += ((map.GetRealNodePosition(destination.x, destination.y) - selfPosition).normalized) * directionToBestTileWeight;
                 totalToTiles += ((map.GetRealNodePosition(destination.x, destination.y) - selfPosition).normalized) * directionToBestTileWeight;
             }
@@ -240,7 +240,7 @@ public class MonsterAI : AI
         Vector2 directionAwayFromWall = GetDirectionAwayFromObstacles(direction.normalized);
         Vector2 moveDirection = direction;
         direction += GetDirectionAwayFromObstacles(direction.normalized);
-        Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
+        //Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
     }
 
     Vector2 GetDirectionAwayFromObstacles(Vector2 direction)
@@ -260,7 +260,7 @@ public class MonsterAI : AI
         };
 
         Vector2 directionXVector = new Vector2(direction.x, 0);
-        float distanceForRaycastX = size.x * 2;
+        float distanceForRaycastX = size.x * 2.5f;
         bool gameObjectInX = false;
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)

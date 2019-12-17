@@ -5,7 +5,7 @@ using UnityEngine;
 public class WatchmanAI : HumanAI
 {
     protected static int ignoreLightLayerMask;
-    protected static float lanternDistanceOffset = -2.0f;
+    protected static float lanternDistanceOffset = -1.0f;
 
     protected override void Start()
     {
@@ -29,10 +29,15 @@ public class WatchmanAI : HumanAI
             {
                 wc.AIUsePrimary();
             }
-            else if( distanceToTargetSquared < wc.lanternInitialSpeed * wc.lanternInitialSpeed * 120 && wc.holdingLantern && wc.secondaryCooldown.done)
+            else if( distanceToTargetSquared < wc.lanternInitialSpeed * wc.lanternInitialSpeed && wc.holdingLantern && wc.secondaryCooldown.done)
             {
                 wc.AIUseSecondary();
             }
+        }
+
+        if(!wc.holdingLantern && targetIsPlayer && wc.secondaryCooldown.done)
+        {
+            wc.AIUseSecondary();
         }
 
         if (finalDirection.sqrMagnitude > 0.01f) wc.AIMove(finalDirection);

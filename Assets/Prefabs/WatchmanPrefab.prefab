@@ -37,7 +37,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300006, guid: f54ba5780d9271d4cb06570648aea2a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -60,7 +60,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28ed57e7eb153de41be65b736561b9a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useMouseMovement: 1
   text: {fileID: 0}
   lantern: {fileID: 0}
 --- !u!1 &7996799381474743312
@@ -149,6 +148,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 319041188654883423, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 8c9d3d6ca8409a74d8c64b8f61dd751b, type: 2}
+    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.03096056
+      objectReference: {fileID: 0}
+    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6198779143639744097, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
         type: 3}
       propertyPath: m_Name
@@ -209,20 +228,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+    - target: {fileID: 6257993203010116619, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
         type: 3}
-      propertyPath: m_Color.r
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 6257993203010116619, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 0.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 6257993203010116619, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 6257993203010116619, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6257993203010116619, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_UsedByComposite
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
-        type: 3}
-      propertyPath: m_Color.g
-      value: 0.03096056
-      objectReference: {fileID: 0}
-    - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
-        type: 3}
-      propertyPath: m_Color.b
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4961073647727660407, guid: 28dff1ea0cf88724bbd79801c2a34a2f, type: 3}

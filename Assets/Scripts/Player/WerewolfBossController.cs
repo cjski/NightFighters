@@ -8,7 +8,7 @@ public class WerewolfBossController : BossController
     public float knockbackRange { get; private set; } = 2;
     public float knockbackDuration { get; private set; } = 1.0f;
     public float knockbackSpeed { get; private set; } = 7.5f;
-    public int knockbackDamage { get; private set; } = 40;
+    public int knockbackDamage { get; private set; } = 25;
     public float knockbackStunDuration { get; private set; } = 1.5f;
     public float dashDuration { get; private set; } = 0.75f;
     public float dashSpeedModifier { get; private set; } = 1.6f;

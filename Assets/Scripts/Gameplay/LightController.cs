@@ -22,6 +22,8 @@ public class LightController : MonoBehaviour {
         halo = (Behaviour)GetComponent("Halo");
         halo.enabled = false;
 
+        GetComponent<SpriteRenderer>().sortingOrder = -1;
+
         anim = GetComponent<Animator>();
         if (anim) anim.Play("Off");
     }

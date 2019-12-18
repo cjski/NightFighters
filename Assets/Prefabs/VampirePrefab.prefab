@@ -68,11 +68,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 7531724258392790886, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
-        type: 3}
-      propertyPath: m_Name
-      value: VampirePrefab
-      objectReference: {fileID: 0}
     - target: {fileID: 4246056355677391704, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_Controller
@@ -81,12 +76,42 @@ PrefabInstance:
     - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 0.32
+      value: 0.64
       objectReference: {fileID: 0}
     - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 0.32
+      value: 0.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Size.x
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Offset.x
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Size.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Offset.y
+      value: -0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 7518944495400187148, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_AutoTiling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7531724258392790886, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Name
+      value: VampirePrefab
       objectReference: {fileID: 0}
     - target: {fileID: 7535175840963685216, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}

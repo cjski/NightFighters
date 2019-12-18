@@ -7,8 +7,8 @@ public class MonsterAI : AI
     protected static Map map;
     protected static float directionToTargetWeight = 1.0f;
     protected static float directionToBestTileWeight = 0.75f;
-    protected static float directionAwayFromObstacleWeight = 1.2f;
-    protected static float minimumDistanceFromHumansSqr = 15.0f;
+    protected static float directionAwayFromObstacleWeight = 1.0f;
+    protected static float minimumDistanceFromHumansSqr = 50.0f;
     protected private Vector2 finalDirection = new Vector2(0, 0);
     private Vector2 previousDirection = new Vector2(0, 0);
 
@@ -272,6 +272,37 @@ public class MonsterAI : AI
                     {
                         distanceToLightSqr = toTarget.sqrMagnitude;
                         direction = newTargetDirection;
+                    }
+                    else
+                    {
+                        Node targetNode = map.GetNode(targetPosition);
+                        // Add one to the target distance calculation because if they are on the same node it will count as 0
+                        float targetDistanceSqr = Mathf.Pow((selfNode.distances[targetNode.x, targetNode.y] + 1 ) * map.unitSize, 2);
+                        if (targetDistanceSqr < distanceToLightSqr)
+                        {
+                            Node destination = selfNode;
+
+                            // Pick the next best node beside you to go to
+                            if (selfNode.l != Node.Connection.Wall && map.GetNode(selfNode.x - 1, selfNode.y).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                            {
+                                destination = map.GetNode(selfNode.x - 1, selfNode.y);
+                            }
+                            if (selfNode.d != Node.Connection.Wall && map.GetNode(selfNode.x, selfNode.y - 1).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                            {
+                                destination = map.GetNode(selfNode.x, selfNode.y - 1);
+                            }
+                            if (selfNode.u != Node.Connection.Wall && map.GetNode(selfNode.x, selfNode.y + 1).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                            {
+                                destination = map.GetNode(selfNode.x, selfNode.y + 1);
+                            }
+                            if (selfNode.r != Node.Connection.Wall && map.GetNode(selfNode.x + 1, selfNode.y).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                            {
+                                destination = map.GetNode(selfNode.x + 1, selfNode.y);
+                            }
+
+                            direction = map.GetRealNodePosition(destination.x, destination.y) - selfPosition;
+                            distanceToLightSqr = targetDistanceSqr;
+                        }
                     }
                 }
             }

@@ -46,7 +46,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     public bool isAlive { get; private set; } = true;
 
-    private Animator anim;
+    protected Animator anim;
 
     protected static int ignoreLayerMask;
 
@@ -89,7 +89,7 @@ public abstract class PlayerController : MonoBehaviour {
                 }
                 else
                 {
-                    if(anim) anim.Play("Idle");
+                    PlayIdle();
                 }
             }
             else if (controller.Type() == Controller.ControllerType.Mouse)
@@ -141,7 +141,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         else
         {
-            if (anim) anim.Play("Idle");
+            PlayIdle();
         }
     }
 
@@ -160,7 +160,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         else
         {
-            if (anim) anim.Play("Idle");
+            PlayIdle();
         }
     }
 
@@ -177,7 +177,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         else
         {
-            if (anim) anim.Play("Idle");
+            PlayIdle();
         }
     }
 
@@ -262,7 +262,7 @@ public abstract class PlayerController : MonoBehaviour {
         }
         transform.Translate(moveSpeed * directionYVector * Time.deltaTime);
 
-        if (anim) anim.Play("Walk");
+        PlayWalk();
         if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
         else GetComponent<SpriteRenderer>().flipX = true;
     }
@@ -379,6 +379,17 @@ public abstract class PlayerController : MonoBehaviour {
     public Vector2 GetSize()
     {
         return GetComponent<Collider2D>().bounds.size;
+    }
+
+    // By default play an idle animation, if a player has a different animation it will be overriden to use the logic of the class
+    protected virtual void PlayIdle()
+    {
+        if (anim) anim.Play("Idle");
+    }
+
+    protected virtual void PlayWalk()
+    {
+        if (anim) anim.Play("Walk");
     }
 
     public void ActivateAI(int newPlayerNumber)

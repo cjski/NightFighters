@@ -113,4 +113,34 @@ public class WatchmanController : HumanController
     {
         Destroy(lantern);
     }
+
+    protected override void PlayIdle()
+    {
+        if(anim)
+        {
+            if (holdingLantern)
+            {
+                anim.Play("Idle_Lantern");
+            }
+            else
+            {
+                anim.Play("Idle_NoLantern");
+            }
+        }
+    }
+
+    protected override void PlayWalk()
+    {
+        if (anim)
+        {
+            if (holdingLantern)
+            {
+                anim.Play("Walk_Lantern");
+            }
+            else
+            {
+                anim.Play("Walk_NoLantern");
+            }
+        }
+    }
 }

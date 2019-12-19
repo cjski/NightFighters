@@ -170,7 +170,7 @@ public class PlayerInformation
 
 public class GameController : MonoBehaviour
 {
-    enum State { game, bossFight, characterSelect, newHumanSelect, enterGameMenu }
+    enum State { game, bossFight, endGameScreen, characterSelect, newHumanSelect, enterGameMenu }
 
     State state;
     PlayerInformation[] playerInfo = new PlayerInformation[GameConstants.NUM_PLAYERS];
@@ -190,7 +190,10 @@ public class GameController : MonoBehaviour
     int numHumans = 1;
     int numMonsters = 3;
 
+    Timer endGameScreenTimer = new Timer(5);
+
     GameObject enterGameMenuPanel;
+    GameObject endGamePanel;
     GameObject startButton;
     GameObject characterInfoPanelPrefab;
     GameObject[] characterInfoPanels = new GameObject[GameConstants.NUM_PLAYERS];
@@ -255,6 +258,22 @@ public class GameController : MonoBehaviour
         {
             UpdateEnterGameMenu();
         }
+        else if(state == State.endGameScreen)
+        {
+            UpdateEndGameScreen();
+        }
+    }
+
+    private void ClearAllGameObjects()
+    {
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            if (playerInfo[i] != null)
+            {
+                Destroy(playerInfo[i].character);
+            }
+        }
+        stageMap.ClearAll();
     }
 
     private void UpdateEnterGameMenu()
@@ -274,15 +293,13 @@ public class GameController : MonoBehaviour
         nextPlayerToAddIndex = 0;
         numHumans = 1;
         numMonsters = 3;
+
+        ClearAllGameObjects();
+
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            if (playerInfo[i] != null)
-            {
-                Destroy(playerInfo[i].character);
-            }
             playerInfo[i] = new PlayerInformation();
         }
-        stageMap.ClearAll();
 
         for (int i = 0; i < ControlSchemeHandler.controlSchemes.Length; ++i)
         {
@@ -368,7 +385,7 @@ public class GameController : MonoBehaviour
 
         if (numHumans == 0 || numMonsters == 0)
         {
-            StartEnterGameMenu();
+            StartEndGameScreen();
         }
     }
 
@@ -402,6 +419,52 @@ public class GameController : MonoBehaviour
         {
             CharacterSelectRegisterInput(i, false);
             ResetCharacterInfoPanel(i, false);
+        }
+    }
+
+    private void StartEndGameScreen()
+    {
+        state = State.endGameScreen;
+        ClearAllGameObjects();
+        endGamePanel = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/EndGamePanelPrefab.prefab", typeof(GameObject)), GameConstants.END_GAME_MENU_PANEL_POSITION, Quaternion.identity);
+        SpriteRenderer[] spriteRenderers = {
+            endGamePanel.transform.Find("SpriteLeft"  ).gameObject.GetComponent<SpriteRenderer>(),
+            endGamePanel.transform.Find("SpriteMiddle").gameObject.GetComponent<SpriteRenderer>(),
+            endGamePanel.transform.Find("SpriteRight" ).gameObject.GetComponent<SpriteRenderer>()
+        };
+
+        Text text = endGamePanel.transform.Find("Canvas").GetComponentInChildren<Text>();
+
+        endGameScreenTimer.Reset();
+
+        // Humans lost
+        if (numHumans == 0)
+        {
+            text.text = "Monsters Win!";
+            spriteRenderers[1].sprite = playerInfo[newBossIndex].classInformation.prefab.GetComponent<SpriteRenderer>().sprite;
+        }
+        else
+        {
+            text.text = "Humans Win!";
+            int rendererIndex = 0;
+            for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+            {
+                if (playerInfo[i].classInformation.isHumanClass)
+                {
+                    spriteRenderers[rendererIndex].sprite = playerInfo[i].classInformation.prefab.GetComponent<SpriteRenderer>().sprite;
+                    ++rendererIndex;
+                }
+            }
+        }
+    }
+
+    private void UpdateEndGameScreen()
+    {
+        endGameScreenTimer.Update();
+        if(endGameScreenTimer.done && Input.GetKeyDown(GameConstants.DEFAULT_GAME_START_KEY))
+        {
+            Destroy(endGamePanel);
+            StartEnterGameMenu();
         }
     }
 

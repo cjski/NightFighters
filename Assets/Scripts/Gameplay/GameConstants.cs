@@ -29,6 +29,8 @@ public static class GameConstants
 
     public static Vector3 ENTER_GAME_MENU_PANEL_POSITION = new Vector3(0, 0, 0);
 
+    public static Vector3 END_GAME_MENU_PANEL_POSITION = new Vector3(0, 0, 0);
+
     public static Vector3 START_BUTTON_POSITION = new Vector3(10, -1.7f, 0);
 
     public static Vector2[] PLAYER_SPAWN_POSITIONS =

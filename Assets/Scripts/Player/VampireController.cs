@@ -16,7 +16,7 @@ public class VampireController : MonsterController
     public float slowProjectileDuration { get; private set; } = 10f;
     public float slowStallTime { get; private set; } = 0.75f;
     public float slowExitTime { get; private set; } = 0.05f;
-    public float slowAmount { get; private set; } = 0.05f;
+    public float slowAmount { get; private set; } = 1.0f;
     public float slowDuration { get; private set; } = 2;
     public float dashDuration { get; private set; } = 0.3f;
     public float dashSpeedModifier { get; private set; } = 1.6f;

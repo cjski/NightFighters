@@ -29,7 +29,7 @@ public class VampireBossController : BossController
         Quaternion.Euler(0, 0, -135),
         Quaternion.Euler(0, 0, -180),
     };
-    public float slowAmount { get; private set; } = 0.05f;
+    public float slowAmount { get; private set; } = 1.1f;
     public float slowDuration { get; private set; } = 2;
     public float dashDuration { get; private set; } = 0.3f;
     public float dashSpeedModifier { get; private set; } = 1.7f;

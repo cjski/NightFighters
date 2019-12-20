@@ -190,7 +190,7 @@ public class GameController : MonoBehaviour
     int numHumans = 1;
     int numMonsters = 3;
 
-    Timer endGameScreenTimer = new Timer(5);
+    Timer endGameScreenTimer = new Timer(2.5f);
 
     GameObject enterGameMenuPanel;
     GameObject endGamePanel;
@@ -433,7 +433,8 @@ public class GameController : MonoBehaviour
             endGamePanel.transform.Find("SpriteRight" ).gameObject.GetComponent<SpriteRenderer>()
         };
 
-        Text text = endGamePanel.transform.Find("Canvas").GetComponentInChildren<Text>();
+        Text[] texts = endGamePanel.transform.Find("Canvas").GetComponentsInChildren<Text>();
+        Text text = texts[0].name == "TextVictory" ? texts[0] : texts[1];
 
         endGameScreenTimer.Reset();
 
@@ -460,11 +461,19 @@ public class GameController : MonoBehaviour
 
     private void UpdateEndGameScreen()
     {
+        Text[] texts = endGamePanel.transform.Find("Canvas").GetComponentsInChildren<Text>();
+        Text text = texts[0].name == "TextEnterButton" ? texts[0] : texts[1];
+        text.text = "";
+
         endGameScreenTimer.Update();
-        if(endGameScreenTimer.done && Input.GetKeyDown(GameConstants.DEFAULT_GAME_START_KEY))
+        if(endGameScreenTimer.done)
         {
-            Destroy(endGamePanel);
-            StartEnterGameMenu();
+            text.text = "Press Enter to Continue";
+            if (Input.GetKeyDown(GameConstants.DEFAULT_GAME_START_KEY))
+            {
+                Destroy(endGamePanel);
+                StartEnterGameMenu();
+            }
         }
     }
 

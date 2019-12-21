@@ -82,4 +82,9 @@ public class VampireBossController : BossController
         ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
         secondaryCooldown.Reset();
     }
+
+    public override float GetDashDistance()
+    {
+        return speed * dashSpeedModifier * dashDuration;
+    }
 }

@@ -74,4 +74,9 @@ public class VampireController : MonsterController
         ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
         secondaryCooldown.Reset();
     }
+
+    public override float GetDashDistance()
+    {
+        return speed * dashSpeedModifier * dashDuration;
+    }
 }

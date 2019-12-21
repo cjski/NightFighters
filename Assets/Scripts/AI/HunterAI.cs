@@ -5,8 +5,6 @@ using UnityEngine;
 public class HunterAI : HumanAI
 {
     protected static int wallLayerMask;
-    protected static float allowableDashDistance = 5.0f;
-    protected static float minimumDistanceFromTargetForDashSqr = 25.0f;
     protected override void Start()
     {
         wallLayerMask = LayerMask.GetMask("Wall");
@@ -18,6 +16,7 @@ public class HunterAI : HumanAI
     {
         if (playerController != null)
         {
+            HunterController hc = (HunterController)playerController;
             canSeeTarget = false;
             targetIsPlayer = false;
             finalDirection = GetDirectionToTargetForMovement();
@@ -25,15 +24,16 @@ public class HunterAI : HumanAI
             {
                 playerController.AIUsePrimary();
             }
-            if(playerController.secondaryCooldown.done)
+            // Use an else here so the AI doesn't end up using 2 powers in one turn
+            else if(playerController.secondaryCooldown.done)
             {
-                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, allowableDashDistance, wallLayerMask);
+                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, hc.GetDashDistance(), wallLayerMask);
 
                 // Dash if there is no wall that the AI would crash into
                 if ( hitTarget.collider == null )
                 {
                     // Don't dash if you would overshoot(light) or crash into the target(player)
-                    if (!canSeeTarget || (canSeeTarget && distanceToTargetSquared > minimumDistanceFromTargetForDashSqr) )
+                    if (!canSeeTarget || (canSeeTarget && distanceToTargetSquared > Mathf.Pow(hc.GetDashDistance(),2)))
                     {
                         playerController.AIUseSecondary();
                     }

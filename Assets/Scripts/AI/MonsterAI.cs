@@ -10,10 +10,12 @@ public class MonsterAI : AI
     protected static float directionAwayFromObstacleWeight = 1.0f;
     protected static float directionAwayFromObstacleMax = 1.0f;
     protected static float minimumDistanceFromHumansSqr = 50.0f;
-    protected private Vector2 finalDirection = new Vector2(0, 0);
-    private Vector2 previousDirection = new Vector2(0, 0);
 
-    protected new void Start()
+    protected Vector2 directionToAttack;
+    protected float closestHumanDistanceSqr;
+    protected float closestLightDistanceSqr;
+
+    protected override void Start()
     {
         base.Start();
     }
@@ -29,29 +31,26 @@ public class MonsterAI : AI
     {
         if (playerController != null)
         {
-            bool canSeeTarget = false;
-            bool isPlayer = false;
-            GetDirectionToTargetForMovement(ref finalDirection, ref canSeeTarget, ref isPlayer);
+            finalDirection = GetDirectionToTargetForMovement();
 
             if (finalDirection.sqrMagnitude > 0.01f)
             {
                 playerController.AIMove(finalDirection);
             }
-
-            previousDirection = finalDirection;
         }
     }
 
-    void GetDirectionToTargetForMovement(ref Vector2 direction, ref bool canSeeTarget, ref bool isPlayer)
+    protected Vector2 GetDirectionToTargetForMovement()
     {
-        direction = Vector2.zero;
+        Vector2 direction = Vector2.zero;
+
+        closestHumanDistanceSqr = 9999;
+        closestLightDistanceSqr = 9999;
 
         bool biasUpNode = true;
         bool biasRightNode = true;
 
         bool canTurnOffLight = true;
-
-        canSeeTarget = false;
         
         Node selfNode = map.GetNode(playerController.gameObject.transform.position);
         
@@ -75,10 +74,10 @@ public class MonsterAI : AI
                 toTarget = targetPosition - selfPosition;
 
                 Vector2 newTargetDirection = Vector2.zero;
-                canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLightLanternProjectileLayerMask);
+                bool canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLightLanternProjectileLayerMask);
 
-                float distanceToHumanSqr = 0;
                 Node targetNode = map.GetNode(targetPosition);
+                float distanceToNewTargetSqr = 0;
 
                 if (canSeeTarget)
                 {
@@ -91,17 +90,23 @@ public class MonsterAI : AI
                     biasUpNode = toTarget.y < 0 ? true : false;
                     biasRightNode = toTarget.x < 0 ? true : false;
 
-                    distanceToHumanSqr = toTarget.sqrMagnitude;
+                    distanceToNewTargetSqr = toTarget.sqrMagnitude;
                 }
                 else
                 {
-                    distanceToHumanSqr = Mathf.Pow(selfNode.distances[targetNode.x, targetNode.y] * map.unitSize, 2);
+                    distanceToNewTargetSqr = Mathf.Pow(selfNode.distances[targetNode.x, targetNode.y] * map.unitSize, 2);
                 }
 
                 // If a human is too close to this AI then turning off a light could end up in them getting caught, so don't do it
-                if(distanceToHumanSqr < minimumDistanceFromHumansSqr)
+                if(distanceToNewTargetSqr < minimumDistanceFromHumansSqr)
                 {
                     canTurnOffLight = false;
+                }
+
+                if(closestHumanDistanceSqr > distanceToNewTargetSqr)
+                {
+                    directionToAttack = toTarget;
+                    closestHumanDistanceSqr = distanceToNewTargetSqr;
                 }
 
                 Node destination = selfNode;
@@ -257,7 +262,6 @@ public class MonsterAI : AI
 
         if(canTurnOffLight)
         {
-            float distanceToLightSqr = 9999.0f;
             for (int i = 0; i < lights.Length; ++i)
             {
                 LightController lc = lights[i].GetComponent<LightController>();
@@ -268,10 +272,10 @@ public class MonsterAI : AI
                     toTarget = targetPosition - selfPosition;
 
                     Vector2 newTargetDirection = Vector2.zero;
-                    canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLanternProjectileLayerMask);
-                    if (canSeeTarget && toTarget.sqrMagnitude < distanceToLightSqr)
+                    bool canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, ignoreLanternProjectileLayerMask);
+                    if (canSeeTarget && toTarget.sqrMagnitude < closestLightDistanceSqr)
                     {
-                        distanceToLightSqr = toTarget.sqrMagnitude;
+                        closestLightDistanceSqr = toTarget.sqrMagnitude;
                         direction = newTargetDirection;
                     }
                     else
@@ -279,7 +283,7 @@ public class MonsterAI : AI
                         Node targetNode = map.GetNode(targetPosition);
                         // Add one to the target distance calculation because if they are on the same node it will count as 0
                         float targetDistanceSqr = Mathf.Pow((selfNode.distances[targetNode.x, targetNode.y] + 1 ) * map.unitSize, 2);
-                        if (targetDistanceSqr < distanceToLightSqr)
+                        if (targetDistanceSqr < closestLightDistanceSqr)
                         {
                             Node destination = selfNode;
 
@@ -302,7 +306,7 @@ public class MonsterAI : AI
                             }
 
                             direction = map.GetRealNodePosition(destination.x, destination.y) - selfPosition;
-                            distanceToLightSqr = targetDistanceSqr;
+                            closestLightDistanceSqr = targetDistanceSqr;
                         }
                     }
                 }
@@ -314,9 +318,14 @@ public class MonsterAI : AI
         //Vector2 moveDirection = direction;
         direction += GetDirectionAwayFromObstacles(direction.normalized);
         //Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
+
+        return direction;
     }
 
-    Vector2 GetDirectionAwayFromObstacles(Vector2 direction)
+    // If the AI is going to run into a wall then move them away from it
+    // Effect of the vector is increased the closer to the wall the AI is
+    // Need to check all around the AI in order to prevent them from getting stuck in corners and escaping as soon as possible
+    private Vector2 GetDirectionAwayFromObstacles(Vector2 direction)
     {
         Vector2 directionAwayFromObstacle = new Vector2();
 

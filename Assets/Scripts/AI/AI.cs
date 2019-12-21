@@ -6,6 +6,7 @@ public class AI : MonoBehaviour
 {
     protected static int ignoreLightLanternProjectileLayerMask;
     protected static int ignoreLanternProjectileLayerMask;
+    protected Vector2 finalDirection = new Vector2(0, 0);
 
     protected PlayerController playerController;
 

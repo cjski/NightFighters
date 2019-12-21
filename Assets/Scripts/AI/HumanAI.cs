@@ -6,12 +6,11 @@ public class HumanAI : AI
 {
     protected static Map map;
     protected static float lightTargetDistanceOffset = 50; //Offsets the distance for the lights so the AI is more likely to target players
-    protected Vector2 finalDirection = new Vector2(0, 0);
     protected float distanceToTargetSquared;
+    protected bool targetIsPlayer;
+    protected bool canSeeTarget;
     protected Node selfNode;
     protected Vector2 selfPosition;
-    protected bool canSeeTarget;
-    protected bool targetIsPlayer;
     protected float range = 3;
 
     protected override void Start()

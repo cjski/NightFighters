@@ -381,6 +381,11 @@ public abstract class PlayerController : MonoBehaviour {
         return GetComponent<Collider2D>().bounds.size;
     }
 
+    public virtual float GetDashDistance()
+    {
+        return 0;
+    }
+
     // By default play an idle animation, if a player has a different animation it will be overriden to use the logic of the class
     protected virtual void PlayIdle()
     {

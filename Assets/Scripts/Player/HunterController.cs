@@ -44,4 +44,9 @@ public class HunterController : HumanController
         //Apply the current speed instead of baseSpeed so the player will dash slower if they're slowed down
         ApplyDash(direction, dashDuration, speed * dashSpeedModifier);
     }
+
+    public override float GetDashDistance()
+    {
+        return speed * dashSpeedModifier * dashDuration;
+    }
 }

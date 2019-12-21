@@ -8,6 +8,7 @@ public class MonsterAI : AI
     protected static float directionToTargetWeight = 1.0f;
     protected static float directionToBestTileWeight = 0.75f;
     protected static float directionAwayFromObstacleWeight = 1.0f;
+    protected static float directionAwayFromObstacleMax = 1.0f;
     protected static float minimumDistanceFromHumansSqr = 50.0f;
     protected private Vector2 finalDirection = new Vector2(0, 0);
     private Vector2 previousDirection = new Vector2(0, 0);
@@ -332,15 +333,14 @@ public class MonsterAI : AI
         };
 
         Vector2 directionXVector = new Vector2(direction.x, 0);
-        float distanceForRaycastX = size.x * 2.5f;
-        bool gameObjectInX = false;
+        float distanceForRaycastX = size.x * 2.0f;
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternProjectileLayerMask);
             if (hit.collider != null)
             {
-                gameObjectInX = true;
+                directionAwayFromObstacle.x = directionAwayFromObstacleMax * (direction.x > 0 ? -1 : 1) * (distanceForRaycastX - hit.distance) / distanceForRaycastX;
                 break;
             }
         }
@@ -355,27 +355,16 @@ public class MonsterAI : AI
         };
 
         Vector2 directionYVector = new Vector2(0, direction.y);
-        float distanceForRaycastY = size.y * 2;
-        bool gameObjectInY = false;
+        float distanceForRaycastY = size.y * 2.0f;
 
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternProjectileLayerMask);
             if (hit.collider != null)
             {
-                gameObjectInY = true;
+                directionAwayFromObstacle.y = directionAwayFromObstacleMax * (direction.y > 0 ? -1 : 1) * (distanceForRaycastY - hit.distance) / distanceForRaycastY;
                 break;
             }
-        }
-
-        if (gameObjectInX)
-        {
-            directionAwayFromObstacle.x = -direction.x;
-        }
-
-        if (gameObjectInY)
-        {
-            directionAwayFromObstacle.y = -direction.y;
         }
 
         return directionAwayFromObstacle * directionAwayFromObstacleWeight;

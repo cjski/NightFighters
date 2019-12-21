@@ -8,7 +8,7 @@ public class VampireController : MonsterController
     private static GameObject slowProjectilePrefab;
 
     public float biteCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
-    public float biteRange { get; private set; } = 2;
+    public float biteRange { get; private set; } = 1.0f;
     public float biteStunDuration { get; private set; } = 1;
     public int biteHealAmount { get; private set; } = 5;
     public float slowProjectileExitSpeed { get; private set; } = 15.0f;

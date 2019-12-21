@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WerewolfAI : MonsterAI
+public class VampireAI : MonsterAI
 {
     protected static int wallLayerMask;
     // Start is called before the first frame update
@@ -17,23 +17,24 @@ public class WerewolfAI : MonsterAI
     {
         if (playerController != null)
         {
-            WerewolfController wc = (WerewolfController)playerController;
+            VampireController vc = (VampireController)playerController;
             finalDirection = GetDirectionToTargetForMovement();
 
-            if(wc.primaryCooldown.done && Mathf.Pow(wc.knockbackRange, 2) > closestHumanDistanceSqr)
+            if (vc.primaryCooldown.done && Mathf.Pow(vc.biteRange, 2) > closestHumanDistanceSqr)
             {
-                wc.AIMove(directionToAttack);
-                wc.AIUsePrimary();
+                vc.AIMove(directionToAttack);
+                vc.AIUsePrimary();
             }
-            else if(wc.secondaryCooldown.done)
+            // Do a dash as a vampire if you can slow the humans down, don't just waste it
+            else if (vc.secondaryCooldown.done && Mathf.Pow(vc.GetDashDistance(), 2) > closestHumanDistanceSqr)
             {
-                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, wc.GetDashDistance(), wallLayerMask);
+                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, vc.GetDashDistance(), wallLayerMask);
 
                 // Dash if there is no wall that the AI would crash into
                 if (hitTarget.collider == null)
                 {
-                    // Don't dash if you would overshoot a light you want to turn off or if you have a position you don't want to move from
-                    if (closestLightDistanceSqr > Mathf.Pow(wc.GetDashDistance(), 2) && finalDirection.sqrMagnitude > 0.01f)
+                    // Don't dash if you would overshoot a light you want to turn off
+                    if (closestLightDistanceSqr > Mathf.Pow(vc.GetDashDistance(), 2))
                     {
                         playerController.AIUseSecondary();
                     }

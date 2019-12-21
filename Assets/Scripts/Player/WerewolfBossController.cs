@@ -5,7 +5,7 @@ using UnityEngine;
 public class WerewolfBossController : BossController
 {
     public float knockbackCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 90 / 180);
-    public float knockbackRange { get; private set; } = 2;
+    public float knockbackRange { get; private set; } = 1.3f;
     public float knockbackDuration { get; private set; } = 1.0f;
     public float knockbackSpeed { get; private set; } = 7.5f;
     public int knockbackDamage { get; private set; } = 25;

@@ -33,7 +33,7 @@ public class AI : MonoBehaviour
         if (hitTarget.collider != null && hitTarget.collider.transform != null && hitTarget.collider.transform.position.Equals(targetPosition))
         {
             // Catches any walls that the single ray would miss so that the AI can clip around walls
-            Vector3 size = playerController.GetComponent<Renderer>().bounds.size;
+            Vector2 size = playerController.GetSize();
             int xDir = 1;
             if (toTarget.x * toTarget.y > 0) xDir = -1;
             Vector2 pos1 = (Vector2)playerController.transform.position + new Vector2(size.y * 0.5f, xDir * size.x * 0.5f);

@@ -273,6 +273,12 @@ public class GameController : MonoBehaviour
                 Destroy(playerInfo[i].character);
             }
         }
+
+        GameObject[] projectiles = GameObject.FindGameObjectsWithTag("Projectile");
+        for( int i=0; i < projectiles.Length; ++i)
+        {
+            Destroy(projectiles[i]);
+        }
         stageMap.ClearAll();
     }
 

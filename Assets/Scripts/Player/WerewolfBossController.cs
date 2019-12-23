@@ -37,7 +37,7 @@ public class WerewolfBossController : BossController
         {
             if (!(players[i].GetComponent<MonsterController>()))
             {
-                Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
+                Vector2 toPlayer = (Vector2)players[i].transform.position - GetPosition();
                 if (InRange(toPlayer, knockbackRange, knockbackCosAngle))
                 {
                     PlayerController pc = players[i].GetComponent<PlayerController>();

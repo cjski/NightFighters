@@ -27,7 +27,7 @@ public class WerewolfAI : MonsterAI
             }
             else if(wc.secondaryCooldown.done)
             {
-                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, wc.GetDashDistance(), wallLayerMask);
+                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.GetPosition(), finalDirection, wc.GetDashDistance(), wallLayerMask);
 
                 // Dash if there is no wall that the AI would crash into
                 if (hitTarget.collider == null)

@@ -150,7 +150,7 @@ public abstract class PlayerController : MonoBehaviour {
         Vector3 mPos3d = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 1); //new Vector2(Screen.width/2, Screen.height/2);
         mPos3d = Camera.main.ScreenToWorldPoint(mPos3d);
         Vector2 mPos2d = new Vector2(mPos3d.x, mPos3d.y);
-        Vector2 move = mPos2d - GetComponent<Rigidbody2D>().position;
+        Vector2 move = mPos2d - GetPosition();
         float distToMoveSqr = move.sqrMagnitude;
 
         direction = move.normalized;
@@ -185,7 +185,7 @@ public abstract class PlayerController : MonoBehaviour {
     {
         hitWall = false;
 
-        Vector2 pos = transform.position;
+        Vector2 pos = GetPosition();
         Vector2 size = GetSize();
         Vector2 halfSizeY = new Vector2(0, size.y * 0.5f);
         Vector2 halfSizeX = new Vector2(size.x * 0.5f, 0);
@@ -374,6 +374,11 @@ public abstract class PlayerController : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    public Vector2 GetPosition()
+    {
+        return (Vector2)gameObject.transform.position + gameObject.GetComponent<BoxCollider2D>().offset;
     }
 
     public Vector2 GetSize()

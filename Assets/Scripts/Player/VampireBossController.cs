@@ -60,7 +60,7 @@ public class VampireBossController : BossController
         {
             if (!(players[i].GetComponent<MonsterController>()))
             {
-                Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
+                Vector2 toPlayer = (Vector2)players[i].transform.position - GetPosition();
                 if (InRange(toPlayer, biteRange, biteCosAngle))
                 {
                     players[i].GetComponent<PlayerController>().ApplyStun(biteStunDuration);
@@ -76,7 +76,7 @@ public class VampireBossController : BossController
     {
         for(int i = 0; i < slowProjectileRotations.Length; ++i)
         {
-            GameObject attack = Instantiate(slowProjectilePrefab, transform.position, transform.rotation);
+            GameObject attack = Instantiate(slowProjectilePrefab, GetPosition(), transform.rotation);
             attack.GetComponent<BatProjectileController>().Init(slowProjectileRotations[i] * -direction, slowProjectileExitSpeed, slowProjectileReturnSpeed, slowStallTime, slowExitTime, slowProjectileDuration, gameObject, slowAmount, slowDuration);
         }
         ApplyDash(direction, dashDuration, speed * dashSpeedModifier);

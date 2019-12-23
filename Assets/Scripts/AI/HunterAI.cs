@@ -27,7 +27,7 @@ public class HunterAI : HumanAI
             // Use an else here so the AI doesn't end up using 2 powers in one turn
             else if(playerController.secondaryCooldown.done)
             {
-                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, hc.GetDashDistance(), wallLayerMask);
+                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.GetPosition(), finalDirection, hc.GetDashDistance(), wallLayerMask);
 
                 // Dash if there is no wall that the AI would crash into
                 if ( hitTarget.collider == null )

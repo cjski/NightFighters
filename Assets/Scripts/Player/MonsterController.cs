@@ -41,8 +41,8 @@ public class MonsterController : PlayerController {
             if (lights[i].GetComponent<LightController>().On())
             {
                 //Use squared distance for faster calculation
-                xDist = transform.position.x - lights[i].transform.position.x;
-                yDist = transform.position.y - lights[i].transform.position.y;
+                xDist = GetPosition().x - lights[i].transform.position.x;
+                yDist = GetPosition().y - lights[i].transform.position.y;
                 if ((xDist * xDist) + (yDist * yDist) < lightRadSqr) return true;
             }
         }

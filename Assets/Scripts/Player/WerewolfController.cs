@@ -41,15 +41,15 @@ public class WerewolfController : MonsterController
                 {
                     lanterns.Add(players[i].GetComponent<WatchmanController>().lantern);
                 }
-                Vector2 toPlayer = players[i].transform.position - gameObject.transform.position;
-                if(InRange(toPlayer, knockbackRange, knockbackCosAngle))
+                Vector2 toPlayer = (Vector2)players[i].transform.position - GetPosition();
+                if (InRange(toPlayer, knockbackRange, knockbackCosAngle))
                     players[i].GetComponent<PlayerController>().ApplyDash(toPlayer.normalized, knockbackDuration, knockbackSpeed);
             }
         }
 
         for (int i = 0; i < projectiles.Length; ++i)
         {
-            Vector2 toProjectile = projectiles[i].transform.position - gameObject.transform.position;
+            Vector2 toProjectile = (Vector2)projectiles[i].transform.position - GetPosition();
             if (toProjectile.sqrMagnitude < knockbackRange)
             {
                 toProjectile.Normalize();
@@ -62,7 +62,7 @@ public class WerewolfController : MonsterController
 
         for (int i = 0; i < lanterns.Count; ++i)
         {
-            Vector2 toLantern = lanterns[i].transform.position - gameObject.transform.position;
+            Vector2 toLantern = (Vector2)lanterns[i].transform.position - GetPosition();
             if (toLantern.sqrMagnitude < knockbackRange)
             {
                 toLantern.Normalize();

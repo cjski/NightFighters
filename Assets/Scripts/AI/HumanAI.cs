@@ -6,6 +6,7 @@ public class HumanAI : AI
 {
     protected static Map map;
     protected static float lightTargetDistanceOffset = 50; //Offsets the distance for the lights so the AI is more likely to target players
+    protected static float weightDirectionAwayFromObstacles = 1.0f;
     protected float distanceToTargetSquared;
     protected bool targetIsPlayer;
     protected bool canSeeTarget;
@@ -39,12 +40,10 @@ public class HumanAI : AI
         
         canSeeTarget = false;
         
-        selfNode = map.GetNode(playerController.gameObject.transform.position);
+        selfNode = map.GetNode(playerController.GetPosition());
 
         distanceToTargetSquared = 9999;
-        Vector2 targetPosition = Vector2.zero;
-        Vector2 toTarget = Vector2.zero;
-        selfPosition = playerController.gameObject.transform.position;
+        selfPosition = playerController.GetPosition();
 
         // Have to get these each time because some players may die and then they leave the array
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
@@ -75,14 +74,16 @@ public class HumanAI : AI
                 }
             }
         }
-
+        Debug.Log(canSeeTarget);
+        direction.Normalize();
+        direction += GetDirectionAwayFromObstacles(direction) * weightDirectionAwayFromObstacles;
         return direction;
     }
 
     protected bool IsNewTargetCloser(GameObject targetObject, ref Vector2 direction, int layerMask, float distanceOffset = 0)
     {
         Vector3 targetPosition = targetObject.transform.position;
-        Vector2 toTarget = targetPosition - playerController.gameObject.transform.position;
+        Vector2 toTarget = (Vector2)targetPosition - playerController.GetPosition();
         float targetDistanceSquared = toTarget.sqrMagnitude + distanceOffset;
         if (targetDistanceSquared < distanceToTargetSquared)
         {

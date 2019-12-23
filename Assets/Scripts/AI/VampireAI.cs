@@ -28,7 +28,7 @@ public class VampireAI : MonsterAI
             // Do a dash as a vampire if you can slow the humans down, don't just waste it
             else if (vc.secondaryCooldown.done && Mathf.Pow(vc.GetDashDistance(), 2) > closestHumanDistanceSqr)
             {
-                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.transform.position, finalDirection, vc.GetDashDistance(), wallLayerMask);
+                RaycastHit2D hitTarget = Physics2D.Raycast(playerController.GetPosition(), finalDirection, vc.GetDashDistance(), wallLayerMask);
 
                 // Dash if there is no wall that the AI would crash into
                 if (hitTarget.collider == null)

@@ -54,9 +54,11 @@ public class WatchmanAI : HumanAI
             if (IsNewTargetCloser(wc.lantern.gameObject, ref direction, ignoreLightLayerMask, lanternDistanceOffset))
             {
                 targetIsPlayer = false;
+                direction.Normalize();
+                direction += GetDirectionAwayFromObstacles(direction) * weightDirectionAwayFromObstacles;
             }
         }
-
+        //Debug.Log(direction + " + " + GetDirectionAwayFromObstacles(direction) + " = "+(direction + GetDirectionAwayFromObstacles(direction)));
         return direction;
     }
 }

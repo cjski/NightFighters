@@ -28,7 +28,7 @@ public class WatchmanController : HumanController
         secondaryCooldown = new Timer(5, true);
 
         lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LanternPrefab.prefab", typeof(GameObject));
-        lantern = Instantiate(lightPrefab, transform.position, Quaternion.identity);
+        lantern = Instantiate(lightPrefab, GetPosition(), Quaternion.identity);
         lanternPointer = transform.Find("LanternPointer").gameObject;
         lanternPointer.SetActive(false);
         holdingLantern = true;
@@ -42,7 +42,7 @@ public class WatchmanController : HumanController
         base.Update();
         if (holdingLantern)
         {
-            lantern.transform.position = transform.position;
+            lantern.transform.position = GetPosition();
         }
         else if(!returnTimer.done)
         {
@@ -50,17 +50,17 @@ public class WatchmanController : HumanController
             if (returnTimer.done)
             {
                 holdingLantern = true;
-                lantern.transform.position = transform.position;
+                lantern.transform.position = GetPosition();
                 catchTimer.Reset();
                 lantern.SetActive(true);
             }
         }
         else
         {
-            Vector2 toLantern = (lantern.transform.position - transform.position);
+            Vector2 toLantern = (Vector2)lantern.transform.position - GetPosition();
             float angle = Mathf.Atan2(toLantern.y, toLantern.x);
             lanternPointer.transform.SetPositionAndRotation(
-                new Vector3(gameObject.transform.position.x + 0.5f * Mathf.Cos(angle), gameObject.transform.position.y + 0.5f * Mathf.Sin(angle), -1),
+                new Vector3(GetPosition().x + 0.5f * Mathf.Cos(angle), GetPosition().y + 0.5f * Mathf.Sin(angle), -1),
                 Quaternion.Euler(0, 0, angle * 180 / Mathf.PI + 90));
             catchTimer.Update();
             if (catchTimer.done && toLantern.sqrMagnitude < lanternDistanceToPickUpSqr)

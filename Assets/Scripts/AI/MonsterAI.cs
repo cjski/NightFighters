@@ -52,11 +52,11 @@ public class MonsterAI : AI
 
         bool canTurnOffLight = true;
         
-        Node selfNode = map.GetNode(playerController.gameObject.transform.position);
+        Node selfNode = map.GetNode(playerController.GetPosition());
         
         Vector2 targetPosition = Vector2.zero;
         Vector2 toTarget = Vector2.zero;
-        Vector2 selfPosition = playerController.gameObject.transform.position;
+        Vector2 selfPosition = playerController.GetPosition();
 
         Vector2 totalAwayFromHuman = new Vector2();
         Vector2 totalToTiles = new Vector2();
@@ -70,7 +70,7 @@ public class MonsterAI : AI
             HumanController hc = players[i].GetComponent<HumanController>();
             if (hc != null)
             {
-                targetPosition = hc.gameObject.transform.position;
+                targetPosition = hc.GetPosition();
                 toTarget = targetPosition - selfPosition;
 
                 Vector2 newTargetDirection = Vector2.zero;
@@ -320,62 +320,5 @@ public class MonsterAI : AI
         //Debug.Log("Overall: " + direction + ", ToTiles: " + totalToTiles + ", AwayFromHumans: " + totalAwayFromHuman + ", AwayFromWall: " + directionAwayFromWall);
 
         return direction;
-    }
-
-    // If the AI is going to run into a wall then move them away from it
-    // Effect of the vector is increased the closer to the wall the AI is
-    // Need to check all around the AI in order to prevent them from getting stuck in corners and escaping as soon as possible
-    private Vector2 GetDirectionAwayFromObstacles(Vector2 direction)
-    {
-        Vector2 directionAwayFromObstacle = new Vector2();
-
-        Vector2 pos = playerController.transform.position;
-        Vector2 size = playerController.GetSize();
-
-        Vector2[] originsForRaycastsX =
-        {
-            pos + new Vector2(0, size.y * 0.5f),
-            pos + new Vector2(0, size.y * 0.25f),
-            pos,
-            pos - new Vector2(0, size.y * 0.25f),
-            pos - new Vector2(0, size.y * 0.5f)
-        };
-
-        Vector2 directionXVector = new Vector2(direction.x, 0);
-        float distanceForRaycastX = size.x * 2.0f;
-
-        for (int i = 0; i < originsForRaycastsX.Length; ++i)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLightLanternProjectileLayerMask);
-            if (hit.collider != null)
-            {
-                directionAwayFromObstacle.x = directionAwayFromObstacleMax * (direction.x > 0 ? -1 : 1) * (distanceForRaycastX - hit.distance) / distanceForRaycastX;
-                break;
-            }
-        }
-
-        Vector2[] originsForRaycastsY =
-        {
-            pos - new Vector2(size.x * 0.5f, 0),
-            pos - new Vector2(size.x * 0.25f, 0),
-            pos,
-            pos + new Vector2(size.x * 0.25f, 0),
-            pos + new Vector2(size.x * 0.5f, 0)
-        };
-
-        Vector2 directionYVector = new Vector2(0, direction.y);
-        float distanceForRaycastY = size.y * 2.0f;
-
-        for (int i = 0; i < originsForRaycastsY.Length; ++i)
-        {
-            RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLightLanternProjectileLayerMask);
-            if (hit.collider != null)
-            {
-                directionAwayFromObstacle.y = directionAwayFromObstacleMax * (direction.y > 0 ? -1 : 1) * (distanceForRaycastY - hit.distance) / distanceForRaycastY;
-                break;
-            }
-        }
-
-        return directionAwayFromObstacle * directionAwayFromObstacleWeight;
     }
 }

@@ -10,7 +10,7 @@ public class LanternController : LightController
 
     public void Throw(Vector2 newDirection, float newSpeed)
     {
-        direction = newDirection;
+        direction = newDirection.normalized;
         speed = newSpeed;
     }
 

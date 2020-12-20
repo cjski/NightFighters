@@ -68,11 +68,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 7531724258392790886, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
-        type: 3}
-      propertyPath: m_Name
-      value: WerewolfPrefab
-      objectReference: {fileID: 0}
     - target: {fileID: 4246056355677391704, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}
       propertyPath: m_Controller
@@ -112,6 +107,17 @@ PrefabInstance:
         type: 3}
       propertyPath: m_UsedByComposite
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7521565242399754338, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3691d18d0f3cc4447b4b4fb9f4bb04a1,
+        type: 3}
+    - target: {fileID: 7531724258392790886, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
+        type: 3}
+      propertyPath: m_Name
+      value: WerewolfPrefab
       objectReference: {fileID: 0}
     - target: {fileID: 7535175840963685216, guid: 97fb81bd6e0e4a840ab8d9b828cd8cad,
         type: 3}

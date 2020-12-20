@@ -153,6 +153,11 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 8c9d3d6ca8409a74d8c64b8f61dd751b, type: 2}
+    - target: {fileID: 644611144510202518, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3849636655936827317, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
         type: 3}
       propertyPath: m_Color.r
@@ -248,6 +253,12 @@ PrefabInstance:
       propertyPath: m_Size.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6260430348814344549, guid: 28dff1ea0cf88724bbd79801c2a34a2f,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 0ed7b84c118483540a7b96e552fcc69e,
+        type: 3}
     m_RemovedComponents:
     - {fileID: 4961073647727660407, guid: 28dff1ea0cf88724bbd79801c2a34a2f, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 28dff1ea0cf88724bbd79801c2a34a2f, type: 3}

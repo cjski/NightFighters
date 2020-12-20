@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class WerewolfController : MonsterController
 {
+    public float knockbackAngleDegrees { get; private set; } = 60.0f;
     public float knockbackCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
     public float knockbackRange { get; private set; } = 1.1f;
-    public float knockbackDuration { get; private set; } = 1.0f;
+    public float knockbackDuration { get; private set; } = 0.25f;
     public float knockbackSpeed { get; private set; } = 7.5f;
     public float dashDuration { get; private set; } = 0.5f;
     public float dashSpeedModifier { get; private set; } = 1.5f;
@@ -72,6 +73,8 @@ public class WerewolfController : MonsterController
                 }
             }
         }
+
+        ActivateHitSprite(knockbackRange, knockbackAngleDegrees);
 
         primaryCooldown.Reset();
     }

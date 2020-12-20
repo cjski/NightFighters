@@ -7,8 +7,9 @@ public class VampireController : MonsterController
 {
     private static GameObject slowProjectilePrefab;
 
+    public float bitAngleDegrees { get; private set; } = 60.0f;
     public float biteCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
-    public float biteRange { get; private set; } = 1.0f;
+    public float biteRange { get; private set; } = 1.5f;
     public float biteStunDuration { get; private set; } = 1;
     public int biteHealAmount { get; private set; } = 5;
     public float slowProjectileExitSpeed { get; private set; } = 15.0f;
@@ -61,6 +62,7 @@ public class VampireController : MonsterController
                 }
             }
         }
+        ActivateHitSprite(biteRange, bitAngleDegrees);
         primaryCooldown.Reset();
     }
 

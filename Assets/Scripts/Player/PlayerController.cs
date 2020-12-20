@@ -41,6 +41,12 @@ public abstract class PlayerController : MonoBehaviour {
     public Timer secondaryCooldown { get; protected set; } = new Timer(1);
     public Text text;
 
+    protected Timer hitDrawTimer = new Timer(.15f);
+    protected Vector2 hitDrawPosDelta = Vector2.zero;
+    protected Vector2 hitDrawPosInitial = Vector2.zero;
+    protected float hitDrawRotDelta = 0;
+    protected float hitDrawRotInitial = 0;
+
     private bool IsAI = false;
     private bool moveAINext = false;
 
@@ -120,6 +126,23 @@ public abstract class PlayerController : MonoBehaviour {
         }
         if (!primaryCooldown.done) primaryCooldown.Update();
         if (!secondaryCooldown.done) secondaryCooldown.Update();
+
+        // Turn off the hit box drawing
+        if (!hitDrawTimer.done)
+        {
+            hitDrawTimer.Update();
+            // Shift to the new position
+            GameObject hitSprite = transform.Find("HitSpritePrefab").gameObject;
+            hitSprite.transform.SetPositionAndRotation(
+                    GetPosition() + hitDrawPosInitial + hitDrawPosDelta * hitDrawTimer.GetPercentDone(),
+                    Quaternion.Euler(0, 0, hitDrawRotInitial + hitDrawRotDelta * hitDrawTimer.GetPercentDone())
+                    );
+        }
+        else
+        {
+            transform.Find("HitSpritePrefab").gameObject.SetActive(false);
+        }
+
         text.text = "Player " + playerNumber + " Health: " + health + "/" + maxHealth + "\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
 	}
 
@@ -331,6 +354,28 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected abstract void OnSecondaryPressed();
 
+    // Calculates the inital position of the hit sprite, it's angle, the deltas, and activates it
+    protected void ActivateHitSprite(float range, float sweepAngleDegrees)
+    {
+        GameObject hitSprite = transform.Find("HitSpritePrefab").gameObject;
+
+        float drawDist = range - 0.5f * hitSprite.GetComponent<SpriteRenderer>().bounds.size.y;
+        Vector2 startDirection = drawDist * (Quaternion.Euler(0, 0, 0.5f * sweepAngleDegrees) * direction).normalized;
+        Vector2 endDirection = drawDist * (Quaternion.Euler(0, 0, -0.5f * sweepAngleDegrees) * direction).normalized;
+
+        hitDrawPosInitial = startDirection;
+        hitDrawRotInitial = Mathf.Atan2(startDirection.y, startDirection.x) * 180 / Mathf.PI - 90;
+        hitDrawPosDelta = (endDirection - startDirection) / 100.0f;
+        // This needs to be negative because of the direction of the sweep
+        hitDrawRotDelta = -sweepAngleDegrees / 100.0f;
+
+        hitSprite.transform.SetPositionAndRotation(
+                GetPosition() + hitDrawPosInitial,
+                Quaternion.Euler(0, 0, hitDrawRotInitial));
+        hitSprite.SetActive(true);
+        hitDrawTimer.Reset();
+    }
+
     public void Damage(int damage)
     {
         health -= damage;
@@ -389,6 +434,11 @@ public abstract class PlayerController : MonoBehaviour {
     public virtual float GetDashDistance()
     {
         return 0;
+    }
+
+    public virtual bool IsHittable()
+    {
+        return movementType == MovementType.Dashing;
     }
 
     // By default play an idle animation, if a player has a different animation it will be overriden to use the logic of the class

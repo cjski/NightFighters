@@ -6,7 +6,8 @@ using UnityEditor;
 public class WatchmanController : HumanController
 {
     static GameObject lightPrefab;
-    public float hitRange { get; private set; } = 1;
+    public float hitRange { get; private set; } = 1.5f;
+    public float hitAngleDegrees { get; private set; } = 60.0f;
     public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
     public float stunTime { get; private set; } = 0.25f;
     public int damage { get; private set; } = 20;
@@ -88,6 +89,8 @@ public class WatchmanController : HumanController
                 }
             }
         }
+
+        ActivateHitSprite(hitRange, hitAngleDegrees);
         primaryCooldown.Reset();
     }
 

@@ -68,16 +68,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 8145530551874419595, guid: f7f8879c97755b84d82987cd5f03d1c6,
-        type: 3}
-      propertyPath: m_Name
-      value: WerewolfBossPrefab
-      objectReference: {fileID: 0}
     - target: {fileID: 2549519447166674869, guid: f7f8879c97755b84d82987cd5f03d1c6,
         type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: 1b510149ee0620d4d84e335200ffd0a2, type: 2}
+    - target: {fileID: 8145530551874419595, guid: f7f8879c97755b84d82987cd5f03d1c6,
+        type: 3}
+      propertyPath: m_Name
+      value: WerewolfBossPrefab
+      objectReference: {fileID: 0}
     - target: {fileID: 8151199966302291853, guid: f7f8879c97755b84d82987cd5f03d1c6,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -188,6 +188,12 @@ PrefabInstance:
       propertyPath: m_Offset.y
       value: -0.03
       objectReference: {fileID: 0}
+    - target: {fileID: 8209292544161916047, guid: f7f8879c97755b84d82987cd5f03d1c6,
+        type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3691d18d0f3cc4447b4b4fb9f4bb04a1,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f7f8879c97755b84d82987cd5f03d1c6, type: 3}
 --- !u!1 &8583007127426236800 stripped

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class WerewolfBossController : BossController
 {
+    public float knockbackAngleDegrees { get; private set; } = 90.0f;
     public float knockbackCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 90 / 180);
     public float knockbackRange { get; private set; } = 1.3f;
     public float knockbackDuration { get; private set; } = 1.0f;
@@ -46,6 +47,8 @@ public class WerewolfBossController : BossController
                 }
             }
         }
+
+        ActivateHitSprite(knockbackRange, knockbackAngleDegrees);
 
         primaryCooldown.Reset();
     }

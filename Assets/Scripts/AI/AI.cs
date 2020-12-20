@@ -51,6 +51,7 @@ public class AI : MonoBehaviour
                 // Check if the corner ever hits a wall or object that is not the player or the intended target
                 for (int i = 0; i < hitTargetCorner.Length; ++i)
                 {
+                    // TO-DO remove the check on player controller position, not needed, change the target corner raycasts to be in ToTarget Direction
                     if (hitTargetCorner[i].collider != null &&
                         !hitTargetCorner[i].collider.transform.position.Equals(targetPosition) &&
                         !hitTargetCorner[i].collider.gameObject.Equals(playerController.gameObject))
@@ -87,7 +88,7 @@ public class AI : MonoBehaviour
         };
 
         Vector2 directionXVector = new Vector2(direction.x, 0);
-        float distanceForRaycastX = size.x * 3.0f;
+        float distanceForRaycastX = size.x * 2.0f;
 
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
@@ -128,7 +129,7 @@ public class AI : MonoBehaviour
         };
 
         Vector2 directionYVector = new Vector2(0, direction.y);
-        float distanceForRaycastY = size.y * 3.0f;
+        float distanceForRaycastY = size.y * 2.0f;
 
         for (int i = 0; i < originsForRaycastsY.Length; ++i)
         {

@@ -36,12 +36,17 @@ public class Timer
 
         if (time >= presetTime)
         {
+            time = presetTime;
             done = true;
         }
     }
 
     public int GetPercentDone()
     {
+        if ( done )
+        {
+            return 100;
+        }
         return Mathf.CeilToInt(100 * time / presetTime);
     }
 }

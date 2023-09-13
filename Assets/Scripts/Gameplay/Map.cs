@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Xml.Schema;
 
 public class Node
 {
@@ -75,6 +76,14 @@ public class Map
     public Vector2 offset;
     private Node[,] map;
 
+    public struct GameData
+    {
+        public int numWalls;
+        public int numLights;
+    }
+
+    public GameData gameData;
+
     public Map(int cols, int rows, float sizeOfUnit, Vector2 newOffset)
     {
         y = rows;
@@ -83,6 +92,12 @@ public class Map
         unitSizeInverse = 1 / unitSize;
         offset = newOffset;
         map = new Node[cols, rows];
+
+        gameData = new GameData
+        {
+            numWalls = GameConstants.DEFAULT_NUM_MAP_WALLS,
+            numLights = GameConstants.DEFAULT_NUM_MAP_LIGHTS
+        };
     }
 
     public Node GetNode(int xIndex, int yIndex)
@@ -112,7 +127,7 @@ public class Map
             }
         }
 
-        RegenerateWalls(8);
+        RegenerateWalls( gameData.numWalls );
         while (!EntirelyConnected())
         {
             // Reset the Node Map so nothing is connected
@@ -123,10 +138,10 @@ public class Map
                     map[i, j] = new Node(i, j);
                 }
             }
-            RegenerateWalls(8);
+            RegenerateWalls( gameData.numWalls );
         }
 
-        RegenerateLights(4);
+        RegenerateLights( gameData.numLights );
 
         GenerateDistances();
     }
@@ -146,7 +161,7 @@ public class Map
         }
     }
 
-    private void RegenerateWalls(int walls)
+    private void RegenerateWalls( int walls )
     {
         GameObject[] gameWalls = GameObject.FindGameObjectsWithTag("Wall");
         for (int i = 0; i < gameWalls.Length; ++i)
@@ -192,8 +207,30 @@ public class Map
         while (walls > 0 && iterations < 10000)
         {
             ++iterations;
-            wallX = Random.Range(0, x);
-            wallY = Random.Range(0, y);
+
+            int xMin = 0;
+            int yMin = 0;
+            int xMax = x;
+            int yMax = y;
+
+            // Avoid placing walls at the edges, so just use the inner group of nodes
+            if ( GameConstants.MAPGEN_AVOID_EDGE_WALLS )
+            {
+                xMin = 1;
+                yMin = 1;
+                xMax = x - 1;
+                yMax = y - 1;
+            }
+
+            // We can't make any walls with this size grid, just drop out here
+            if ( xMax <= xMin || yMax <= yMin )
+            {
+                walls = 0;
+                continue;
+            }
+
+            wallX = Random.Range(xMin, xMax);
+            wallY = Random.Range(yMin, yMax);
             wallR = Random.Range(0, 4);
 
             Node node = map[wallX, wallY], other;

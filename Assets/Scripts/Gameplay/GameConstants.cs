@@ -13,9 +13,9 @@ public static class GameConstants
     public static int MONSTER_CLASS_TYPE_INDEX = 1;
     
     public static int MAP_ROWS = 4;
-    public static int MAP_COLUMNS = 6;
-    public static float MAP_TILE_SIZE = 3.5f;
-    public static Vector2 MAP_OFFSET = new Vector2(-4, -2);
+    public static int MAP_COLUMNS = 6; 
+    public static float MAP_TILE_SIZE = 3.5f; 
+    public static Vector2 MAP_OFFSET = new Vector2(-2, -2);
 
     public static Vector3[] CHARACTER_INFO_PANEL_POSITIONS = 
     {
@@ -45,4 +45,8 @@ public static class GameConstants
 
     public static float GAMEPAD_SELECTION_WAIT_TIME = 0.1f;
     public static float GAMEPAD_SELECTION_SENSITIVITY = 0.25f;
+
+    public static int DEFAULT_NUM_MAP_WALLS = 6;
+    public static int DEFAULT_NUM_MAP_LIGHTS = 6;
+    public static bool MAPGEN_AVOID_EDGE_WALLS = true;
 }

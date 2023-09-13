@@ -11,7 +11,7 @@ public class LightController : MonoBehaviour {
     Timer turnOffTimer = new Timer(2);
     Timer brokenTimer = new Timer(2);
     public bool humansIn = false, monstersIn = false, broken = false;
-    private float activateRadSqr = 0.25f;
+    private float activateRadSqr = 0.3125f;
     public GameObject currentHumanInLight = null;
     public GameObject currentMonsterInLight = null;
 

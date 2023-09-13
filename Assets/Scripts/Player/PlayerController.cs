@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected enum MovementType { Normal, Dashing, Stun };
 
+    public enum PushPriority { Normal, Boss };
+
     protected int playerNumber;
 
     private Controller controller;
@@ -23,10 +26,14 @@ public abstract class PlayerController : MonoBehaviour {
     protected Vector2 direction;
     protected MovementType movementType;
     protected float speedModifier;
+    private Vector2 pushVector;
+    private Vector2 desiredMove;
     private float minSpeed = 1.25f;
     private float maxSpeed = 50.0f;
     private List<TimedSpeedModifier> timedSpeedModifiers;
     private Timer stunTimer = new Timer(1);
+
+    public PushPriority pushPriority = PushPriority.Normal;
 
     protected int health;
     protected int maxHealth;
@@ -62,6 +69,7 @@ public abstract class PlayerController : MonoBehaviour {
         
         direction = new Vector2(1, 0);
         movementType = MovementType.Normal;
+        pushVector = new Vector2(0, 0);
         speedModifier = 0;
         timedSpeedModifiers = new List<TimedSpeedModifier>();
 
@@ -84,46 +92,6 @@ public abstract class PlayerController : MonoBehaviour {
     protected void Update() {
         UpdateTimedSpeedModifiers();
 
-        if (movementType == MovementType.Normal)
-        {
-            if (IsAI)
-            {
-                if(moveAINext)
-                {
-                    Move(direction, speed);
-                    moveAINext = false;
-                }
-                else
-                {
-                    PlayIdle();
-                }
-            }
-            else if (controller.Type() == Controller.ControllerType.Mouse)
-                MoveWithMouse();
-            else if (controller.Type() == Controller.ControllerType.Keyboard)
-                MoveWithKeys();
-            else if (controller.Type() == Controller.ControllerType.Gamepad)
-                MoveWithGamepad();
-        }
-        else if (movementType == MovementType.Dashing) Dash();
-        else if (movementType == MovementType.Stun)
-        {
-            stunTimer.Update();
-            if(stunTimer.done)
-            {
-                stunTimer.Reset();
-                movementType = MovementType.Normal;
-            }
-        }
-
-        if (!IsAI)
-        {
-            if(movementType != MovementType.Stun)
-            {
-                if (controller.GetAPressed() && primaryCooldown.done) OnPrimaryPressed();
-                if (controller.GetBPressed() && secondaryCooldown.done) OnSecondaryPressed();
-            }
-        }
         if (!primaryCooldown.done) primaryCooldown.Update();
         if (!secondaryCooldown.done) secondaryCooldown.Update();
 
@@ -146,6 +114,46 @@ public abstract class PlayerController : MonoBehaviour {
         text.text = "Player " + playerNumber + " Health: " + health + "/" + maxHealth + "\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
 	}
 
+    public void UpdatePreMove()
+    {
+        if (movementType == MovementType.Normal)
+        {
+            if (IsAI)
+            {
+                if (moveAINext)
+                {
+                    SetMove(direction, speed);
+                    moveAINext = false;
+                }
+            }
+            else if (controller.Type() == Controller.ControllerType.Mouse)
+                MoveWithMouse();
+            else if (controller.Type() == Controller.ControllerType.Keyboard)
+                MoveWithKeys();
+            else if (controller.Type() == Controller.ControllerType.Gamepad)
+                MoveWithGamepad();
+        }
+        else if (movementType == MovementType.Dashing) Dash();
+        else if (movementType == MovementType.Stun)
+        {
+            stunTimer.Update();
+            if (stunTimer.done)
+            {
+                stunTimer.Reset();
+                movementType = MovementType.Normal;
+            }
+        }
+
+        if (!IsAI)
+        {
+            if (movementType != MovementType.Stun)
+            {
+                if (controller.GetAPressed() && primaryCooldown.done) OnPrimaryPressed();
+                if (controller.GetBPressed() && secondaryCooldown.done) OnSecondaryPressed();
+            }
+        }
+    }
+
     private void MoveWithKeys()
     {
         int moveX = 0, moveY = 0;
@@ -160,11 +168,7 @@ public abstract class PlayerController : MonoBehaviour {
         if (move.sqrMagnitude > 0)
         {
             direction = move.normalized;
-            Move(move.normalized, speed);
-        }
-        else
-        {
-            PlayIdle();
+            SetMove(move.normalized, speed);
         }
     }
 
@@ -179,11 +183,7 @@ public abstract class PlayerController : MonoBehaviour {
         direction = move.normalized;
         if(distToMoveSqr >= 4 * speed * speed * Time.deltaTime * Time.deltaTime)
         {
-            Move(direction, speed);
-        }
-        else
-        {
-            PlayIdle();
+            SetMove(direction, speed);
         }
     }
 
@@ -196,18 +196,50 @@ public abstract class PlayerController : MonoBehaviour {
         }
         if(move.sqrMagnitude > .25f)
         {
-            Move(direction, speed);
+            SetMove(direction, speed);
         }
+    }
+    
+    public void ApplyPush( Vector2 direction, PlayerController pusher )
+    {
+        // We don't want a small guy pushing around a boss
+        if ( pusher.pushPriority < pushPriority )
+        {
+            return;
+        }
+        
+        bool pusherIsDashing = pusher.movementType == PlayerController.MovementType.Dashing;
+        bool selfIsDashing = movementType == PlayerController.MovementType.Dashing;
+        
+        if ( selfIsDashing && !pusherIsDashing )
+        {
+            return;
+        }
+
+        // Push severely if the player is being dashed into or a boss is pushing through them
+        bool severePush = (pusherIsDashing && !selfIsDashing) || pusher.pushPriority > pushPriority;
+
+        if ( !severePush )
+        {
+            pushVector += direction * pusher.speed * 0.25f;
+        }
+        // To shove someone out of the way, we need to negate their speed and add ours. This isn't perfect but should work fine for us
         else
         {
-            PlayIdle();
+            pushVector += direction * ( pusher.speed + this.speed );
         }
     }
 
-    private void Move(Vector2 direction, float moveSpeed)
+    /*
+     * Set our desired move direction and apply push vectors to other characters
+     */ 
+    private void SetMove( Vector2 direction, float moveSpeed )
     {
-        hitWall = false;
+        // Set our desired move
+        desiredMove = direction * speed;
 
+        // Calculate anyone we'd be pushing by moving here
+        List<GameObject> pushedPlayers = new List<GameObject>();
         Vector2 pos = GetPosition();
         Vector2 size = GetSize();
         Vector2 halfSizeY = new Vector2(0, size.y * 0.5f);
@@ -228,26 +260,14 @@ public abstract class PlayerController : MonoBehaviour {
         for (int i = 0; i < originsForRaycastsX.Length; ++i)
         {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLayerMask);
-            if(hit.collider != null)
+            if ( hit.collider != null )
             {
-                float deltaToCollide = hit.distance - halfSizeX.x;
-                if(deltaToCollide <= ellipsonCollide)
+                if ( hit.collider.gameObject.tag == "Player" && !pushedPlayers.Contains( hit.collider.gameObject ) )
                 {
-                    directionXVector.x = 0;
+                    pushedPlayers.Add( hit.collider.gameObject );
                 }
-                else
-                {
-                    directionXVector.x = moveSpeed * Time.deltaTime / (hit.distance - halfSizeX.x) * (directionXVector.x > 0 ? 1 : -1);
-                }
-               
-                if(hit.collider.gameObject.tag == "Wall")
-                {
-                    hitWall = true;
-                }
-                break;
             }
         }
-        transform.Translate(moveSpeed * directionXVector * Time.deltaTime);
 
         Vector2[] originsForRaycastsY =
         {
@@ -266,28 +286,136 @@ public abstract class PlayerController : MonoBehaviour {
             RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLayerMask);
             if (hit.collider != null)
             {
-                float deltaToCollide = hit.distance - halfSizeY.y;
-                if (deltaToCollide <= ellipsonCollide)
+                if (hit.collider.gameObject.tag == "Player" && !pushedPlayers.Contains(hit.collider.gameObject))
                 {
-                    directionYVector.y = 0;
+                    pushedPlayers.Add(hit.collider.gameObject);
                 }
-                else
-                {
-                    directionYVector.y = moveSpeed * Time.deltaTime / (hit.distance - halfSizeY.y) * (directionYVector.y > 0 ? 1 : -1);
-                }
-                
-                if (hit.collider.gameObject.tag == "Wall")
-                {
-                    hitWall = true;
-                }
-                break;
             }
         }
-        transform.Translate(moveSpeed * directionYVector * Time.deltaTime);
+        
+        // Apply a push to everyone that we hit
+        foreach( GameObject pushed in pushedPlayers )
+        {
+            PlayerController pc = pushed.GetComponent<PlayerController>();
+            Vector2 toPushed = pc.GetPosition() - pos;
+            toPushed.Normalize();
 
-        PlayWalk();
-        if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
-        else GetComponent<SpriteRenderer>().flipX = true;
+            pc.ApplyPush( toPushed, this );
+        }
+    }
+
+    /*
+     * This is where we actually shift the transform of the player and do wall collision detection
+     */
+    public void UpdateMove()
+    {
+        // First get our move + pushes
+        Vector2 moveVector = desiredMove + pushVector;
+        float moveMagnitude = moveVector.magnitude;
+        moveVector.Normalize();
+
+        hitWall = false;
+
+        if (moveMagnitude > 0)
+        {
+            Vector2 pos = GetPosition();
+            Vector2 size = GetSize();
+            Vector2 halfSizeY = new Vector2(0, size.y * 0.5f);
+            Vector2 halfSizeX = new Vector2(size.x * 0.5f, 0);
+
+            Vector2[] originsForRaycastsX =
+            {
+                pos + halfSizeY,
+                pos + halfSizeY * 0.5f,
+                pos,
+                pos - halfSizeY * 0.5f,
+                pos - halfSizeY
+            };
+
+            Vector2 directionXVector = new Vector2(moveVector.x, 0);
+            float distanceForRaycastX = moveMagnitude * Time.deltaTime + halfSizeX.x;
+
+            for (int i = 0; i < originsForRaycastsX.Length; ++i)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsX[i], directionXVector, distanceForRaycastX, ignoreLayerMask);
+                if (hit.collider != null)
+                {
+                    float deltaToCollide = hit.distance - halfSizeX.x;
+                    if (deltaToCollide <= ellipsonCollide)
+                    {
+                        directionXVector.x = 0;
+                    }
+                    else
+                    {
+                        directionXVector.x = moveMagnitude * Time.deltaTime / (hit.distance - halfSizeX.x) * (directionXVector.x > 0 ? 1 : -1);
+                    }
+
+                    if (hit.collider.gameObject.tag == "Wall")
+                    {
+                        hitWall = true;
+                    }
+                    break;
+                }
+            }
+            transform.Translate(moveMagnitude * directionXVector * Time.deltaTime);
+
+            Vector2[] originsForRaycastsY =
+            {
+                pos - halfSizeX,
+                pos - halfSizeX * 0.5f,
+                pos,
+                pos + halfSizeX * 0.5f,
+                pos + halfSizeX
+            };
+
+            Vector2 directionYVector = new Vector2(0, moveVector.y);
+            float distanceForRaycastY = moveMagnitude * Time.deltaTime + halfSizeY.y;
+
+            for (int i = 0; i < originsForRaycastsY.Length; ++i)
+            {
+                RaycastHit2D hit = Physics2D.Raycast(originsForRaycastsY[i], directionYVector, distanceForRaycastY, ignoreLayerMask);
+                if (hit.collider != null)
+                {
+                    float deltaToCollide = hit.distance - halfSizeY.y;
+                    if (deltaToCollide <= ellipsonCollide)
+                    {
+                        directionYVector.y = 0;
+                    }
+                    else
+                    {
+                        directionYVector.y = moveMagnitude * Time.deltaTime / (hit.distance - halfSizeY.y) * (directionYVector.y > 0 ? 1 : -1);
+                    }
+
+                    if (hit.collider.gameObject.tag == "Wall")
+                    {
+                        hitWall = true;
+                    }
+                    break;
+                }
+            }
+            transform.Translate(moveMagnitude * directionYVector * Time.deltaTime);
+
+            bool hasInputMotion = desiredMove.y != 0 || desiredMove.x != 0;
+            // Our movement is just from getting pushed around, just play the idle and don't update facing direction
+            if ( !hasInputMotion )
+            {
+                PlayIdle();
+            }
+            else
+            {
+                PlayWalk();
+                if (moveVector.x > 0) GetComponent<SpriteRenderer>().flipX = false;
+                else GetComponent<SpriteRenderer>().flipX = true;
+            }
+        }
+        else
+        {
+            PlayIdle();
+        }
+
+        // Cleanup
+        desiredMove = Vector2.zero;
+        pushVector = Vector2.zero;
     }
 
     private void UpdateTimedSpeedModifiers()
@@ -310,7 +438,7 @@ public abstract class PlayerController : MonoBehaviour {
     // Used for any launching of the player(dash, knockback). Skips updating directions
     private void Dash()
     {
-        Move(direction, dashSpeed);
+        SetMove(direction, dashSpeed);
         dashTime.Update();
         if (hitWall && wallHitStuns)
         {
@@ -465,7 +593,6 @@ public abstract class PlayerController : MonoBehaviour {
             direction = newDirection.normalized;
             moveAINext = true;
         }
-        //Move(direction, speed);
     }
 
     public void AIUsePrimary()

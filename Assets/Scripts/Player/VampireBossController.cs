@@ -50,7 +50,7 @@ public class VampireBossController : BossController
     // Update is called once per frame
     new protected void Update()
     {
-        base.Update();
+        //base.Update();
     }
 
     protected override void OnPrimaryPressed()

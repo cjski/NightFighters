@@ -313,6 +313,30 @@ public class GameController : MonoBehaviour
         }
     }
 
+    private void UpdatePlayers()
+    {
+        UpdatePlayersPreMove();
+        UpdatePlayersMove();
+    }
+
+    private void UpdatePlayersPreMove()
+    {
+        for ( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
+        {
+            PlayerController playerController = playerInfo[i].character.GetComponent<PlayerController>();
+            playerController.UpdatePreMove();
+        }
+    }
+
+    private void UpdatePlayersMove()
+    {
+        for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
+        {
+            PlayerController playerController = playerInfo[i].character.GetComponent<PlayerController>();
+            playerController.UpdateMove();
+        }
+    }
+
     private void UpdateGame()
     {
         if (Input.GetKeyDown(KeyCode.R))
@@ -324,7 +348,11 @@ public class GameController : MonoBehaviour
         {
             Regenerate();
         }
-        
+
+        // Handle player stuff we need happening in sequential order
+        UpdatePlayers();
+
+        // Handle anyone dying
         int lastMonsterIndex = 0;
         newHumanIndex = -1;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)

@@ -90,32 +90,12 @@ public abstract class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     protected void Update() {
-        UpdateTimedSpeedModifiers();
-
-        if (!primaryCooldown.done) primaryCooldown.Update();
-        if (!secondaryCooldown.done) secondaryCooldown.Update();
-
-        // Turn off the hit box drawing
-        if (!hitDrawTimer.done)
-        {
-            hitDrawTimer.Update();
-            // Shift to the new position
-            GameObject hitSprite = transform.Find("HitSpritePrefab").gameObject;
-            hitSprite.transform.SetPositionAndRotation(
-                    GetPosition() + hitDrawPosInitial + hitDrawPosDelta * hitDrawTimer.GetPercentDone(),
-                    Quaternion.Euler(0, 0, hitDrawRotInitial + hitDrawRotDelta * hitDrawTimer.GetPercentDone())
-                    );
-        }
-        else
-        {
-            transform.Find("HitSpritePrefab").gameObject.SetActive(false);
-        }
-
-        text.text = "Player " + playerNumber + " Health: " + health + "/" + maxHealth + "\nA: "+primaryCooldown.GetPercentDone()+" B: "+secondaryCooldown.GetPercentDone();
+        
 	}
 
     public void UpdatePreMove()
     {
+        // Eval all desired movement
         if (movementType == MovementType.Normal)
         {
             if (IsAI)
@@ -143,6 +123,30 @@ public abstract class PlayerController : MonoBehaviour {
                 movementType = MovementType.Normal;
             }
         }
+
+        // Update thinking
+        UpdateTimedSpeedModifiers();
+
+        if (!primaryCooldown.done) primaryCooldown.Update();
+        if (!secondaryCooldown.done) secondaryCooldown.Update();
+
+        // Turn off the hit box drawing
+        if ( !hitDrawTimer.done )
+        {
+            hitDrawTimer.Update();
+            // Shift to the new position
+            GameObject hitSprite = transform.Find("HitSpritePrefab").gameObject;
+            hitSprite.transform.SetPositionAndRotation(
+                    GetPosition() + hitDrawPosInitial + hitDrawPosDelta * hitDrawTimer.GetPercentDone(),
+                    Quaternion.Euler(0, 0, hitDrawRotInitial + hitDrawRotDelta * hitDrawTimer.GetPercentDone())
+                    );
+        }
+        else
+        {
+            transform.Find("HitSpritePrefab").gameObject.SetActive(false);
+        }
+
+        text.text = "Player " + playerNumber + " Health: " + health + "/" + maxHealth + "\nA: " + primaryCooldown.GetPercentDone() + " B: " + secondaryCooldown.GetPercentDone();
 
         if (!IsAI)
         {

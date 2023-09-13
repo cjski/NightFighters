@@ -236,7 +236,7 @@ public abstract class PlayerController : MonoBehaviour {
     private void SetMove( Vector2 direction, float moveSpeed )
     {
         // Set our desired move
-        desiredMove = direction * speed;
+        desiredMove = direction * moveSpeed;
 
         // Calculate anyone we'd be pushing by moving here
         List<GameObject> pushedPlayers = new List<GameObject>();
@@ -316,7 +316,11 @@ public abstract class PlayerController : MonoBehaviour {
 
         hitWall = false;
 
-        if (moveMagnitude > 0)
+        if ( movementType == MovementType.Stun )
+        {
+            PlayIdle();
+        }
+        else if ( moveMagnitude > 0 )
         {
             Vector2 pos = GetPosition();
             Vector2 size = GetSize();
@@ -413,6 +417,11 @@ public abstract class PlayerController : MonoBehaviour {
             PlayIdle();
         }
 
+        if ( hitWall && wallHitStuns )
+        {
+            ApplyStun( wallHitStunDuration );
+        }
+
         // Cleanup
         desiredMove = Vector2.zero;
         pushVector = Vector2.zero;
@@ -438,13 +447,10 @@ public abstract class PlayerController : MonoBehaviour {
     // Used for any launching of the player(dash, knockback). Skips updating directions
     private void Dash()
     {
-        SetMove(direction, dashSpeed);
+        SetMove( direction, dashSpeed );
         dashTime.Update();
-        if (hitWall && wallHitStuns)
-        {
-            ApplyStun(wallHitStunDuration);
-        }
-        else if (dashTime.done)
+        
+        if (dashTime.done)
         {
             movementType = MovementType.Normal;
         }
@@ -474,7 +480,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     public void ApplyStun(float duration)
     {
-        stunTimer.Set(duration);
+        stunTimer.Set( duration );
         movementType = MovementType.Stun;
     }
 

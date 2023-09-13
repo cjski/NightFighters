@@ -8,7 +8,7 @@ public class MonsterAI : AI
     protected static float directionToTargetWeight = 1.0f;
     protected static float directionToBestTileWeight = 0.75f;
     protected static float directionAwayFromObstacleWeight = 1.0f;
-    protected static float directionAwayFromObstacleMax = 1.0f;
+    protected new static float directionAwayFromObstacleMax = 1.0f;
     protected static float minimumDistanceFromHumansSqr = 50.0f;
 
     protected Vector2 directionToAttack;

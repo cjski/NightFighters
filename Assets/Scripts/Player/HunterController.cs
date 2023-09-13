@@ -21,7 +21,7 @@ public class HunterController : HumanController
         primaryCooldown = new Timer(1, true);
         secondaryCooldown = new Timer(4, true);
 
-        arrowPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/ArrowPrefab.prefab", typeof(GameObject));
+        arrowPrefab = (GameObject)Resources.Load<GameObject>("Prefabs/ArrowPrefab");
         base.Start();
     }
 

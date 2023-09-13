@@ -45,19 +45,19 @@ public class Map
 {
     private static GameObject[] horizontalWallPrefabs =
     {
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab0.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab1.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab2.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab3.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallHorizontalPrefab4.prefab", typeof(GameObject))
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallHorizontalPrefab0"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallHorizontalPrefab1"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallHorizontalPrefab2"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallHorizontalPrefab3"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallHorizontalPrefab4")
     };
 
     private static GameObject[] verticalWallPrefabs =
     {
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab0.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab1.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab2.prefab", typeof(GameObject)),
-        (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WallVerticalPrefab3.prefab", typeof(GameObject))
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallVerticalPrefab0"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallVerticalPrefab1"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallVerticalPrefab2"),
+        (GameObject)Resources.Load<GameObject>("Prefabs/WallVerticalPrefab3")
     };
     private static Quaternion[] horizontalRotations =
     {
@@ -67,7 +67,7 @@ public class Map
     {
         Quaternion.Euler(0, 0, 0),
     };
-    private static GameObject lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LightPrefab.prefab", typeof(GameObject));
+    private static GameObject lightPrefab = (GameObject)Resources.Load<GameObject>("Prefabs/LightPrefab");
 
     public int y, x;
     public float unitSize;

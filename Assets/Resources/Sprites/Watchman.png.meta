@@ -1,19 +1,39 @@
 fileFormatVersion: 2
 guid: f54ba5780d9271d4cb06570648aea2a6
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: Watchman_0
-    21300002: Watchman_1
-    21300004: Watchman_2
-    21300006: Watchman_3
-    21300008: Watchman_4
-    21300010: Watchman_5
-    21300012: Watchman_6
-    21300014: Watchman_7
-    21300016: Watchman_8
-    21300018: Watchman_9
+  internalIDToNameTable:
+  - first:
+      213: 21300000
+    second: Watchman_0
+  - first:
+      213: 21300002
+    second: Watchman_1
+  - first:
+      213: 21300004
+    second: Watchman_2
+  - first:
+      213: 21300006
+    second: Watchman_3
+  - first:
+      213: 21300008
+    second: Watchman_4
+  - first:
+      213: 21300010
+    second: Watchman_5
+  - first:
+      213: 21300012
+    second: Watchman_6
+  - first:
+      213: 21300014
+    second: Watchman_7
+  - first:
+      213: 21300016
+    second: Watchman_8
+  - first:
+      213: 21300018
+    second: Watchman_9
   externalObjects: {}
-  serializedVersion: 9
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -30,9 +50,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -42,11 +65,11 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: -1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -64,11 +87,17 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
-  - serializedVersion: 2
+  - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -78,8 +107,10 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
-  - serializedVersion: 2
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -89,7 +120,35 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
     serializedVersion: 2
     sprites:
@@ -109,6 +168,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: eedd0f2f38e900a4ba8e9cdd71647474
+      internalID: 21300000
       vertices: []
       indices: 
       edges: []
@@ -129,6 +189,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 937541733b76ab6468f3ea238a2407c8
+      internalID: 21300002
       vertices: []
       indices: 
       edges: []
@@ -149,6 +210,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: f1d55f231c9b36a40b7a4aa6fb8d6b07
+      internalID: 21300004
       vertices: []
       indices: 
       edges: []
@@ -169,6 +231,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 7e2e8e988d6b0114d823dff637ad3e25
+      internalID: 21300006
       vertices: []
       indices: 
       edges: []
@@ -189,6 +252,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: bf60a6ad793eed048bc9ababb84112c9
+      internalID: 21300008
       vertices: []
       indices: 
       edges: []
@@ -209,6 +273,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 6bf3ac277c1326941821ef365d864f34
+      internalID: 21300010
       vertices: []
       indices: 
       edges: []
@@ -229,6 +294,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: cacc6b066e891fd4ab59cad03b9fccaf
+      internalID: 21300012
       vertices: []
       indices: 
       edges: []
@@ -249,6 +315,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: dfb839b2aa23610429ffcf7777f060a2
+      internalID: 21300014
       vertices: []
       indices: 
       edges: []
@@ -269,6 +336,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 9fedf1e4d69a1364f90f3992abf458f8
+      internalID: 21300016
       vertices: []
       indices: 
       edges: []
@@ -289,6 +357,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 5ed1f10c020948043bba1c5c1074c3c1
+      internalID: 21300018
       vertices: []
       indices: 
       edges: []
@@ -297,13 +366,25 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 134c96a8d5dc9a94a8d9008bba454f9c
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
-  spritePackingTag: 
+    secondaryTextures: []
+    nameFileIdTable:
+      Watchman_0: 21300000
+      Watchman_1: 21300002
+      Watchman_2: 21300004
+      Watchman_3: 21300006
+      Watchman_4: 21300008
+      Watchman_5: 21300010
+      Watchman_6: 21300012
+      Watchman_7: 21300014
+      Watchman_8: 21300016
+      Watchman_9: 21300018
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

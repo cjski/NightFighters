@@ -43,7 +43,7 @@ public class VampireBossController : BossController
         primaryCooldown = new Timer(3, true);
         secondaryCooldown = new Timer(6, true);
 
-        slowProjectilePrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/BatProjectilePrefab.prefab", typeof(GameObject));
+        slowProjectilePrefab = (GameObject)Resources.Load<GameObject>("Prefabs/BatProjectilePrefab");
         base.Start();
     }
 

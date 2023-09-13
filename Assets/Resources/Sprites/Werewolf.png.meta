@@ -1,13 +1,21 @@
 fileFormatVersion: 2
-guid: 5a51bbd73a122354bac59fe3b8b36a10
+guid: 8ec329531c700c74788b2bca26ea953a
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: Vampire_0
-    21300002: Vampire_1
-    21300004: Vampire_2
-    21300006: Vampire_3
+  internalIDToNameTable:
+  - first:
+      213: 21300000
+    second: Werewolf_0
+  - first:
+      213: 21300002
+    second: Werewolf_1
+  - first:
+      213: 21300004
+    second: Werewolf_2
+  - first:
+      213: 21300006
+    second: Werewolf_3
   externalObjects: {}
-  serializedVersion: 9
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -24,9 +32,12 @@ TextureImporter:
     externalNormalMap: 0
     heightScale: 0.25
     normalMapFilter: 0
+    flipGreenChannel: 0
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -36,11 +47,11 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
-    wrapW: -1
+    wrapW: 0
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -58,11 +69,17 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 1
+  swizzle: 50462976
+  cookieLightType: 1
   platformSettings:
-  - serializedVersion: 2
+  - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -72,8 +89,10 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
-  - serializedVersion: 2
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -83,12 +102,40 @@ TextureImporter:
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 0
+    ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
+  - serializedVersion: 3
+    buildTarget: Server
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 1
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Vampire_0
+      name: Werewolf_0
       rect:
         serializedVersion: 2
         x: 0
@@ -102,13 +149,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cd577e042655f0640bb931ca5770fa9d
+      spriteID: 30b26a3c49ba7d64ba72a1114340220c
+      internalID: 21300000
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Vampire_1
+      name: Werewolf_1
       rect:
         serializedVersion: 2
         x: 32
@@ -122,13 +170,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 070813e180d6b2f468cbef8ee7a11cb3
+      spriteID: 2f8cd394c01292043a9927c59db0a244
+      internalID: 21300002
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Vampire_2
+      name: Werewolf_2
       rect:
         serializedVersion: 2
         x: 0
@@ -142,13 +191,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 322a67933a0b6fe4981cca645a37379f
+      spriteID: 9339efbd1f9e71a4d95bb3fbf6a82522
+      internalID: 21300004
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Vampire_3
+      name: Werewolf_3
       rect:
         serializedVersion: 2
         x: 32
@@ -162,7 +212,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c4c7b3c64436aa94fa328800fd4acd6b
+      spriteID: 0b1f52a5e021cf346b7bca8c4f7b5102
+      internalID: 21300006
       vertices: []
       indices: 
       edges: []
@@ -170,14 +221,20 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: c26927c846538a547906ef34c03051bb
+    spriteID: 673f18b89e7014a499059b8dd44561cd
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
-  spritePackingTag: 
+    secondaryTextures: []
+    nameFileIdTable:
+      Werewolf_0: 21300000
+      Werewolf_1: 21300002
+      Werewolf_2: 21300004
+      Werewolf_3: 21300006
+  mipmapLimitGroupName: 
   pSDRemoveMatte: 0
-  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

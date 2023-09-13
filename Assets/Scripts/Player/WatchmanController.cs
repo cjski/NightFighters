@@ -28,7 +28,7 @@ public class WatchmanController : HumanController
         primaryCooldown = new Timer(2.5f, true);
         secondaryCooldown = new Timer(5, true);
 
-        lightPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/LanternPrefab.prefab", typeof(GameObject));
+        lightPrefab = Resources.Load<GameObject>("Prefabs/LanternPrefab");
         lantern = Instantiate(lightPrefab, GetPosition(), Quaternion.identity);
         lanternPointer = transform.Find("LanternPointer").gameObject;
         lanternPointer.SetActive(false);

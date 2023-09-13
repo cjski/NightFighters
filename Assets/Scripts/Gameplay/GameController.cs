@@ -202,34 +202,34 @@ public class GameController : MonoBehaviour
     void Start()
     {
         classes = new List<ClassInformation> {
-            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterPrefab.prefab", typeof(GameObject)),
+            new ClassInformation(Resources.Load<GameObject>("Prefabs/HunterPrefab"),
             "Hunter", "None", "Arrow", "Dash", true, false),
-            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanPrefab.prefab", typeof(GameObject)),
+            new ClassInformation(Resources.Load<GameObject>("Prefabs/WatchmanPrefab"),
             "Watchman", "Lantern", "Stun", "Lantern Toss", true, false),
-            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfPrefab.prefab", typeof(GameObject)),
+            new ClassInformation(Resources.Load<GameObject>("Prefabs/WerewolfPrefab"),
             "Werewolf", "Break Lights", "Knockback", "Dash", false, false),
-            new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampirePrefab.prefab", typeof(GameObject)),
+            new ClassInformation(Resources.Load<GameObject>("Prefabs/VampirePrefab"),
             "Vampire", "None", "Bite(Heal)", "Slow Projectile", false, false)
         };
 
         bossClasses = new List<ClassInformation>
         {
-           new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfBossPrefab.prefab", typeof(GameObject)),
+           new ClassInformation(Resources.Load<GameObject>("Prefabs/WerewolfBossPrefab"),
            "", "", "", "", false, true),
-           new ClassInformation((GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampireBossPrefab.prefab", typeof(GameObject)),
+           new ClassInformation(Resources.Load<GameObject>("Prefabs/VampireBossPrefab"),
            "", "", "", "", false, true)
         };
 
         stageMap = new Map(GameConstants.MAP_COLUMNS, GameConstants.MAP_ROWS, GameConstants.MAP_TILE_SIZE, GameConstants.MAP_OFFSET);
 
-        characterInfoPanelPrefab = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/CharacterInfoPanelPrefab.prefab", typeof(GameObject));
+        characterInfoPanelPrefab = Resources.Load<GameObject>("Prefabs/CharacterInfoPanelPrefab");
 
         AIControllerPrefabs = new List<GameObject>
         {
-            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/HunterAIController.prefab", typeof(GameObject)),
-            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WatchmanAIController.prefab", typeof(GameObject)),
-            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/WerewolfAIController.prefab", typeof(GameObject)),
-            (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/VampireAIController.prefab", typeof(GameObject)),
+            Resources.Load<GameObject>("Prefabs/HunterAIController"),
+            Resources.Load<GameObject>("Prefabs/WatchmanAIController"),
+            Resources.Load<GameObject>("Prefabs/WerewolfAIController"),
+            Resources.Load<GameObject>("Prefabs/VampireAIController"),
         };
 
         StartEnterGameMenu();
@@ -294,7 +294,7 @@ public class GameController : MonoBehaviour
 
     private void StartEnterGameMenu()
     {
-        enterGameMenuPanel = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/EnterGamePanelPrefab.prefab", typeof(GameObject)), GameConstants.ENTER_GAME_MENU_PANEL_POSITION, Quaternion.identity);
+        enterGameMenuPanel = Instantiate(Resources.Load<GameObject>("Prefabs/EnterGamePanelPrefab"), GameConstants.ENTER_GAME_MENU_PANEL_POSITION, Quaternion.identity);
         state = State.enterGameMenu;
         nextPlayerToAddIndex = 0;
         numHumans = 1;
@@ -432,7 +432,7 @@ public class GameController : MonoBehaviour
     {
         state = State.endGameScreen;
         ClearAllGameObjects();
-        endGamePanel = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/EndGamePanelPrefab.prefab", typeof(GameObject)), GameConstants.END_GAME_MENU_PANEL_POSITION, Quaternion.identity);
+        endGamePanel = (GameObject)Instantiate(Resources.Load<GameObject>("Prefabs/EndGamePanelPrefab"), GameConstants.END_GAME_MENU_PANEL_POSITION, Quaternion.identity);
         SpriteRenderer[] spriteRenderers = {
             endGamePanel.transform.Find("SpriteLeft"  ).gameObject.GetComponent<SpriteRenderer>(),
             endGamePanel.transform.Find("SpriteMiddle").gameObject.GetComponent<SpriteRenderer>(),
@@ -502,7 +502,7 @@ public class GameController : MonoBehaviour
     private void StartCharacterSelect()
     {
         state = State.characterSelect;
-        startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
+        startButton = (GameObject)Instantiate(Resources.Load<GameObject>("Prefabs/StartButtonPrefab"), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
         startButton.SetActive(false);
         allowedHumanPlayerIndex = 0;
         playerInfo[0].isRealPlayer = true;
@@ -805,7 +805,7 @@ public class GameController : MonoBehaviour
     {
         if (playerInfo[newHumanIndex].isRealPlayer)
         {
-            startButton = (GameObject)Instantiate(AssetDatabase.LoadAssetAtPath("Assets/Prefabs/StartButtonPrefab.prefab", typeof(GameObject)), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
+            startButton = (GameObject)Instantiate(Resources.Load<GameObject>("Prefabs/StartButtonPrefab"), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
             startButton.SetActive(false);
             stageMap.ClearAll();
             HidePlayers();

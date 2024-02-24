@@ -13,7 +13,7 @@ public class VampireBossAI : BossAI
     // Update is called once per frame
     protected override void Update()
     {
-        if (playerController != null)
+        if (playerController != null && !playerController.IsStunned())
         {
             VampireBossController vc = playerController as VampireBossController;
             finalDirection = GetDirectionToTargetForMovement();

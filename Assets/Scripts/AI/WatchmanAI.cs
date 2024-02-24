@@ -15,7 +15,7 @@ public class WatchmanAI : HumanAI
 
     protected override void Update()
     {
-        if (playerController == null) return;
+        if (playerController == null || playerController.IsStunned()) return;
 
         WatchmanController wc = playerController as WatchmanController;
 

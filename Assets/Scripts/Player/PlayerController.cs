@@ -327,9 +327,12 @@ public abstract class PlayerController : MonoBehaviour {
 
         if ( movementType == MovementType.Stun )
         {
-            PlayIdle();
+            moveVector = pushVector;
+            moveMagnitude = moveVector.magnitude;
+            moveVector.Normalize();
         }
-        else if ( moveMagnitude > 0 )
+
+        if ( moveMagnitude > 0 )
         {
             Vector2 pos = GetPosition();
             Vector2 size = GetSize();
@@ -410,7 +413,7 @@ public abstract class PlayerController : MonoBehaviour {
 
             bool hasInputMotion = desiredMove.y != 0 || desiredMove.x != 0;
             // Our movement is just from getting pushed around, just play the idle and don't update facing direction
-            if ( !hasInputMotion )
+            if ( !hasInputMotion && !( movementType == MovementType.Stun ) )
             {
                 PlayIdle();
             }
@@ -582,6 +585,11 @@ public abstract class PlayerController : MonoBehaviour {
     public virtual bool IsHittable()
     {
         return movementType == MovementType.Dashing;
+    }
+
+    public virtual bool IsStunned()
+    {
+        return movementType == MovementType.Stun;
     }
 
     // By default play an idle animation, if a player has a different animation it will be overriden to use the logic of the class

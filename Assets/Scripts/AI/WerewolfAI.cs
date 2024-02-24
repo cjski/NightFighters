@@ -13,7 +13,7 @@ public class WerewolfAI : MonsterAI
     // Update is called once per frame
     protected override void Update()
     {
-        if (playerController)
+        if (playerController && !playerController.IsStunned())
         {
             WerewolfController wc = (WerewolfController)playerController;
             finalDirection = GetDirectionToTargetForMovement();

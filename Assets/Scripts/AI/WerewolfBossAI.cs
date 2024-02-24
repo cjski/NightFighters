@@ -13,7 +13,7 @@ public class WerewolfBossAI : BossAI
     // Update is called once per frame
     protected override void Update()
     {
-        if (playerController)
+        if (playerController && !playerController.IsStunned())
         {
             WerewolfBossController controller = playerController as WerewolfBossController;
             finalDirection = GetDirectionToTargetForMovement();

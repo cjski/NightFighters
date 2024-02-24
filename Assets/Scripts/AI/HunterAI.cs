@@ -12,7 +12,7 @@ public class HunterAI : HumanAI
     // Update is called once per frame
     protected override void Update()
     {
-        if (playerController != null)
+        if (playerController != null && !playerController.IsStunned())
         {
             HunterController hc = (HunterController)playerController;
             canSeeTarget = false;

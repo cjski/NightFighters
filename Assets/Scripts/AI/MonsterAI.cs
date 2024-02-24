@@ -28,7 +28,7 @@ public class MonsterAI : AI
 
     protected override void Update()
     {
-        if (playerController != null)
+        if (playerController != null && !playerController.IsStunned())
         {
             finalDirection = GetDirectionToTargetForMovement();
 

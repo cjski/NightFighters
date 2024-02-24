@@ -10,7 +10,7 @@ public class WatchmanController : HumanController
     public float hitAngleDegrees { get; private set; } = 60.0f;
     public float hitCosAngle { get; private set; } = Mathf.Cos(3.14159265f * 60 / 180);
     public float stunTime { get; private set; } = 0.25f;
-    public int damage { get; private set; } = 20;
+    public int damage { get; private set; } = 15;
     public float lanternInitialSpeed { get; private set; } = 16.25f;
     public float lanternDistanceToPickUpSqr { get; private set; } = 0.3f;
     public Timer catchTimer { get; private set; } = new Timer(.5f);

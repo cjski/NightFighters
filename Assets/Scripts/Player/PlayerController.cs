@@ -16,7 +16,7 @@ public abstract class PlayerController : MonoBehaviour {
 
     protected enum MovementType { Normal, Dashing, Stun };
 
-    public enum PushPriority { Normal, Boss };
+    public enum PushPriority { Normal, Monster, Boss };
 
     protected int playerNumber;
 
@@ -147,6 +147,11 @@ public abstract class PlayerController : MonoBehaviour {
         }
 
         text.text = "Player " + playerNumber + " Health: " + health + "/" + maxHealth + "\nA: " + primaryCooldown.GetPercentDone() + " B: " + secondaryCooldown.GetPercentDone();
+
+        if ( movementType == MovementType.Stun )
+        {
+            text.text += "\nSTUNNED";
+        }
 
         if (!IsAI)
         {

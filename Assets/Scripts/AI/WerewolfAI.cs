@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class WerewolfAI : MonsterAI
 {
-    protected static int wallLayerMask;
     // Start is called before the first frame update
     protected override void Start()
     {
-        wallLayerMask = LayerMask.GetMask("Wall");
         base.Start();
     }
 
@@ -30,7 +28,7 @@ public class WerewolfAI : MonsterAI
                 RaycastHit2D hitTarget = Physics2D.Raycast(playerController.GetPosition(), finalDirection, wc.GetDashDistance(), wallLayerMask);
 
                 // Dash if there is no wall that the AI would crash into
-                if (hitTarget.collider == null)
+                if (hitTarget.collider)
                 {
                     // Don't dash if you would overshoot a light you want to turn off or if you have a position you don't want to move from
                     if (closestLightDistanceSqr > Mathf.Pow(wc.GetDashDistance(), 2) && finalDirection.sqrMagnitude > 0.01f)

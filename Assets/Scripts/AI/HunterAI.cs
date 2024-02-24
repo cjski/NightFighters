@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class HunterAI : HumanAI
 {
-    protected static int wallLayerMask;
     protected override void Start()
     {
-        wallLayerMask = LayerMask.GetMask("Wall");
         base.Start();
     }
 

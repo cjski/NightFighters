@@ -18,6 +18,7 @@ public class BossController : MonsterController
     new protected void Start()
     {
         base.Start();
+        pushPriority = PushPriority.Boss;
     }
 
     // Update is called once per frame

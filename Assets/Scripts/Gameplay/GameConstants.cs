@@ -49,4 +49,8 @@ public static class GameConstants
     public static int DEFAULT_NUM_MAP_WALLS = 6;
     public static int DEFAULT_NUM_MAP_LIGHTS = 6;
     public static bool MAPGEN_AVOID_EDGE_WALLS = true;
+
+    public static int[] WALLS_PER_STAGE = { 6, 6, 4 };
+    public static int[] LIGHTS_PER_STAGE = { 6, 4, 3 };
+    public static int[] LIGHTS_ON_PER_STAGE = { 2, 1, 0 };
 }

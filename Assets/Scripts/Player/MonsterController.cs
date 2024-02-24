@@ -12,6 +12,8 @@ public class MonsterController : PlayerController {
 	// Use this for initialization
 	new protected void Start () {
         base.Start();
+
+        pushPriority = PushPriority.Monster;
     }
 
     // Update is called once per frame
@@ -38,7 +40,7 @@ public class MonsterController : PlayerController {
         float xDist, yDist;
         for (int i = 0; i < lights.Length; ++i)
         {
-            if (lights[i].GetComponent<LightController>().On())
+            if ( lights[i].GetComponent<LightController>().isOn )
             {
                 //Use squared distance for faster calculation
                 xDist = GetPosition().x - lights[i].transform.position.x;

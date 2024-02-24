@@ -116,8 +116,11 @@ public class Map
         return new Vector2(xPos + 0.5f, yPos + 0.5f)*unitSize + offset;
     }
 
-    public void Generate()
+    public void Generate( int numWalls, int numLights )
     {
+        gameData.numWalls = numWalls;
+        gameData.numLights = numLights;
+
         // Initialize all nodes - all will be used later
         for(int i=0;i< x;++i)
         {

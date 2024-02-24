@@ -11,7 +11,7 @@ public class HunterController : HumanController
     public float dashDuration { get; private set; } = 0.5f;
     public float arrowSpeed { get; private set; } = 10.0f;
     public float arrowDuration { get; private set; } = 2;
-    public int arrowDamage { get; private set; } = 20;
+    public int arrowDamage { get; private set; } = 10;
 
     // Start is called before the first frame update
     protected new void Start()

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MonsterAI : AI
 {
-    protected static Map map;
     protected static float directionToTargetWeight = 1.0f;
     protected static float directionToBestTileWeight = 0.75f;
     protected static float directionAwayFromObstacleWeight = 1.0f;
@@ -40,7 +39,7 @@ public class MonsterAI : AI
         }
     }
 
-    protected Vector2 GetDirectionToTargetForMovement()
+    protected override Vector2 GetDirectionToTargetForMovement()
     {
         Vector2 direction = Vector2.zero;
 
@@ -266,7 +265,7 @@ public class MonsterAI : AI
             {
                 LightController lc = lights[i].GetComponent<LightController>();
                 // Don't go for any lights that are off
-                if (lc != null && lc.On() && !lc.IsLantern())
+                if (lc != null && lc.isOn && !lc.IsLantern())
                 {
                     targetPosition = lc.gameObject.transform.position;
                     toTarget = targetPosition - selfPosition;

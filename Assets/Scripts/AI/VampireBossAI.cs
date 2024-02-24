@@ -1,8 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VampireAI : BossAI
+public class VampireBossAI : BossAI
 {
     // Start is called before the first frame update
     protected override void Start()
@@ -15,7 +15,7 @@ public class VampireAI : BossAI
     {
         if (playerController != null)
         {
-            VampireController vc = playerController as VampireController;
+            VampireBossController vc = playerController as VampireBossController;
             finalDirection = GetDirectionToTargetForMovement();
 
             if (vc.primaryCooldown.done && Mathf.Pow(vc.biteRange, 2) > closestHumanDistanceSqr)

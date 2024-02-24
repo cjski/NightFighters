@@ -4,6 +4,23 @@ using UnityEngine;
 using UnityEditor;
 using UnityEngine.UI;
 
+
+public enum StatLevel
+{
+    LOW,
+    MEDIUM,
+    HIGH,
+    MAX,
+    COUNT
+}
+
+public struct Stats
+{
+    public StatLevel health;
+    public StatLevel attack;
+    public StatLevel speed;
+}
+
 public class ClassInformation
 {
     public GameObject prefab { get; private set; }
@@ -13,8 +30,11 @@ public class ClassInformation
     public string secondaryDescription { get; private set; }
     public bool isHumanClass { get; private set; }
     public bool isBossClass { get; private set; }
+    public Stats stats { get; private set; }
 
-    public ClassInformation(GameObject classPrefab, string className, string classPassiveDescription, string classPrimaryDescription, string classSecondaryDescription, bool classIsHumanClass, bool classIsBossClass)
+
+    public ClassInformation(GameObject classPrefab, string className, string classPassiveDescription, string classPrimaryDescription,
+        string classSecondaryDescription, bool classIsHumanClass, bool classIsBossClass, StatLevel classHealth, StatLevel classAttack, StatLevel classSpeed)
     {
         prefab = classPrefab;
         name = className;
@@ -23,6 +43,12 @@ public class ClassInformation
         secondaryDescription = classSecondaryDescription;
         isHumanClass = classIsHumanClass;
         isBossClass = classIsBossClass;
+        stats = new Stats()
+        {
+            health = classHealth,
+            attack = classAttack,
+            speed = classSpeed
+        };
     }
 }
 
@@ -173,11 +199,13 @@ public class GameController : MonoBehaviour
     enum State { game, bossFight, endGameScreen, characterSelect, newHumanSelect, enterGameMenu }
 
     State state;
+    int stage = 0;
     PlayerInformation[] playerInfo = new PlayerInformation[GameConstants.NUM_PLAYERS];
     int nextPlayerToAddIndex = 0;
     Map stageMap;
 
     List<GameObject> AIControllerPrefabs;
+    List<GameObject> BossAIControllerPrefabs;
     GameObject[] AIControllers = new GameObject[GameConstants.NUM_PLAYERS];
 
     List<ClassInformation> classes;
@@ -202,22 +230,22 @@ public class GameController : MonoBehaviour
     void Start()
     {
         classes = new List<ClassInformation> {
-            new ClassInformation(Resources.Load<GameObject>("Prefabs/HunterPrefab"),
-            "Hunter", "None", "Arrow", "Dash", true, false),
-            new ClassInformation(Resources.Load<GameObject>("Prefabs/WatchmanPrefab"),
-            "Watchman", "Lantern", "Stun", "Lantern Toss", true, false),
-            new ClassInformation(Resources.Load<GameObject>("Prefabs/WerewolfPrefab"),
-            "Werewolf", "Break Lights", "Knockback", "Dash", false, false),
-            new ClassInformation(Resources.Load<GameObject>("Prefabs/VampirePrefab"),
-            "Vampire", "None", "Bite(Heal)", "Slow Projectile", false, false)
+            new ClassInformation( Resources.Load<GameObject>("Prefabs/HunterPrefab"),
+            "Hunter", "None", "Arrow", "Dash", true, false, StatLevel.LOW, StatLevel.HIGH, StatLevel.HIGH ),
+            new ClassInformation( Resources.Load<GameObject>("Prefabs/WatchmanPrefab"),
+            "Watchman", "Lantern", "Stun", "Lantern Toss", true, false, StatLevel.HIGH, StatLevel.MEDIUM, StatLevel.LOW ),
+            new ClassInformation( Resources.Load<GameObject>("Prefabs/WerewolfPrefab"),
+            "Werewolf", "Break Lights", "Knockback", "Dash", false, false, StatLevel.MEDIUM, StatLevel.MEDIUM, StatLevel.MAX ),
+            new ClassInformation( Resources.Load<GameObject>("Prefabs/VampirePrefab"),
+            "Vampire", "None", "Bite(Heal)", "Slow Projectile", false, false, StatLevel.LOW, StatLevel.HIGH, StatLevel.MEDIUM )
         };
 
         bossClasses = new List<ClassInformation>
         {
-           new ClassInformation(Resources.Load<GameObject>("Prefabs/WerewolfBossPrefab"),
-           "", "", "", "", false, true),
-           new ClassInformation(Resources.Load<GameObject>("Prefabs/VampireBossPrefab"),
-           "", "", "", "", false, true)
+           new ClassInformation( Resources.Load<GameObject>("Prefabs/WerewolfBossPrefab"),
+           "", "", "", "", false, true, StatLevel.MAX, StatLevel.MEDIUM, StatLevel.HIGH ),
+           new ClassInformation( Resources.Load<GameObject>("Prefabs/VampireBossPrefab"),
+           "", "", "", "", false, true, StatLevel.MEDIUM, StatLevel.MAX, StatLevel.MEDIUM )
         };
 
         stageMap = new Map(GameConstants.MAP_COLUMNS, GameConstants.MAP_ROWS, GameConstants.MAP_TILE_SIZE, GameConstants.MAP_OFFSET);
@@ -232,12 +260,20 @@ public class GameController : MonoBehaviour
             Resources.Load<GameObject>("Prefabs/VampireAIController"),
         };
 
+        BossAIControllerPrefabs = new List<GameObject>
+        {
+            Resources.Load<GameObject>("Prefabs/WerewolfBossAIController"),
+            Resources.Load<GameObject>("Prefabs/VampireBossAIController"),
+        };
+
         StartEnterGameMenu();
     }
 
     // Update is called once per frame
     void Update()
     {
+        CheckDebugKeyPress();
+
         if (state == State.game)
         {
             UpdateGame();
@@ -261,6 +297,18 @@ public class GameController : MonoBehaviour
         else if(state == State.endGameScreen)
         {
             UpdateEndGameScreen();
+        }
+    }
+
+    private void CheckDebugKeyPress()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RegeneratePlayers();
+        }
+        else if (Input.GetKeyDown(KeyCode.G))
+        {
+            Regenerate();
         }
     }
 
@@ -296,6 +344,7 @@ public class GameController : MonoBehaviour
     {
         enterGameMenuPanel = Instantiate(Resources.Load<GameObject>("Prefabs/EnterGamePanelPrefab"), GameConstants.ENTER_GAME_MENU_PANEL_POSITION, Quaternion.identity);
         state = State.enterGameMenu;
+        stage = 0;
         nextPlayerToAddIndex = 0;
         numHumans = 1;
         numMonsters = 3;
@@ -323,8 +372,11 @@ public class GameController : MonoBehaviour
     {
         for ( int i = 0; i < GameConstants.NUM_PLAYERS; ++i )
         {
-            PlayerController playerController = playerInfo[i].character.GetComponent<PlayerController>();
-            playerController.UpdatePreMove();
+            if ( playerInfo[i].character != null )
+            {
+                PlayerController playerController = playerInfo[i].character.GetComponent<PlayerController>();
+                playerController.UpdatePreMove();
+            }
         }
     }
 
@@ -332,23 +384,16 @@ public class GameController : MonoBehaviour
     {
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            PlayerController playerController = playerInfo[i].character.GetComponent<PlayerController>();
-            playerController.UpdateMove();
+            if (playerInfo[i].character != null)
+            {
+                PlayerController playerController = playerInfo[i].character.GetComponent<PlayerController>();
+                playerController.UpdateMove();
+            }
         }
     }
 
     private void UpdateGame()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            RegeneratePlayers();
-        }
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            Regenerate();
-        }
-
         // Handle player stuff we need happening in sequential order
         UpdatePlayers();
 
@@ -357,12 +402,12 @@ public class GameController : MonoBehaviour
         newHumanIndex = -1;
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
-            if (!playerInfo[i].character.GetComponent<PlayerController>().isAlive)
+            if ( !playerInfo[i].character.GetComponent<PlayerController>().isAlive )
             {
                 newHumanIndex = i;
             }
 
-            if(!playerInfo[i].classInformation.isHumanClass && newHumanIndex != i)
+            if( !playerInfo[i].classInformation.isHumanClass && newHumanIndex != i )
             {
                 lastMonsterIndex = i;
             }
@@ -390,16 +435,6 @@ public class GameController : MonoBehaviour
 
     private void UpdateBossFight()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            RegeneratePlayers();
-        }
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            Regenerate();
-        }
-        
         for (int i = 0; i < GameConstants.NUM_PLAYERS; ++i)
         {
             if (playerInfo[i].character != null && !playerInfo[i].character.GetComponent<PlayerController>().isAlive)
@@ -420,6 +455,10 @@ public class GameController : MonoBehaviour
         if (numHumans == 0 || numMonsters == 0)
         {
             StartEndGameScreen();
+        }
+        else
+        {
+            UpdatePlayers();
         }
     }
 
@@ -530,6 +569,7 @@ public class GameController : MonoBehaviour
     private void StartCharacterSelect()
     {
         state = State.characterSelect;
+        stage = 0;
         startButton = (GameObject)Instantiate(Resources.Load<GameObject>("Prefabs/StartButtonPrefab"), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
         startButton.SetActive(false);
         allowedHumanPlayerIndex = 0;
@@ -831,6 +871,8 @@ public class GameController : MonoBehaviour
 
     private void StartNewHumanCharacterSelection()
     {
+        stage += 1;
+
         if (playerInfo[newHumanIndex].isRealPlayer)
         {
             startButton = (GameObject)Instantiate(Resources.Load<GameObject>("Prefabs/StartButtonPrefab"), GameConstants.START_BUTTON_POSITION, Quaternion.identity);
@@ -958,15 +1000,37 @@ public class GameController : MonoBehaviour
             else
             {
                 if(AIControllers[i] != null) Destroy(AIControllers[i]);
-                AIControllers[i] = Instantiate(AIControllerPrefabs[playerInfo[i].classSelectionIndex], new Vector3(-100, -100, -100), Quaternion.identity);
+
+                if ( i == newBossIndex )
+                {
+                    int selectionIndex = playerInfo[i].classSelectionIndex - GameConstants.NUM_HUMAN_CLASSES;
+                    AIControllers[i] = Instantiate(BossAIControllerPrefabs[selectionIndex], new Vector3(-100, -100, -100), Quaternion.identity);
+                }
+                else
+                {
+                    AIControllers[i] = Instantiate(AIControllerPrefabs[playerInfo[i].classSelectionIndex], new Vector3(-100, -100, -100), Quaternion.identity);
+                }
+                
                 AIControllers[i].GetComponent<AI>().Init(stageMap, currentPlayerInfo.character, i+1);
             }
         }
+    }
 
+    private void RegenerateLights()
+    {
         GameObject[] lights = GameObject.FindGameObjectsWithTag("Light");
-        for (int i = 0; i < lights.Length; ++i)
+        int numLightsOn = GameConstants.LIGHTS_ON_PER_STAGE[ stage ];
+        int numLightsOff = lights.Length - numLightsOn;
+
+        // The regenerated lights are random, so just partition the array into two for which are on and off
+        for (int i = 0; i < numLightsOff; ++i)
         {
             lights[i].GetComponent<LightController>().TurnOff();
+        }
+
+        for (int i = numLightsOff; i < lights.Length; ++i)
+        {
+            lights[i].GetComponent<LightController>().TurnOn();
         }
     }
 
@@ -990,8 +1054,9 @@ public class GameController : MonoBehaviour
 
     private void Regenerate()
     {
-        stageMap.Generate();
+        stageMap.Generate( GameConstants.WALLS_PER_STAGE[ stage ], GameConstants.LIGHTS_PER_STAGE[ stage ] );
         RegeneratePlayers();
+        RegenerateLights();
     }
 
     private void ResetCharacterInfoPanel(int playerIndex, bool isNewHumanSelection)
@@ -999,12 +1064,28 @@ public class GameController : MonoBehaviour
         PlayerInformation currentPlayerInfo = playerInfo[playerIndex];
         if (currentPlayerInfo.isRealPlayer)
         {
-            characterInfoPanels[playerIndex].transform.Find("Canvas").GetComponentInChildren<Text>().text =
-                "Player " + (playerIndex + 1) +
-                "\nName: " + currentPlayerInfo.classInformation.name +
-                "\nPassive: " + currentPlayerInfo.classInformation.passiveDescription +
-                "\nPrimary: " + currentPlayerInfo.classInformation.primaryDescription +
-                "\nSecondary: " + currentPlayerInfo.classInformation.secondaryDescription;
+            string infoText = "";
+
+            infoText += currentPlayerInfo.classInformation.name + " : ";
+            if ( currentPlayerInfo.classInformation.isHumanClass )
+            {
+                infoText += "Human";
+            }
+            else
+            {
+                infoText += "Monster";
+            }
+
+            infoText += "\nPassive: " + currentPlayerInfo.classInformation.passiveDescription;
+            infoText += "\nA: " + currentPlayerInfo.classInformation.primaryDescription +
+                        "  B: " + currentPlayerInfo.classInformation.secondaryDescription;
+
+            string[] StatToText = { "[X]", "[X][X]", "[X][X][X]", "[X][X][X][X]" };
+            infoText += "\nHP:   " + StatToText[(int)currentPlayerInfo.classInformation.stats.health] +
+                        "\nATK: " + StatToText[(int)currentPlayerInfo.classInformation.stats.attack] +
+                        "\nSPD: " + StatToText[(int)currentPlayerInfo.classInformation.stats.speed];
+
+            characterInfoPanels[playerIndex].transform.Find("Canvas").GetComponentInChildren<Text>().text = infoText;
 
             SpriteRenderer characterInfoPanelSpriteRenderer = characterInfoPanels[playerIndex].transform.Find("ClassSprite").gameObject.GetComponent<SpriteRenderer>();
             SpriteRenderer classSpriteRenderer = currentPlayerInfo.classInformation.prefab.GetComponent<SpriteRenderer>();

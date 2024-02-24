@@ -6,8 +6,18 @@ public class AI : MonoBehaviour
 {
     protected static int ignoreLightLanternProjectileLayerMask;
     protected static int ignoreLanternProjectileLayerMask;
+    protected static int wallLayerMask;
     protected static float directionAwayFromObstacleMax = 1.0f;
     protected Vector2 finalDirection = new Vector2(0, 0);
+
+    protected float distanceToTargetSquared;
+    protected bool targetIsPlayer;
+    protected bool canSeeTarget;
+    protected static Map map;
+    protected static float lightTargetDistanceOffset = 50; //Offsets the distance for the lights so the AI is more likely to target players
+    protected static float weightDirectionAwayFromObstacles = 1.0f;
+    protected Node selfNode;
+    protected Vector2 selfPosition;
 
     protected PlayerController playerController;
 
@@ -15,6 +25,7 @@ public class AI : MonoBehaviour
     {
         ignoreLightLanternProjectileLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Light", "Lantern", "Projectile");
         ignoreLanternProjectileLayerMask = ~LayerMask.GetMask("IgnoreRaycast", "Lantern", "Projectile");
+        wallLayerMask = LayerMask.GetMask("Wall");
     }
 
     protected virtual void Update()
@@ -25,6 +36,11 @@ public class AI : MonoBehaviour
     public virtual void Init(Map gameMap, GameObject player, int newPlayerNumber)
     {
 
+    }
+
+    protected virtual Vector2 GetDirectionToTargetForMovement()
+    {
+        return Vector2.zero;
     }
 
     protected bool FindIfTargetIsVisible(Vector2 targetPosition, Vector2 toTarget, ref Vector2 direction, int layerMask)
@@ -160,5 +176,58 @@ public class AI : MonoBehaviour
         }
 
         return directionAwayFromObstacle;
+    }
+
+    protected bool IsNewTargetCloser(GameObject targetObject, ref Vector2 direction, int layerMask, float distanceOffset = 0)
+    {
+        Vector3 targetPosition = targetObject.transform.position;
+        Vector2 toTarget = (Vector2)targetPosition - playerController.GetPosition();
+        float targetDistanceSquared = toTarget.sqrMagnitude + distanceOffset;
+        if (targetDistanceSquared < distanceToTargetSquared)
+        {
+            Vector2 newTargetDirection = Vector2.zero;
+            canSeeTarget = FindIfTargetIsVisible(targetPosition, toTarget, ref newTargetDirection, layerMask);
+            if (!canSeeTarget)
+            {
+                Node targetNode = map.GetNode(targetPosition);
+                // Add one to the target distance calculation because if they are on the same node it will count as 0
+                float targetDistance = (selfNode.distances[targetNode.x, targetNode.y] + 1) * map.unitSize;
+                targetDistanceSquared = targetDistance * targetDistance + distanceOffset;
+                if (targetDistanceSquared < distanceToTargetSquared)
+                {
+                    Node destination = selfNode;
+
+                    // Pick the next best node beside you to go to
+                    if (selfNode.l != Node.Connection.Wall && map.GetNode(selfNode.x - 1, selfNode.y).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = map.GetNode(selfNode.x - 1, selfNode.y);
+                    }
+                    if (selfNode.d != Node.Connection.Wall && map.GetNode(selfNode.x, selfNode.y - 1).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = map.GetNode(selfNode.x, selfNode.y - 1);
+                    }
+                    if (selfNode.u != Node.Connection.Wall && map.GetNode(selfNode.x, selfNode.y + 1).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = map.GetNode(selfNode.x, selfNode.y + 1);
+                    }
+                    if (selfNode.r != Node.Connection.Wall && map.GetNode(selfNode.x + 1, selfNode.y).distances[targetNode.x, targetNode.y] < destination.distances[targetNode.x, targetNode.y])
+                    {
+                        destination = map.GetNode(selfNode.x + 1, selfNode.y);
+                    }
+
+                    direction = map.GetRealNodePosition(destination.x, destination.y) - selfPosition;
+                    distanceToTargetSquared = targetDistanceSquared;
+                    return true;
+                }
+            }
+            else
+            {
+                direction = newTargetDirection;
+                distanceToTargetSquared = targetDistanceSquared;
+                return true;
+            }
+        }
+
+        return false;
     }
 }

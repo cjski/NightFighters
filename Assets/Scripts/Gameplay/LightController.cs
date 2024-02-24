@@ -5,11 +5,11 @@ using UnityEngine;
 public class LightController : MonoBehaviour {
 
     protected Behaviour halo;
+    public bool isOn;
     private float turnOnFixedTime = 2;
     private float turnOnBrokenTime = 4;
     Timer turnOnTimer = new Timer(2);
     Timer turnOffTimer = new Timer(2);
-    Timer brokenTimer = new Timer(2);
     public bool humansIn = false, monstersIn = false, broken = false;
     private float activateRadSqr = 0.3125f;
     public GameObject currentHumanInLight = null;
@@ -20,18 +20,39 @@ public class LightController : MonoBehaviour {
     // Use this for initialization
     protected void Start () {
         halo = (Behaviour)GetComponent("Halo");
-        halo.enabled = false;
+
+        if ( halo )
+        {
+            if ( isOn )
+            {
+                halo.enabled = true;
+            }
+            else
+            {
+                halo.enabled = false;
+            }
+        }
 
         GetComponent<SpriteRenderer>().sortingOrder = -1;
 
         anim = GetComponent<Animator>();
-        if (anim) anim.Play("Off");
+        if ( anim )
+        {
+            if ( isOn )
+            {
+                anim.Play( "On" );
+            }
+            else
+            {
+                anim.Play( "Off" );
+            }
+        }
     }
 	
 	// Update is called once per frame
 	protected void Update () {
         FindPlayersIn();
-        if (halo.enabled)
+        if ( isOn )
         {
             if (monstersIn)
             {
@@ -45,11 +66,13 @@ public class LightController : MonoBehaviour {
                 turnOnTimer.Update();
             }
         }
-        if (turnOnTimer.done)
+
+        if ( turnOnTimer.done )
         {
             halo.enabled = true;
             if (anim) anim.Play("On");
             turnOnTimer.Reset();
+            isOn = true;
         }
         else if (turnOffTimer.done)
         {
@@ -58,6 +81,7 @@ public class LightController : MonoBehaviour {
             halo.enabled = false;
             if (anim) anim.Play("Off");
             turnOffTimer.Reset();
+            isOn = false;
         }
     }
 
@@ -95,12 +119,6 @@ public class LightController : MonoBehaviour {
         }
     }
 
-    public bool On()
-    {
-        if(halo != null) return halo.enabled;
-        return false;
-    }
-
     public bool TurningOn()
     {
         return turnOnTimer.time > 0;
@@ -115,10 +133,15 @@ public class LightController : MonoBehaviour {
     {
         turnOffTimer.Reset();
         turnOnTimer.Reset();
-        if (halo)
+        isOn = false;
+        if ( halo )
         {
             halo.enabled = false;
-            if (anim) anim.Play("Off");
+            
+        }
+        if ( anim )
+        {
+            anim.Play("Off");
         }
     }
 
@@ -126,10 +149,14 @@ public class LightController : MonoBehaviour {
     {
         turnOffTimer.Reset();
         turnOnTimer.Reset();
-        if (halo)
+        isOn = true;
+        if ( halo )
         {
             halo.enabled = true;
-            if (anim) anim.Play("On");
+        }
+        if ( anim )
+        {
+            anim.Play("On");
         }
     }
 
